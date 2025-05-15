@@ -1,0 +1,37 @@
+[pyprland]
+plugins = ["scratchpads","layout_center"]
+
+[pyprland.variables]
+term_classed = "kitty --class"
+
+[scratchpads.term]
+animation = "fromTop"
+command = "kitty --class main-dropterm"
+class = "main-dropterm"
+size = "75% 60%"
+max_size = "1920px 100%"
+
+[scratchpads.btop]
+animation = "fromTop"
+command = "kitty --class main-btop -e btop"
+class = "main-btop"
+size = "80% 75%"
+max_size = "1920px 100%"
+
+[scratchpads.yazi]
+animation = "fromTop"
+command = "kitty --class main-yazi -e yazi"
+class = "main-yazi"
+size = "90% 80%"
+max_size = "1920px 100%"
+
+[layout_center]
+margin = 30
+offset = [0, 20]
+next = "movefocus r"
+prev = "movefocus l"
+next2 = "movefocus d"
+prev2 = "movefocus u"
+
+# [expos]
+# workspace = special:exposed,gapsout:60,gapsin:30,bordersize:5,border:true,shadow:false,movefocus_cycles_groupfirst:true

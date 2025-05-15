@@ -1,0 +1,8 @@
+"custom/memory_swap": {
+  "exec": "~/.local/share/bin/swap.sh",
+  "format": "US: {}",
+  "return-type": "json",
+  "interval": 10,
+  "tooltip": true
+},
+
