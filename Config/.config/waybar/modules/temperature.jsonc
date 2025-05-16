@@ -1,0 +1,7 @@
+"temperature": {
+  "critical-threshold": 80,
+  "format-critical": " {temperatureC}°C",
+  "format": " {temperatureC}°C",
+  "tooltip-format": "  󰍽: s-tui\n {temperatureC}° Celsius\n{temperatureF}° Fahrenheit\n{temperatureK}° Kelvin",
+  "on-click": "footclient -T waybar_s-tui -e s-tui"
+},

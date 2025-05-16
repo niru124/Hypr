@@ -1,0 +1,8 @@
+{
+    "version": "2.0.1",
+    "autoload": {
+        "AT Translated Set 2 keyboard": "new preset",
+        "Logitech USB Optical Mouse": "REVERSE_X",
+        "Raspberry Pi Pico Mouse": "new preset"
+    }
+}

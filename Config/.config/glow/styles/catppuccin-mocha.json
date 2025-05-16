@@ -1,0 +1,105 @@
+{
+    "document": {
+        "indent": 2,
+        "background_color": "#1E1E2E",
+        "block_prefix": "\n",
+        "block_suffix": "\n",
+        "color": "#D4BE93"
+    },
+    "paragraph": {
+        "margin": 4,
+        "color": "#D4BE93",
+        "background_color": "#302F3B"
+    },
+    "heading": {
+        "color": "#D4BE93",
+        "background_color": "#1A1B26"
+    },
+    "h1": {
+        "prefix": "=> ",
+        "suffix": " <=",
+        "margin": 2,
+        "bold": true,
+        "background_color": "#B5E8E0"
+    },
+    "h2": {
+        "prefix": "## ",
+        "margin": 4
+    },
+    "h3": {
+        "prefix": "### ",
+        "margin": 6
+    },
+    "block_quote": {
+        "color": "#FAF5DC",
+        "indent": 1,
+        "indent_token": "=> "
+    },
+    "list": {
+        "color": "#D4BE93",
+        "background_color": "#302F3B",
+        "level_indent": 4
+    },
+    "code_block": {
+        "color": "#ABEBC6",
+        "theme": "solarized-dark"
+    },
+    "table": {
+        "margin": 4
+    },
+    "text": {
+        "bold": true,
+        "color": "#D4BE93",
+        "background_color": "#302F3B"
+    },
+    "item": {
+        "block_prefix": "• ",
+        "color": "#D4BE93"
+    },
+    "enumeration": {
+        "block_prefix": ". ",
+        "color": "#D4BE93"
+    },
+    "task": {
+        "ticked": "✓ ",
+        "unticked": "✗ ",
+        "color": "#ABEBC6"
+    },
+    "link": {
+        "color": "#B5E8E0",
+        "underline": true,
+        "block_prefix": "(",
+        "block_suffix": ")"
+    },
+    "link_text": {
+        "color": "#B5E8E0",
+        "bold": true
+    },
+    "image": {
+        "color": "#D4BE93",
+        "block_prefix": "[Image: ",
+        "block_suffix": "]"
+    },
+    "image_text": {
+        "color": "#FAC2BA"
+    },
+    "code": {
+        "color": "#ABEBC6"
+    },
+    "emph": {
+        "italic": true,
+        "color": "#B5E8E0"
+    },
+    "strong": {
+        "bold": true,
+        "color": "#D4BE93"
+    },
+    "strikethrough": {
+        "crossed_out": true,
+        "color": "#FAC2BA"
+    },
+    "hr": {
+        "block_prefix": "---",
+        "color": "#F0E0FF"
+    }
+}

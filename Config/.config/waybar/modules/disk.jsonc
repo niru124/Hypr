@@ -1,0 +1,7 @@
+"disk": {
+  "interval": 600,
+  "format": "󰋊 {percentage_used}%",
+  "path": "/",
+  "on-click": "footclient -T waybar_dua -e dua i /",
+  "tooltip-format": "    󰍽: dua\nTotal: {total}\n Used: {used} ({percentage_used}%)\n Free: {free} ({percentage_free}%)",
+},
