@@ -1,8 +1,0 @@
-"custom/gpu": {
-  "format": "󰛨 {}",
-  "return-type": "json",
-  "exec": "~/.local/share/bin/gpu-status.sh",
-  "interval": 5,
-  "tooltip": true
-},
-

@@ -1,7 +1,0 @@
-"custom/fan": {
-  "exec": "sensors | awk '/fan1:/ {print $2,$3}'",
-  "format": "  {}",
-  "interval": 5,
-  "tooltip-format": "{sensors | awk '/fan1:/ {print $2,$3}'}\n { sensors | awk '/fan2:/ {print $2,$3}'}\n",
-  "on-click": "btop",
-},

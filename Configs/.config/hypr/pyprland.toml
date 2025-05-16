@@ -33,5 +33,4 @@ prev = "movefocus l"
 next2 = "movefocus d"
 prev2 = "movefocus u"
 
-# [expos]
-# workspace = special:exposed,gapsout:60,gapsin:30,bordersize:5,border:true,shadow:false,movefocus_cycles_groupfirst:true
+[expose]
