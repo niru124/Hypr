@@ -1,0 +1,4 @@
+neovim
+hyprsunset
+dunst
+wl-copy

@@ -8,7 +8,7 @@ term_classed = "kitty --class"
 animation = "fromTop"
 command = "kitty --class main-dropterm"
 class = "main-dropterm"
-size = "75% 60%"
+size = "100% 60%"
 max_size = "1920px 100%"
 
 [scratchpads.btop]
@@ -16,6 +16,13 @@ animation = "fromTop"
 command = "kitty --class main-btop -e btop"
 class = "main-btop"
 size = "80% 75%"
+max_size = "1920px 100%"
+
+[scratchpads.cava]
+animation = "fromTop"
+command = "kitty --class main-cava -e cava"
+class = "main-cava"
+size = "90% 80%"
 max_size = "1920px 100%"
 
 [scratchpads.yazi]
