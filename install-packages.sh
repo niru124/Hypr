@@ -1,6 +1,7 @@
 #!/bin/bash
 
 PACKAGE_FILE=$pwd"packages.txt"
+PACKAGE_FILE2=$pwd"packages2.txt"
 
 # Check if the file exists
 if [ ! -f "$PACKAGE_FILE" ]; then
@@ -12,5 +13,9 @@ fi
 echo "Installing packages from '$PACKAGE_FILE'..."
 sudo pacman -Syu --noconfirm
 xargs -a "$PACKAGE_FILE" sudo pacman -S --noconfirm
+
+# Read the package names and install them
+echo "Installing packages from '$PACKAGE_FILE'... with yay"
+xargs -a "$PACKAGE_FILE" yay -S --noconfirm
 
 echo "All packages processed."
