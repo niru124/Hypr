@@ -4,11 +4,6 @@
             {
                 "type": 3,
                 "code": 57,
-                "origin_hash": "1a01fd0461130a1a47d25e4deb4c3f71"
-            },
-            {
-                "type": 3,
-                "code": 53,
                 "origin_hash": "1a01fd0461130a1a47d25e4deb4c3f71",
                 "analog_threshold": -1
             },
@@ -30,13 +25,64 @@
             },
             {
                 "type": 3,
+                "code": 1,
+                "origin_hash": "1a01fd0461130a1a47d25e4deb4c3f71",
+                "analog_threshold": 1
+            },
+            {
+                "type": 3,
+                "code": 53,
+                "origin_hash": "1a01fd0461130a1a47d25e4deb4c3f71",
+                "analog_threshold": 1
+            },
+            {
+                "type": 3,
                 "code": 0,
+                "origin_hash": "1a01fd0461130a1a47d25e4deb4c3f71",
+                "analog_threshold": 1
+            }
+        ],
+        "target_uinput": "keyboard",
+        "expo": 0.77
+    },
+    {
+        "input_combination": [
+            {
+                "type": 3,
+                "code": 57,
+                "origin_hash": "1a01fd0461130a1a47d25e4deb4c3f71"
+            },
+            {
+                "type": 3,
+                "code": 54,
+                "origin_hash": "1a01fd0461130a1a47d25e4deb4c3f71",
+                "analog_threshold": 1
+            },
+            {
+                "type": 1,
+                "code": 330,
+                "origin_hash": "1a01fd0461130a1a47d25e4deb4c3f71"
+            },
+            {
+                "type": 1,
+                "code": 325,
+                "origin_hash": "1a01fd0461130a1a47d25e4deb4c3f71"
+            },
+            {
+                "type": 3,
+                "code": 1,
+                "origin_hash": "1a01fd0461130a1a47d25e4deb4c3f71",
+                "analog_threshold": 1
+            },
+            {
+                "type": 3,
+                "code": 53,
                 "origin_hash": "1a01fd0461130a1a47d25e4deb4c3f71",
                 "analog_threshold": -1
             },
             {
                 "type": 3,
-                "code": 1,
+                "code": 0,
                 "origin_hash": "1a01fd0461130a1a47d25e4deb4c3f71",
                 "analog_threshold": 1
             }

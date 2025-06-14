@@ -1,5 +1,6 @@
 [pyprland]
 plugins = ["scratchpads","layout_center"]
+style = ["opacity 0.8", "bordercolor rgb(FFFF00)"]
 
 [pyprland.variables]
 term_classed = "kitty --class"
@@ -8,21 +9,14 @@ term_classed = "kitty --class"
 animation = "fromTop"
 command = "kitty --class main-dropterm"
 class = "main-dropterm"
-size = "100% 60%"
+size = "98% 60%"
 max_size = "1920px 100%"
 
-[scratchpads.btop]
+[scratchpads.nvim]
 animation = "fromTop"
-command = "kitty --class main-btop -e btop"
-class = "main-btop"
-size = "80% 75%"
-max_size = "1920px 100%"
-
-[scratchpads.cava]
-animation = "fromTop"
-command = "kitty --class main-cava -e cava"
-class = "main-cava"
-size = "90% 80%"
+command = "kitty --class main-nvim -e nvim 1.md"
+class = "main-nvim"
+size = "95% 60%"
 max_size = "1920px 100%"
 
 [scratchpads.yazi]
@@ -39,5 +33,3 @@ next = "movefocus r"
 prev = "movefocus l"
 next2 = "movefocus d"
 prev2 = "movefocus u"
-
-[expose]

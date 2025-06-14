@@ -16,9 +16,9 @@
 
 // positions generated based on config.ctl //
 
-	"modules-left": ["custom/padd","custom/l_end","cpu","memory","custom/cpuinfo","disk","custom/gpu","custom/fan","custom/memory_swap","custom/r_end","custom/l_end","idle_inhibitor","clock","custom/r_end","custom/l_end","hyprland/workspaces","custom/r_end","custom/padd"],
-	"modules-center": ["custom/padd","custom/l_end","wlr/taskbar","custom/r_end","custom/padd"],
-	"modules-right": ["custom/padd","custom/l_end","backlight","network","custom/net_usage","pulseaudio","pulseaudio#microphone","custom/r_end","custom/l_end","privacy","tray","battery","custom/r_end","custom/l_end","custom/power","custom/r_end","custom/padd"],
+	"modules-left": ["custom/padd","custom/l_end","cpu","memory","custom/cpuinfo","disk","custom/gpu","custom/fan","custom/memory_swap","custom/r_end","custom/l_end","idle_inhibitor","clock","custom/r_end","","custom/padd"],
+	"modules-center": ["custom/padd","","custom/l_end","hyprland/workspaces","custom/r_end","custom/padd"],
+	"modules-right": ["custom/padd","custom/l_end","network","custom/net_usage","pulseaudio","pulseaudio#microphone","custom/r_end","custom/l_end","privacy","tray","battery","custom/r_end","custom/l_end","","custom/notifications","custom/power","custom/r_end","custom/padd"],
 
 
 // sourced from modules based on config.ctl //
@@ -136,37 +136,9 @@
         }
     },
 
-	"wlr/taskbar": {
-		"format": "{icon}",
-		"rotate": 0,
-		"icon-size": 16,
-		"icon-theme": "",
-        "spacing": 0,
-		"tooltip-format": "{title}",
-		"on-click": "activate",
-		"on-click-middle": "close",
-		"ignore-list": [
-			"Alacritty"
-		],
-		"app_ids-mapping": {
-			"firefoxdeveloperedition": "firefox-developer-edition",
-      "jetbrains-datagrip": "DataGrip"
-		}
-	},
-
-    "backlight": {
-        "device": "intel_backlight",
-        "rotate": 0,
-        "format": "{icon} {percent}%",
-        "format-icons": ["", "", "", "", "", "", "", "", ""],
-        "on-scroll-up": "brightnesscontrol.sh i 1",
-        "on-scroll-down": "brightnesscontrol.sh d 1",
-        "min-length": 6
-    },
-
     "network": {
         "tooltip": true,
-        "format-wifi": " ",
+    "format-wifi": "<span foreground='#99ffdd'> {bandwidthDownBytes}</span> <span foreground='#ffcc66'> {bandwidthUpBytes}</span>",
         "rotate":" ${r_deg
     }","format-ethernet": "󰈀 ","tooltip-format": "Network: <big><b>{essid}</b></big>\nSignal strength: <b>{signaldBm}dBm ({signalStrength}%)</b>\nFrequency: <b>{frequency}MHz</b>\nInterface: <b>{ifname}</b>\nIP: <b>{ipaddr}/{cidr}</b>\nGateway: <b>{gwaddr}</b>\nNetmask: <b>{netmask}</b>",
     "format-linked": "󰈀 {ifname} (No IP)",
@@ -176,11 +148,13 @@
     "interval": 2,
 },
 "custom/net_usage": {
-  "exec": "~/net.sh",
+  "exec": "~/.local/share/bin/net.sh",
   "interval": 10,
   "return-type": "json",
-  "format": "{}"
+  "format": "{}",
+  "markup": "pango"
 },
+
 "pulseaudio": {
     "format": "{icon} {volume}",
     "rotate": 0,
@@ -254,6 +228,35 @@
         "format-icons": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"]
     },
 
+    "custom/notifications": {
+      // "format": "{icon} {}",
+        "format": "{} {icon}", // TODO: workaround for the module not showing up // revert when fixed
+        "rotate": 0,
+        "format-icons": {
+            "email-notification": "<span foreground='white'><sup></sup></span>",
+            "chat-notification": "󱋊<span foreground='white'><sup></sup></span>",
+            "warning-notification": "󱨪<span foreground='yellow'><sup></sup></span>",
+            "error-notification": "󱨪<span foreground='red'><sup></sup></span>",
+            "network-notification": "󱂇<span foreground='white'><sup></sup></span>",
+            "battery-notification": "󰁺<span foreground='white'><sup></sup></span>",
+            "update-notification": "󰚰<span foreground='white'><sup></sup></span>",
+            "music-notification": "󰝚<span foreground='white'><sup></sup></span>",
+            "volume-notification": "󰕿<span foreground='white'><sup></sup></span>",
+            "notification": "<span foreground='white'><sup></sup></span>",
+            "dnd": "",
+            "none": ""
+        },
+        "return-type": "json",
+        "exec-if": "which dunstctl",
+        "exec": "notifications.py",
+        "on-scroll-down": "sleep 0.1 && dunstctl history-pop",
+        "on-click": "dunstctl set-paused toggle",
+        "on-click-middle": "dunstctl history-clear",
+        "on-click-right": "dunstctl close-all",
+        "interval": 1,
+        "tooltip": true,
+        "escape": true
+    },
     "custom/power": {
         "format": "{}",
         "rotate": 0,

@@ -115,6 +115,7 @@ tooltip {
 #custom-net_usage,
 #custom-networki,
 #network,
+#custom-notification,
 #custom-notifications,
 #custom-power,
 #privacy,
@@ -182,4 +183,8 @@ tooltip {
     border-radius: 7px 0px 0px 7px;
     margin-left: 8px;
     padding-left: 0px;
+}
+
+#custom-notification {
+  font-family: "NotoSansMono Nerd Font";
 }

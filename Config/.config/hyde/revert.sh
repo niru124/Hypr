@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/bin/bash
 
 # Revert to internal monitor only
 hyprctl keyword monitor "HDMI-A-1,disable"

@@ -3,6 +3,6 @@
     "autoload": {
         "AT Translated Set 2 keyboard": "new preset",
         "Logitech USB Optical Mouse": "REVERSE_X",
-        "Raspberry Pi Pico Mouse": "new preset"
+        "SYNA32A5:00 06CB:CE17 Mouse": "new preset"
     }
 }

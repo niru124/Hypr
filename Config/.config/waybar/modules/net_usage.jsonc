@@ -1,6 +1,8 @@
 "custom/net_usage": {
-  "exec": "~/net.sh",
+  "exec": "~/.local/share/bin/net.sh",
   "interval": 10,
   "return-type": "json",
-  "format": "{}"
+  "format": "{}",
+  "markup": "pango"
 },
+

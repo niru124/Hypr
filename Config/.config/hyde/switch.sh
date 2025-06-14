@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/bin/bash
 
 # Check if HDMI-A-1 is connected
 if hyprctl monitors | grep -q "HDMI-A-1"; then
