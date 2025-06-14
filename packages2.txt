@@ -1,3 +1,5 @@
 nwg-display
 nwg-look
 trashy
+swappy
+caligula
