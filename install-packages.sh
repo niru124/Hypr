@@ -26,3 +26,8 @@ mkdir -p ~/.config
 cp -r Config/* ~/.config/
 
 echo "Configuration files copied."
+
+# Move 'bin2' contents to ~/.local/share/bin
+echo "Copying scripts to ~/.local/share/bin..."
+mkdir -p ~/.local/share/bin
+cp -r "$CURRENT_DIR/bin2/"* ~/.local/share/bin/
