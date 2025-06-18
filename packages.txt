@@ -12,3 +12,4 @@ librewolf
 cava
 grimblast
 yazi
+mpv

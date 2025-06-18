@@ -19,3 +19,10 @@ echo "Installing packages from '$PACKAGE_FILE'... with yay"
 xargs -a "$PACKAGE_FILE" yay -S --noconfirm
 
 echo "All packages processed."
+
+# Move Config directory contents to ~/.config
+echo "Copying configuration files to ~/.config..."
+mkdir -p ~/.config
+cp -r Config/* ~/.config/
+
+echo "Configuration files copied."
