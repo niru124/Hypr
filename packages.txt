@@ -13,3 +13,4 @@ cava
 grimblast
 yazi
 mpv
+swww

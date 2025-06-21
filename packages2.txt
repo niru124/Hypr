@@ -3,3 +3,6 @@ nwg-look
 trashy
 swappy
 caligula
+python-pywal16
+power-profiles-daemon
+wttrbar
