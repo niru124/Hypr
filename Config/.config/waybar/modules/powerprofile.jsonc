@@ -1,0 +1,6 @@
+"custom/powerprofile": {
+  "format": "{}",
+  "exec": "sh -c 'case $(powerprofilesctl get) in performance) echo \"⚡\" ;; balanced) echo \"⚙️\" ;; power-saver) echo \"🌿 \" ;; *) echo \"❓\" ;; esac'",
+  "interval": 10,
+  "on-click": "sh -c 'case $(powerprofilesctl get) in performance) powerprofilesctl set balanced ;; balanced) powerprofilesctl set power-saver ;; power-saver) powerprofilesctl set performance ;; esac'"
+},
