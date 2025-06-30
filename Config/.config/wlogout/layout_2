@@ -15,14 +15,14 @@
 
 {
     "label" : "shutdown",
-    "action" : "systemctl poweroff",
+    "action" : "shutdown now",
     "text" : "Shutdown",
     "keybind" : "s"
 }
 
 {
     "label" : "reboot",
-    "action" : "systemctl reboot",
+    "action" : "reboot",
     "text" : "Reboot",
     "keybind" : "r"
 }
