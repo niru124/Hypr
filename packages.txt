@@ -1,11 +1,9 @@
 neovim
 hyprsunset
 dunst
-wl-copy
 yay
 kitty
 btop
-wl-logout
 rofi-wayland
 zen-browser
 librewolf

@@ -124,8 +124,9 @@ icat() {
   # Pass all arguments as a list (handles spaces)
   kitty +kitten icat "$@"
 }
+
 # delete and copy
-copy_clean() {
+clean() {
     src="$1"
     dest="$2"
 
@@ -157,6 +158,24 @@ alias inject='input-remapper-control --command start --device "Raspberry Pi Pico
 
 # Add flags to existing aliases.
 alias ls="${aliases[ls]:-ls} -A"
+
+# tmux and fzf
+tmux-fzf-session() {
+  local session
+  session=$(tmux list-sessions -F "#{session_name}" | fzf --prompt="Select tmux session: ")
+
+  if [[ -n $session ]]; then
+    # Ask whether to attach or kill
+    action=$(printf "attach\nkill" | fzf --prompt="Action for [$session]: ")
+
+    if [[ $action == "attach" ]]; then
+      tmux attach -t "$session"
+    elif [[ $action == "kill" ]]; then
+      tmux kill-session -t "$session"
+      echo "Killed session: $session"
+    fi
+  fi
+}
 
 # Set shell options: http://zsh.sourceforge.net/Doc/Release/Options.html.
 setopt glob_dots     # no special treatment for file names with a leading dot
