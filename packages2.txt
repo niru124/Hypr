@@ -7,5 +7,6 @@ python-pywal16
 power-profiles-daemon
 wttrbar
 toru-bin
-wl-copy
 wl-logout
+wl-clipboard
+input-remapper-bin

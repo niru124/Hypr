@@ -31,6 +31,7 @@ xargs -a "$PACKAGE_FILE2" yay -S --noconfirm --needed
 
 echo "All packages processed."
 
+<<<<<<< HEAD
 # Copy configuration files to ~/.config using rsync
 # Copy the contents of .config subdirectory to ~/.config
 CONFIG_DIR="$CURRENT_DIR/Config/.config"
@@ -53,3 +54,28 @@ if [ -d "$BIN_DIR" ] && [ "$(ls -A "$BIN_DIR")" ]; then
 else
     echo "Warning: '$BIN_DIR' does not exist or is empty. Skipping script copy."
 fi
+=======
+# Move Config directory contents to ~/.config
+echo "Copying configuration files to ~/.config..."
+mkdir -p ~/.config
+cp -r "$CURRENT_DIR/Config/"* ~/.config/
+
+echo "Configuration files copied."
+
+# Move 'bin2' contents to ~/.local/share/bin
+echo "Copying scripts to ~/.local/share/bin..."
+mkdir -p ~/.local/share/bin
+cp -r "$CURRENT_DIR/bin2/"* ~/.local/share/bin/
+
+# Make all .sh scripts executable
+echo "Making scripts executable..."
+chmod +x ~/.local/share/bin/*.sh
+
+echo "Scripts copied and made executable."
+
+# Install zoxide using the official install script
+echo "Installing zoxide..."
+curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
+
+echo "zoxide installation complete."
+>>>>>>> 6f242cf (add more script and config)

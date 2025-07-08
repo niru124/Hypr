@@ -12,3 +12,5 @@ grimblast
 yazi
 mpv
 swww
+gparted
+waybar
