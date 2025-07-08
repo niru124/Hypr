@@ -31,17 +31,25 @@ xargs -a "$PACKAGE_FILE2" yay -S --noconfirm --needed
 
 echo "All packages processed."
 
-# Move Config directory contents to ~/.config
-echo "Copying configuration files to ~/.config..."
-mkdir -p ~/.config
-cp -r "$CURRENT_DIR/Config/"* ~/.config/
+# Copy configuration files to ~/.config using rsync
+# Copy the contents of .config subdirectory to ~/.config
+CONFIG_DIR="$CURRENT_DIR/Config/.config"
+if [ -d "$CONFIG_DIR" ] && [ "$(ls -A "$CONFIG_DIR")" ]; then
+    echo "Copying configuration files from .config to ~/.config..."
+    mkdir -p "$HOME/.config"
+    rsync -avv --exclude='.*' "$CONFIG_DIR/" "$HOME/.config/" > rsync_config.log 2>&1
+    echo "Configuration files copied."
+else
+    echo "Warning: '$CONFIG_DIR' does not exist or is empty. Skipping configuration copy."
+fi
 
-echo "Configuration files copied."
-
-# Move 'bin2' contents to ~/.local/share/bin
-echo "Copying scripts to ~/.local/share/bin..."
-mkdir -p ~/.local/share/bin
-cp -r "$CURRENT_DIR/bin2/"* ~/.local/share/bin/
-
-echo "Scripts copied to ~/.local/share/bin"
-
+# Copy scripts to ~/.local/share/bin using rsync
+BIN_DIR="$CURRENT_DIR/bin2"
+if [ -d "$BIN_DIR" ] && [ "$(ls -A "$BIN_DIR")" ]; then
+    echo "Copying scripts to ~/.local/share/bin..."
+    mkdir -p ~/.local/share/bin
+    rsync -av --exclude='.*' "$BIN_DIR/" ~/.local/share/bin/
+    echo "Scripts copied to ~/.local/share/bin."
+else
+    echo "Warning: '$BIN_DIR' does not exist or is empty. Skipping script copy."
+fi
