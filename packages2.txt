@@ -1,4 +1,4 @@
-nwg-display
+nwg-displays
 nwg-look
 trashy
 swappy
