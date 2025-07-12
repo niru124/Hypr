@@ -78,4 +78,4 @@ echo "Installing zoxide..."
 curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
 
 echo "zoxide installation complete."
->>>>>>> 6f242cf (add more script and config)
+# >>>>>>> 7f242cf (add more script and config)

@@ -14,3 +14,6 @@ mpv
 swww
 gparted
 waybar
+hyprlock
+greetd-tuigreet
+fzf
