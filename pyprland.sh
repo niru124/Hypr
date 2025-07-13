@@ -1,29 +1,23 @@
 #!/bin/bash
 
-set -e
+# Set the target directory
+CONFIG_DIR="$HOME/.config/hypr"
+VENV_DIR="$CONFIG_DIR/myenv"
 
-FONT_NAME="CaskaydiaCove"
-DOWNLOAD_URL="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/${FONT_NAME}.zip"
-FONT_DIR="$HOME/.local/share/fonts/$FONT_NAME"
+# Create the config directory if it doesn't exist
+mkdir -p "$CONFIG_DIR"
 
-echo "Installing Caskaydia Cove Nerd Font..."
+# Navigate to the config directory
+cd "$CONFIG_DIR" || exit 1
 
-# Create font directory
-mkdir -p "$FONT_DIR"
+# Create a Python virtual environment
+python3 -m venv myenv
 
-# Download and unzip the font
-echo "Downloading font..."
-curl -L -o "${FONT_NAME}.zip" "$DOWNLOAD_URL"
+# Activate the virtual environment
+source "$VENV_DIR/bin/activate"
 
-echo "Extracting font..."
-unzip -o "${FONT_NAME}.zip" -d "$FONT_DIR"
+# Install pyprland
+pip install pyprland
 
-# Clean up the zip file
-rm "${FONT_NAME}.zip"
-
-# Update font cache
-echo "Updating font cache..."
-fc-cache -fv
-
-echo "Caskaydia Cove Nerd Font installed successfully!"
+echo "✅ Pyprland installed in virtual environment at: $VENV_DIR"
 

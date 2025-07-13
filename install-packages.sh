@@ -31,7 +31,6 @@ xargs -a "$PACKAGE_FILE2" yay -S --noconfirm --needed
 
 echo "All packages processed."
 
-<<<<<<< HEAD
 # Copy configuration files to ~/.config using rsync
 # Copy the contents of .config subdirectory to ~/.config
 CONFIG_DIR="$CURRENT_DIR/Config/.config"
@@ -54,7 +53,7 @@ if [ -d "$BIN_DIR" ] && [ "$(ls -A "$BIN_DIR")" ]; then
 else
     echo "Warning: '$BIN_DIR' does not exist or is empty. Skipping script copy."
 fi
-=======
+
 # Move Config directory contents to ~/.config
 echo "Copying configuration files to ~/.config..."
 mkdir -p ~/.config
@@ -78,4 +77,13 @@ echo "Installing zoxide..."
 curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
 
 echo "zoxide installation complete."
-# >>>>>>> 7f242cf (add more script and config)
+
+for script in gtk_theme.sh font.sh pyprland.sh tui_greet.sh; do
+    if [ -f "$script" ]; then
+        echo "Running $script..."
+        chmod +x "$script"
+        ./"$script"
+    else
+        echo "Warning: $script not found. Skipping."
+    fi
+done
