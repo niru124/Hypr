@@ -1,0 +1,16 @@
+# ~/.config/alacritty/alacritty.toml
+
+general.import = ["~/.config/alacritty/themes/catppuccin-mocha.toml"]
+
+[window]
+decorations = "none"           # Hides the top bar
+startup_mode = "Windowed"
+dynamic_title = true
+opacity = 0.7
+
+[font]
+size = 15.0
+
+[font.normal]
+family = "JetBrainsMono Nerd Font"
+style = "Regular"

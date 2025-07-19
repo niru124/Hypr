@@ -1,7 +1,3 @@
-Here's how we can **finalize and polish** your `README.md`-style documentation for **HyDE** and make it **clean, installation-friendly, and developer-ready** — especially since you've bundled Pyprland, dynamic theming, and modularity.
-
----
-
 ## HyDE - A Dynamic Hyprland Environment
 
 **HyDE** is a comprehensive, intelligent, and highly dynamic configuration for the Hyprland Wayland compositor. It aims to provide a feature-rich, aesthetically pleasing, and deeply integrated desktop experience by automating theming, component configuration, and user feedback.
@@ -27,7 +23,7 @@ Built around modular and powerful shell scripts, **HyDE** manages everything fro
 - **Pre-configured Applications**
   Comes bundled with tuned configs for:
 
-  - **Neovim** (Arduino-ready)
+  - **Neovim**
   - **Yazi**
   - **Cava**
   - **Kitty**
@@ -93,7 +89,7 @@ HyDE/
 To add more plugins, edit:
 
 ```bash
-~/.config/hypr/myenv/pyprland.toml
+~/.config/hypr/pyprland.toml
 ```
 
 other plugins and configurations could be found at https://hyprland-community.github.io/pyprland/Plugins.html

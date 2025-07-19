@@ -8,17 +8,14 @@ ROFI_THEME="$HOME/.config/rofi/clipboard.rasi"
 chosen=$(rofi \
   -modi emoji \
   -show emoji \
-  -emoji-format '{emoji}' \
+  -emoji-format '{emoji} {name}' \
   -kb-secondary-copy "" \
   -kb-custom-1 Ctrl+c \
   -theme "$ROFI_THEME")
 
 # Check for exit status (10 = custom key 1 pressed)
 if [[ $? -eq 10 ]]; then
-    # Copy emoji to clipboard (supports xclip or wl-copy)
-    if command -v xclip &>/dev/null; then
-        echo -n "$chosen" | xclip -selection clipboard
-    elif command -v wl-copy &>/dev/null; then
+    if command -v wl-copy &>/dev/null; then
         echo -n "$chosen" | wl-copy
     else
         notify-send "Emoji Picker" "Clipboard utility not found."
