@@ -17,3 +17,5 @@ waybar
 hyprlock
 greetd-tuigreet
 fzf
+rofi-calc
+picom
