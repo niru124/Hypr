@@ -1,0 +1,18 @@
+# # Hypridle full configuration
+#
+# # Global settings
+# general {
+#     # If this file exists, idle is inhibited
+#     inhibit-file = /tmp/idle_inhibit
+# }
+#
+# # Listener that locks the screen and suspends after 15 minutes (900 seconds)
+# listener {
+#     timeout = 900
+#
+#     # This runs on idle timeout — lock the screen and suspend
+#     on-timeout = hyprlock && sleep 2 && systemctl suspend
+#
+#     # This runs when activity resumes (e.g., mouse/keyboard input)
+#     on-resume = hyprctl dispatch dpms on
+# }
