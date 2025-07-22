@@ -1,0 +1,117 @@
+#!/bin/bash
+
+# Directory where system sounds are stored
+sound_dir="/usr/share/sounds/freedesktop/stereo"
+
+# Declare an associative array of sound options
+declare -A sounds=(
+    [alarm-clock-elapsed]="alarm-clock-elapsed.oga"
+    [audio-channel-front-center]="audio-channel-front-center.oga"
+    [audio-channel-front-left]="audio-channel-front-left.oga"
+    [audio-channel-front-right]="audio-channel-front-right.oga"
+    [audio-channel-rear-center]="audio-channel-rear-center.oga"
+    [audio-channel-rear-left]="audio-channel-rear-left.oga"
+    [audio-channel-rear-right]="audio-channel-rear-right.oga"
+    [audio-channel-side-left]="audio-channel-side-left.oga"
+    [audio-channel-side-right]="audio-channel-side-right.oga"
+    [audio-test-signal]="audio-test-signal.oga"
+    [audio-volume-change]="audio-volume-change.oga"
+    [bell]="bell.oga"
+    [camera-shutter]="camera-shutter.oga"
+    [complete]="complete.oga"
+    [device-added]="device-added.oga"
+    [device-removed]="device-removed.oga"
+    [dialog-error]="dialog-error.oga"
+    [dialog-information]="dialog-information.oga"
+    [dialog-warning]="dialog-warning.oga"
+    [message-new-instant]="message-new-instant.oga"
+    [message]="message.oga"
+    [network-connectivity-established]="network-connectivity-established.oga"
+    [network-connectivity-lost]="network-connectivity-lost.oga"
+    [phone-incoming-call]="phone-incoming-call.oga"
+    [phone-outgoing-busy]="phone-outgoing-busy.oga"
+    [phone-outgoing-calling]="phone-outgoing-calling.oga"
+    [power-plug]="power-plug.oga"
+    [power-unplug]="power-unplug.oga"
+    [screen-capture]="screen-capture.oga"
+    [service-login]="service-login.oga"
+    [service-logout]="service-logout.oga"
+    [suspend-error]="suspend-error.oga"
+    [trash-empty]="trash-empty.oga"
+    [window-attention]="window-attention.oga"
+    [window-question]="window-question.oga"
+)
+
+urgency="normal"
+message=""
+sound_key=""
+sound_file=""
+app_name="custom-notify"
+replace_id=12345
+notify_extra_opts=""
+
+# Parse command line
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -low) urgency="low"; shift ;;
+        -normal) urgency="normal"; shift ;;
+        -critical) urgency="critical"; shift ;;
+        --message)
+            message="$2"
+            shift 2
+            ;;
+        --app-name)
+            app_name="$2"
+            shift 2
+            ;;
+        --replace-id)
+            replace_id="$2"
+            shift 2
+            ;;
+        --notify-opts)
+            notify_extra_opts="$2"
+            shift 2
+            ;;
+        -*)  # sound key
+            sound_key="${1#-}"
+            shift
+            ;;
+        *)
+            message="$1"
+            shift
+            ;;
+    esac
+done
+
+# fallback & resolve sound file (unchanged) ...
+if [[ -z "$sound_key" ]]; then
+    if command -v fzf >/dev/null 2>&1; then
+        sound_key=$(printf "%s\n" "${!sounds[@]}" | sort | fzf --prompt="Select a sound: ")
+    else
+        echo "fzf not installed. Please install it or pass a sound key with -sound-name."
+        exit 1
+    fi
+fi
+
+if [[ -n "$sound_key" && -n "${sounds[$sound_key]}" ]]; then
+    sound_file="$sound_dir/${sounds[$sound_key]}"
+else
+    echo "Invalid sound key or sound not found."
+    exit 1
+fi
+
+if [[ -z "$message" ]]; then
+    read -rp "Enter the notification message: " message
+fi
+
+# Send the notification with extra notify-send options
+eval notify-send -a "$app_name" -r "$replace_id" -u "$urgency" $notify_extra_opts "\"$message\""
+
+# Play sound
+if [[ -f "$sound_file" ]]; then
+    mpv --really-quiet "$sound_file" &
+else
+    echo "Sound file not found: $sound_file"
+    exit 1
+fi
+

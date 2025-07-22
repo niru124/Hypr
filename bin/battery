@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Get battery percentage using `upower` (may vary depending on your system)
+battery_percentage=$(upower -i /org/freedesktop/UPower/devices/battery_BAT0 | grep -i "percentage" | awk '{print $2}' | sed 's/%//')
+
+# If battery percentage is less than 5, hibernate the system
+# if [ "$battery_percentage" -lt 80 ]; then
+systemctl hibernate
+# fi
+

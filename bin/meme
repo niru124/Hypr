@@ -1,0 +1,64 @@
+     #!/bin/bash
+
+# Function to show usage if arguments are not provided
+usage() {
+    echo "Usage: $0 <youtube-url> <start-duration> <end-duration>"
+    echo "Example: $0 https://www.youtube.com/watch?v=dQw4w9WgXcQ 00:05:01 00:05:03"
+    exit 1
+}
+
+# Check for valid arguments
+if [ $# -ne 3 ]; then
+    usage
+fi
+
+# Input arguments
+URL="$1"
+START_DURATION="$2"
+END_DURATION="$3"
+
+# Download the video section using yt-dlp and force MKV format output
+echo "Downloading section from $START_DURATION to $END_DURATION from the video at $URL in MKV format"
+yt-dlp --download-sections "*${START_DURATION}-${END_DURATION}" -f bestvideo+bestaudio --merge-output-format mkv "$URL" -o "downloaded_video.mkv"
+
+# Check if the download was successful
+if [ $? -ne 0 ]; then
+    echo "Download failed. Exiting..."
+    exit 1
+fi
+
+# Convert the downloaded video to mp3 using ffmpeg
+echo "Converting the downloaded video to MP3..."
+ffmpeg -i "downloaded_video.mkv" -vn -ab 320k "output.mp3"
+
+# Check if the conversion was successful
+if [ $? -ne 0 ]; then
+    echo "Conversion failed. Exiting..."
+    exit 1
+fi
+
+# Success message
+echo "MP3 conversion successful! The output is saved as 'output.mp3'."
+
+# Play the MP3 file using mpv for the user to decide which part to cut
+echo "Now, the audio will be played using mpv. Pause at the desired start and end times to get the timestamps."
+mpv "output.mp3"  # Removed --quiet to show the playback time
+
+# Prompt the user to input the start and end timestamps for trimming
+echo -n "Enter the start time for trimming (e.g., 00:00:01): "
+read trim_start_time
+echo -n "Enter the end time for trimming (e.g., 00:00:03): "
+read trim_end_time
+
+# Trim the MP3 file using ffmpeg
+echo "Trimming the MP3 file from $trim_start_time to $trim_end_time..."
+ffmpeg -i "output.mp3" -ss "$trim_start_time" -to "$trim_end_time" -c copy "trimmed_output.mp3"
+
+# Check if the trimming was successful
+if [ $? -eq 0 ]; then
+    echo "Trimming successful! The trimmed MP3 is saved as 'trimmed_output.mp3'."
+else
+    echo "Trimming failed. Exiting..."
+    exit 1
+fi
+

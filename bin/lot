@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# Activate the Python virtual environment
+source "$HOME/ollama/myenv/bin/activate"
+
+oterm
+
+# Deactivate the virtual environment
+deactivate

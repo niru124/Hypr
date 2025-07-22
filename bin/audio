@@ -1,0 +1,28 @@
+#!/bin/bash                                                                   
+                                                                                  
+    # Prompt the user for the video file path                                     
+    read -r -p "Enter the path to the video file: " video_file                    
+                                                                                  
+    # Check if the file exists                                                    
+    if [[ ! -f "$video_file" ]]; then                                             
+      echo "Error: File '$video_file' not found."                                 
+      exit 1                                                                      
+    fi                                                                            
+                                                                                  
+    # Extract the filename without extension                                      
+    filename=$(basename "$video_file")                                            
+    filename_no_ext="${filename%.*}"                                              
+                                                                                  
+    # Construct the output audio file name (same name as video, but .mp3)         
+    audio_file="$filename_no_ext.mp3"                                             
+                                                                                  
+    # Use ffmpeg to convert the video to MP3 audio (192kbps)                      
+    ffmpeg -i "$video_file" -vn -ab 192k "$audio_file"                            
+                                                                                  
+    # Check if the conversion was successful                                      
+    if [[ $? -eq 0 ]]; then                                                       
+      echo "Conversion successful. Audio file saved as '$audio_file'."            
+    else                                                                          
+      echo "Error: Conversion failed."                                            
+      exit 1                                                                      
+    fi  

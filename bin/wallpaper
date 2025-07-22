@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Directory containing the images
+BACKGROUND_DIR="$HOME/Pictures/backgrounds/"
+
+# Find all image files (jpg, png, etc.) in the directory
+IMAGES=($(find "$BACKGROUND_DIR" -type f -iname "*.jpg" -o -iname "*.png"))
+
+# Select a random image
+RANDOM_IMAGE=${IMAGES[$RANDOM % ${#IMAGES[@]}]}
+
+# Set the background using gsettings
+gsettings set org.gnome.desktop.background picture-uri "file://$RANDOM_IMAGE"
+

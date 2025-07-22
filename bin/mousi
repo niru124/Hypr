@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Path to the directory
+DIR="/run/media/$whoami/RIVER"
+
+# Function to check and run the script
+if [ -d "$DIR" ]; then
+  if grep -q "Logitech USB Optical Mouse" < <(xinput list); then
+    xinput set-prop "Logitech USB Optical Mouse" "Coordinate Transformation Matrix" -1 0 1 0 1 0 0 0 1
+    echo "Script executed: Logitech mouse transformation applied."
+  else
+    echo "Logitech USB Optical Mouse not found in xinput list."
+  fi
+else
+  echo "$DIR not found."
+fi
+

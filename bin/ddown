@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# Check if URL argument is given
+if [ -z "$1" ]; then
+  echo "Usage: $0 <GitHub-folder-URL>"
+  echo "Example: $0 https://github.com/l6174/hyprdots/tree/main/Wallpapers"
+  exit 1
+fi
+
+# Original GitHub folder URL
+GITHUB_URL="$1"
+
+# URL encode the GitHub URL
+ENCODED_URL=$(python3 -c "import urllib.parse; print(urllib.parse.quote('''$GITHUB_URL'''))")
+
+# Construct the download URL
+DOWNLOAD_URL="https://download-directory.github.io/?url=${ENCODED_URL}"
+
+# Extract folder name to name the zip
+FOLDER_NAME=$(basename "$GITHUB_URL")
+ZIP_FILE="${FOLDER_NAME}"
+
+# Download the zip
+echo "Downloading $FOLDER_NAME from GitHub..."
+curl -L -o "$ZIP_FILE" "$DOWNLOAD_URL"
+
+# Check if download succeeded
+if [ $? -eq 0 ]; then
+  echo "Download complete: $ZIP_FILE"
+
+  # Optional: Unzip
+  echo "Unzipping..."
+  unzip "$ZIP_FILE"
+  rm -rf "$ZIP_FILE"
+else
+  echo "Download failed."
+fi
+

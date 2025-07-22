@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Check if fzf is installed
+if ! command -v fzf &> /dev/null
+then
+    echo "fzf is required but not installed. Please install it first."
+    exit 1
+fi
+
+# Dynamically search for the input word inside file contents
+# This uses fzf for fuzzy searching and grep for content matching
+
+# 'fzf' is used to search interactively for files that contain the word
+grep -r -n --color=always --binary-files=without-match "$1" . | fzf \
+  --preview="echo {} | cut -d: -f1 | xargs -I % head -n 20 %" \
+  --preview-window=up:40%:wrap \
+  --height=40% \
+  --border \
+  --prompt="Search: " \
+  --bind "enter:execute(echo {} | cut -d: -f1 | sed 's/\x1b\[[0-9;]*m//g' | xargs -I % nvim %)"
+

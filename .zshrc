@@ -177,6 +177,17 @@ tmux-fzf-session() {
   fi
 }
 
+# better notify
+msg() {
+    ICON_DIR="$HOME/.config/dunst/icons/random"
+    ICON=$(find "$ICON_DIR" -type f -name "*.svg" | shuf -n 1)
+
+    # Fallback if no icon is found
+    [ -z "$ICON" ] && ICON="dialog-information"
+
+    notify-send -i "$ICON" "$@"
+}
+
 # Set shell options: http://zsh.sourceforge.net/Doc/Release/Options.html.
 setopt glob_dots     # no special treatment for file names with a leading dot
 setopt no_auto_menu  # require an extra TAB press to open the completion menu

@@ -1,0 +1,72 @@
+#!/bin/bash
+
+# Function to display a menu for padding options
+choose_padding() {
+    echo "Select padding size (in pixels):"
+    echo "1) No padding (0px)"
+    echo "2) Small padding (50px)"
+    echo "3) Medium padding (100px)"
+    echo "4) Large padding (150px)"
+    read -p "Enter your choice [1-4]: " padding_choice
+    case $padding_choice in
+        1)
+            padding=0
+            ;;
+        2)
+            padding=50
+            ;;
+        3)
+            padding=100
+            ;;
+        4)
+            padding=150
+            ;;
+        *)
+            echo "Invalid choice. Using no padding (0px)."
+            padding=0
+            ;;
+    esac
+}
+
+# Function to convert images to PDF with padding
+convert_to_pdf() {
+    # Get images as input arguments
+    images=("$@")
+    
+    # Get the current date to use in the output PDF name
+    output_pdf="output_$(date +%Y%m%d%H%M%S).pdf"
+    
+    # Choose padding option
+    choose_padding
+    
+    # Temporary files to hold processed images
+    processed_images=()
+
+    for image in "${images[@]}"; do
+        if [[ -f "$image" ]]; then
+            # Resize the image to fit the width of A4 (2100px)
+            # Add the chosen padding to the top and bottom (using the extent)
+            convert "$image" -resize 2100x -gravity center -extent 2100x$((2970 + 2 * padding)) -background white "$image"_processed.jpg
+            processed_images+=("$image"_processed.jpg)
+        else
+            echo "File $image not found. Skipping..."
+        fi
+    done
+
+    # Convert all processed images to a PDF
+    convert "${processed_images[@]}" "$output_pdf"
+    echo "PDF created successfully: $output_pdf"
+    
+    # Clean up temporary files
+    rm "${processed_images[@]}"
+}
+
+# Main script logic
+if [ $# -lt 1 ]; then
+    echo "Usage: $0 <image1> <image2> ... <imageN>"
+    exit 1
+fi
+
+# Call the function to convert images to PDF
+convert_to_pdf "$@"
+

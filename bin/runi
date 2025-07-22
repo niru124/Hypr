@@ -1,0 +1,77 @@
+#!/bin/bash
+
+# Define color codes
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+NC='\033[0m' # No Color
+
+# Check if a filename is provided
+if [ "$#" -ne 1 ]; then
+    echo -e "${RED}Usage: $0 filename${NC}"
+    exit 1
+fi
+
+FILENAME="$1"
+
+# Check if the file exists
+if [ ! -f "$FILENAME" ]; then
+    echo -e "${RED}File $FILENAME does not exist.${NC}"
+    exit 1
+fi
+
+# Extract the file extension
+EXTENSION="${FILENAME##*.}"
+
+# Compile and run function based on file extension
+compile_and_run() {
+    case $EXTENSION in
+        cpp)
+            g++ "$FILENAME" -o output
+            if [ $? -eq 0 ]; then
+                echo -e "${GREEN}Running the C++ program...${NC}"
+                ./output
+            else
+                echo -e "${RED}Compilation failed for C++.${NC}"
+            fi
+            ;;
+        py)
+            echo -e "${GREEN}Running the Python program...${NC}"
+            python3 "$FILENAME"
+            ;;
+        # Add more languages here
+        java)
+            javac "$FILENAME"
+            if [ $? -eq 0 ]; then
+                echo -e "${GREEN}Running the Java program...${NC}"
+                java "${FILENAME%.*}"
+            else
+                echo -e "${RED}Compilation failed for Java.${NC}"
+            fi
+            ;;
+	   js)
+            echo -e "${GREEN}Running the Node program...${NC}"
+            node "$FILENAME"
+            ;;
+	sh)
+            echo -e "${GREEN}Running the Node program...${NC}"
+            bash "$FILENAME"
+            ;;
+        # Add more languages as needed
+        *)
+            echo -e "${RED}Unsupported file type: $EXTENSION${NC}"
+            exit 1
+            ;;
+    esac
+}
+
+# Initial compilation and run
+compile_and_run
+
+# Watch for changes in the file and recompile/run
+while true; do
+    inotifywait -e close_write "$FILENAME"
+    echo -e "${YELLOW}File changed, recompiling...${NC}"
+    compile_and_run
+done
+

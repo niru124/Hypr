@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# Function to check if a valid directory was provided
+check_directory() {
+    if [ ! -d "$1" ]; then
+        echo "Invalid directory: $1"
+        exit 1
+    fi
+}
+
+# Check if a directory argument is provided
+if [ $# -ne 1 ]; then
+    echo "Usage: $0 <directory>"
+    exit 1
+fi
+
+# Get the directory from the command-line argument
+dir_path="$1"
+
+# Check if the provided path is a valid directory
+check_directory "$dir_path"
+
+# Loop through all files in the directory and rename them
+for file in "$dir_path"/*; do
+    # Check if it's a regular file
+    if [ -f "$file" ]; then
+        # Extract filename and extension
+        filename=$(basename "$file")
+        extension="${filename##*.}"
+        name_without_extension="${filename%.*}"
+
+        # Get the current date in dd_mm_yyyy format
+        current_date=$(date +%d_%m_%Y)
+
+        # Create new filename
+        new_filename="${current_date}.${extension}"
+
+        # Construct full paths for old and new filenames
+        old_file_path="$dir_path/$filename"
+        new_file_path="$dir_path/$new_filename"
+
+        # Rename the file
+        mv "$old_file_path" "$new_file_path"
+    fi
+done
+
+echo "Files renamed successfully."
+

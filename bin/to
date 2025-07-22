@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Activate the Python virtual environment
+source "$HOME/stt/myenv/bin/activate"
+
+# Check if file already exists and remove it
+if [ -f "$HOME/stt/audio.mp3" ]; then
+    echo "Removing existing audio.mp3"
+    rm "$HOME/stt/audio.mp3"
+else
+    echo "No existing audio.mp3 to remove"
+fi
+
+# Run ffmpeg to record audio
+echo "Running ffmpeg to record audio..."
+ffmpeg -f alsa -i default -t $1 "$HOME/stt/audio.mp3"
+if [ $? -ne 0 ]; then
+    echo "ffmpeg failed"
+    exit 1
+fi
+
+# Run the Python script
+echo "Running Python script..."
+python "$HOME/stt/1.py"
+
+# Deactivate the virtual environment
+deactivate
+

@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Set the directory containing the images
+IMAGE_DIR="$HOME/.local/share/backgrounds"
+
+# Check if the directory exists
+if [ ! -d "$IMAGE_DIR" ]; then
+  echo "Directory not found: $IMAGE_DIR"
+  exit 1
+fi
+
+# Pick a random image file from the directory
+IMAGE_FILE=$(find "$IMAGE_DIR" -type f | shuf -n 1)
+
+# Check if an image file was found
+if [ -z "$IMAGE_FILE" ]; then
+  echo "No image files found in the directory."
+  exit 1
+fi
+
+# Set the selected image as the desktop background
+gsettings set org.gnome.desktop.background picture-uri "file://$IMAGE_FILE"
+
+# Verify if the background was set successfully
+if [ $? -eq 0 ]; then
+  echo "Background set to: $IMAGE_FILE"
+else
+  echo "Failed to set the background."
+fi
+
