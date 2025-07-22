@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+
+# Reliable Tmux Session Manager with Preview
+
+# List all windows with session context
+list_session_windows() {
+  tmux list-windows -a -F "#{session_name}:#{window_index}: #{window_name}" | sort
+}
+
+# Parse selected line to session:window
+parse_session_window() {
+  echo "$1" | awk -F: '{print $1 ":" $2}'
+}
+
+# Preview the first pane content of a window
+preview_cmd='
+pane=$(tmux list-panes -t $(echo {} | awk -F: "{print \$1\":\"\$2}") -F "#{pane_index}" 2>/dev/null | head -n1)
+if [[ -n "$pane" ]]; then
+  tmux capture-pane -p -t $(echo {} | awk -F: "{print \$1\":\"\$2}")".$pane" -S -100 | (command -v bat >/dev/null && bat --style=plain --color=always -l bash || cat)
+else
+  echo "No pane found."
+fi
+'
+
+# Action prompt
+choose_action() {
+  local session_window="$1"
+  local session=$(echo "$session_window" | cut -d':' -f1)
+
+  action=$(printf "Attach\nKill\nRename" | fzf --prompt="Action for [$session_window]: " --height=40%)
+
+  case "$action" in
+    Attach)
+      tmux switch-client -t "$session_window"
+      ;;
+    Kill)
+      tmux kill-session -t "$session"
+      echo "Killed session: $session"
+      ;;
+    Rename)
+      read -r -p "New session name: " new_name
+      [[ -n $new_name ]] && tmux rename-session -t "$session" "$new_name" && echo "Renamed to $new_name"
+      ;;
+    *) echo "No action taken." ;;
+  esac
+}
+
+# --- Main ---
+
+selected=$(list_session_windows | \
+  fzf \
+    --prompt="Session:Window → " \
+    --height=90% \
+    --layout=reverse-list \
+    --preview="$preview_cmd" \
+    --preview-window="up:75%,wrap,border" \
+)
+
+if [[ -n "$selected" ]]; then
+  session_window=$(parse_session_window "$selected")
+  choose_action "$session_window"
+else
+  echo "No selection"
+fi
+

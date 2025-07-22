@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Activate the Python virtual environment
+source "$HOME/gemini/myenv/bin/activate"
+
+# Run the gem.py script
+python "$HOME/gemini/gem.py
+
+# Deactivate the virtual environment
+deactivate
+

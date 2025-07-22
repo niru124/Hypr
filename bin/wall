@@ -1,0 +1,28 @@
+#!/bin/sh
+
+# Set the wallpaper directory to the new location
+WALLPAPER_DIR="$HOME/Pictures/backgrounds"
+
+# Loop to change wallpaper every hour
+while true; do
+    # Find a random wallpaper from the specified directory
+    wallpaper="$(find -L "$WALLPAPER_DIR" -type f | shuf -n 1)"
+    
+    # Write the wallpaper settings to the configuration file
+    echo "ipc = off
+
+    preload = $wallpaper
+
+    wallpaper = eDP-1,$wallpaper
+    wallpaper = HDMI-A-1,$wallpaper" > "$XDG_CONFIG_HOME/hypr/hyprpaper.conf"
+
+    # Restart hyprpaper with the new configuration
+    hyprpaper &
+
+    # Sleep for 1 hour (3600 seconds)
+    sleep 3600
+
+    # Kill the previous hyprpaper process before restarting
+    killall -9 hyprpaper
+done
+

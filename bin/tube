@@ -1,0 +1,71 @@
+#!/bin/bash
+
+VIDEO_URL="$1"
+if [ -z "$VIDEO_URL" ]; then
+    echo "Usage: $0 <youtube_url>"
+    exit 1
+fi
+
+# Desired resolutions in order of preference
+QUALITIES=(2160 1440 1080 720 480 360)
+
+# Ask user for max desired quality
+echo "Choose the maximum quality to download:"
+for i in "${!QUALITIES[@]}"; do
+    echo "$((i+1)). ${QUALITIES[$i]}p"
+done
+read -p "Enter your choice [1-${#QUALITIES[@]}]: " CHOICE
+
+if ! [[ "$CHOICE" =~ ^[0-9]+$ ]] || (( CHOICE < 1 || CHOICE > ${#QUALITIES[@]} )); then
+    echo "Invalid choice."
+    exit 1
+fi
+
+MAX_QUALITY=${QUALITIES[$((CHOICE-1))]}
+
+# Get format list
+FORMATS=$(yt-dlp -F "$VIDEO_URL")
+
+# Audio format: prefer 140 (m4a) if available
+AUDIO_FMT=$(echo "$FORMATS" | awk '/^140\s/ {print $1}')
+if [ -z "$AUDIO_FMT" ]; then
+    AUDIO_FMT=$(echo "$FORMATS" | awk '/audio only/ && /m4a/ {print $1; exit}')
+fi
+if [ -z "$AUDIO_FMT" ]; then
+    AUDIO_FMT=$(echo "$FORMATS" | awk '/audio only/ {print $1; exit}')
+fi
+
+# Try resolutions from desired down to lowest
+VIDEO_FMT=""
+for Q in "${QUALITIES[@]}"; do
+    if (( Q > MAX_QUALITY )); then continue; fi
+    VIDEO_FMT=$(echo "$FORMATS" | awk -v res="${Q}" '$0 ~ res"p" && /video only/ && /mp4/ {print $1; exit}')
+    if [ -n "$VIDEO_FMT" ]; then
+        SELECTED_QUALITY=$Q
+        break
+    fi
+done
+
+if [ -z "$VIDEO_FMT" ]; then
+    echo "No matching video format found."
+    exit 1
+fi
+
+# Output path
+TEMP_FILE=$(mktemp --suffix=".mp4" /tmp/ytvideoXXXXXX)
+echo "Downloading $SELECTED_QUALITY""p to: $TEMP_FILE"
+
+# Download and merge
+yt-dlp -f "$VIDEO_FMT+$AUDIO_FMT" -o "$TEMP_FILE" "$VIDEO_URL"
+if [ $? -ne 0 ]; then
+    echo "Download failed."
+    rm -f "$TEMP_FILE"
+    exit 1
+fi
+
+# Play with mpv
+mpv "$TEMP_FILE"
+
+# Cleanup
+rm -f "$TEMP_FILE"
+
