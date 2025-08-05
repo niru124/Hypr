@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hyprlock Preview</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "JetBrains Mono", monospace;
+        background-image: url("jump.png");
+        /* fallback path */
+        background-size: cover;
+        background-position: center;
+        height: 100vh;
+        color: rgba(255, 255, 255, 1);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .label {
+        position: absolute;
+        text-align: center;
+        color: rgba(255, 255, 255, 1);
+      }
+
+      .date {
+        top: 30px;
+        font-size: 44px;
+        font-family: "Abocat", sans-serif;
+      }
+
+      .time {
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 250px;
+        font-family: "Steelfish Outline", sans-serif;
+      }
+
+      .user {
+        bottom: 120px;
+        font-size: 28px;
+        font-family: "Mexcellent", sans-serif;
+      }
+
+      .input-field {
+        position: absolute;
+        bottom: 60px;
+        border-radius: 50px;
+        width: 250px;
+        height: 50px;
+        /* border: 3px solid rgba(255, 255, 255, 1); */
+        background: rgba(255, 255, 255, 0.2);
+        color: rgba(0, 0, 0, 1);
+        font-size: 18px;
+        text-align: center;
+        line-height: 50px;
+        font-style: italic;
+      }
+
+      .uptime {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        font-size: 24px;
+        color: rgba(0, 0, 0, 1);
+      }
+
+      .weather {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        font-size: 24px;
+      }
+
+      .profile-img {
+        position: absolute;
+        bottom: 200px;
+        width: 230px;
+        height: 230px;
+        border: 2px solid rgba(255, 255, 255, 1);
+        border-radius: 50%;
+        object-fit: cover;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Background image auto-applied -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <div class="label date"><b>Sunday, 27 July 2025</b></div>
+    <div class="label time">
+      <b><big>13:37:42</big></b>
+    </div>
+    <div class="label user"><i class="fas fa-user"></i> Username</div>
+    <div class="uptime"><b>up 2 hours, 42 minutes</b></div>
+    <!-- <div class="weather">🌦 25°C, Partly Cloudy</div> -->
+  </body>
+</html>

@@ -23,8 +23,8 @@ $scrPath = $HOME/.local/share/bin # set scripts path
 # █░▀░█ █▄█ █░▀█ █ ░█░ █▄█ █▀▄
 
 # See https://wiki.hyprland.org/Configuring/Monitors/
-# monitor = eDP-1,1920x1080,auto,1
-# monitor=eDP-1,1920x1080@60.06,0x0,1.0,mirror,HDMI-A-1
+monitor = eDP-1,1920x1080,auto,1
+# monitor=HDMI-A-1,1920x1080@60,0x1080,1.0
 
 # █░░ ▄▀█ █░█ █▄░█ █▀▀ █░█
 # █▄▄ █▀█ █▄█ █░▀█ █▄▄ █▀█
@@ -181,7 +181,7 @@ xwayland {
 source = ~/.config/hypr/animations.conf
 source = ~/.config/hypr/keybindings.conf
 source = ~/.config/hypr/windowrules.conf
-source = ~/.config/hypr/monitors.conf
+# source = ~/.config/hypr/monitors.conf
 # source = ~/.config/hypr/workspaces.conf
 # source = ~/.config/hypr/themes/common.conf # shared theme settings
 # # hyprlang noerror true
@@ -198,7 +198,7 @@ general {
     gaps_in = 4
     gaps_out = 4
     border_size = 3
-    col.active_border = rgba(122,194,190,1) rgba(154,230,225,1) rgba(65,149,129,1) rgba(170,240,223,1) 180deg
+    col.active_border = rgba(122,169,194,1) rgba(154,204,230,1) rgba(24,48,82,1) rgba(170,199,240,1) 180deg
     col.inactive_border = rgba(81,87,109,1) rgba(98,104,128,1) rgba(115,121,148,1) rgba(131,139,167,1) 45deg
 }
 
