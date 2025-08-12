@@ -20,3 +20,7 @@ fzf
 rofi-calc
 picom
 sound-theme-freedesktop
+xdg-desktop-portal 
+xdg-desktop-portal-hyprland
+pipewire
+wireplumber 
