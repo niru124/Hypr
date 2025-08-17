@@ -7,17 +7,26 @@ configuration {
 @theme "~/.config/rofi/theme.rasi"
 
 window {
-  width: 30%;
+  width: 25em; /* Adjusted width */
   border-radius: 10px;
-  background-color: @background;
+  background-color: @main-bg; /* Use theme colors */
+}
+
+mainbox {
+    enabled:                     true;
+    spacing:                     0em;
+    padding:                     0.5em;
+    orientation:                 vertical;
+    children:                    [ "inputbar" , "listview" ]; /* Simplified for calculator */
+    background-color:            transparent;
 }
 
 inputbar {
   children: [ prompt, entry ];
-  background-color: @background-alt;
+  background-color: @main-bg;
   border-radius: 8px;
-  padding: 8px;
-  margin: 10px;
+  padding: 0.8em;
+  margin: 0.5em;
 }
 
 prompt {
@@ -27,28 +36,23 @@ prompt {
 
 entry {
   placeholder: "Calculate...";
-  placeholder-color: @foreground-alt;
+  placeholder-color: @main-fg;
+  text-color: @main-fg;
+  background-color: transparent;
 }
 
 listview {
   lines: 0;
+  background-color: transparent;
 }
 
 element {
-  padding: 0;
+  padding: 0.5em;
+  background-color: transparent;
+  text-color: @main-fg;
 }
 
 element-text {
   background-color: inherit;
   text-color: inherit;
-}
-
-/* Colors (assuming Catppuccin-like palette) */
-* {
-  background: #1e1e2e;
-  background-alt: #313244;
-  foreground: #cdd6f4;
-  foreground-alt: #bac2de;
-  primary: #89b4fa;
-  selected: #a6e3a1;
 }
