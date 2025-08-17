@@ -259,6 +259,24 @@ install_astronvim() {
     echo "--- AstroNvim Installation Complete ---"
 }
 
+# --- Cursor Theme Installation ---
+install_cursor_theme() {
+    echo "--- Starting Cursor Theme Installation ---"
+
+    CURSOR_THEME_SCRIPT="$CURRENT_DIR/cursortheme.sh"
+
+    if [ ! -f "$CURSOR_THEME_SCRIPT" ]; then
+        echo "Error: Cursor theme installation script not found at '$CURSOR_THEME_SCRIPT'. Skipping cursor theme installation."
+        return 1
+    fi
+
+    echo "Running cursor theme installation script..."
+    chmod +x "$CURSOR_THEME_SCRIPT"
+    "$CURSOR_THEME_SCRIPT"
+
+    echo "--- Cursor Theme Installation Complete ---"
+}
+
 # --- Main Script Logic ---
 echo "Welcome to the HyDE Installation Script!"
 echo "This script will guide you through installing various components for your Hyprland setup."
@@ -303,6 +321,12 @@ fi
 # AstroNvim
 if confirm_action "AstroNvim (Neovim configuration)"; then
     install_astronvim
+    echo
+fi
+
+# Cursor Theme
+if confirm_action "Bibata Cursor Theme Installation and Configuration"; then
+    install_cursor_theme
     echo
 fi
 

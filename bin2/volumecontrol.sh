@@ -50,7 +50,7 @@ notify_vol() {
 
     ico="${icodir}/vol-${angle}.svg"
     bar=$(seq -s $(($vol / 15)) | sed 's/[0-9]//g')
-    notify-send -a "t2" -r 91190 -t 800 -i "${ico}" "${vol}${bar}" "${nsink}"
+    notify -normal --app-name "t2" -r 91190 --notify-opts "-t 800 -i ${ico}" "${vol}${bar} Volume" -audio-volume-change
 }
 
 notify_mute() {
