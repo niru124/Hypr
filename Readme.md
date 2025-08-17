@@ -49,20 +49,21 @@ Clone the repo and run the installer:
 ```bash
 git clone https://github.com/niru124/Hypr.git
 cd HyDE/
-chmod +x install-packages.sh
-./install-packages.sh
+chmod +x install_all.sh
+./install_all.sh
 ```
 
-This script will:
+This interactive script will guide you through the installation process, prompting you to confirm each major component:
 
-- Update your system
-- Install required packages (Pacman + AUR)
-- Copy configuration files to `~/.config`
-- Install Pyprland in a virtual environment
-- Setup scripts in `~/.local/share/bin`
-- Run theme and font scripts
-- Configure `tuigreet`, Waybar, and other components
-- add or remove packages from `packages(pacman)` and `packages2(yay)`
+- **Core Packages**: Updates your system, installs essential packages (Pacman + AUR), copies core configuration files to `~/.config`, sets up custom scripts in `~/.local/share/bin`, and installs `zoxide`.
+- **Non-Essential Packages**: Installs additional packages from `non-essential.txt`.
+- **Fonts**: Installs Nerd Fonts (CaskaydiaCove, 0xProto, JetBrainsMono) and custom fonts (Abocat, Steelfish Outline, Mexcellent).
+  > **Note:** For custom fonts, you may need to update the placeholder download URLs in `install_all.sh` with direct `.zip` links.
+- **GTK Theme**: Installs the Catppuccin GTK Theme and configures Flatpak access.
+- **Pyprland**: Installs Pyprland in a dedicated Python virtual environment.
+- **TUI Greet Configuration**: Configures the `tuigreet` display manager.
+  > **Note:** This step requires `sudo` privileges.
+- **AstroNvim**: Installs the AstroNvim Neovim configuration (requires Neovim v0.7+ and Nerd Fonts to be pre-installed).
 
 ---
 
@@ -70,16 +71,14 @@ This script will:
 
 ```bash
 HyDE/
-├── install-packages.sh     # Main installation script
-├── packages.txt            # Pacman packages
-├── packages2.txt           # AUR (yay) packages
+├── install_all.sh          # Main interactive installation script
+├── astrovim_install(extra).sh # AstroNvim installation script
+├── packages.txt            # Pacman packages list
+├── packages2.txt           # AUR (yay) packages list
+├── non-essential.txt       # Non-essential AUR (yay) packages list
 ├── Config/
 │   └── .config/            # All Hyprland-related dotfiles
 ├── bin2/                   # Custom helper scripts
-├── pyprland.sh             # Pyprland setup script
-├── gtk_theme.sh            # GTK theming
-├── font.sh                 # Font installer
-└── tui_greet.sh            # Login screen setup
 ```
 
 ---
