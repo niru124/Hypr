@@ -78,7 +78,7 @@ done
 # Notify if it worked
 if [ -s "$temp_screenshot" ]; then
 	cp "$temp_screenshot" "$save_dir/$save_file"
-	notify-send -a "Screenshot" -i "$temp_screenshot" "Saved in $save_dir"
+		notify -a "t1" -i "${save_dir}/${save_file}" "saved in ${save_dir}" -screen-capture
 else
 	notify-send -a "Screenshot" "Screenshot failed."
 	exit 1

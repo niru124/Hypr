@@ -1,0 +1,57 @@
+configuration {
+  modi: "drun,run,ssh";
+  show-icons: true;
+  display-drun: "Apps";
+  display-run: "Run";
+  display-ssh: "SSH";
+  font: "CaskaydiaCove Nerd Font 10";
+}
+
+@theme "~/.config/rofi/theme.rasi"
+
+window {
+  width: 30%;
+  border-radius: 10px;
+  background-color: @background;
+}
+
+inputbar {
+  children: [ prompt, entry ];
+  background-color: @background-alt;
+  border-radius: 8px;
+  padding: 8px;
+  margin: 10px;
+}
+
+prompt {
+  text-color: @primary;
+  padding: 0 10px 0 0;
+}
+
+entry {
+  placeholder: "Set timer (e.g. 10m, 30s, 1h):";
+  placeholder-color: @foreground-alt;
+}
+
+listview {
+  lines: 0;
+}
+
+element {
+  padding: 0;
+}
+
+element-text {
+  background-color: inherit;
+  text-color: inherit;
+}
+
+/* Colors (assuming Catppuccin-like palette) */
+* {
+  background: #1e1e2e;
+  background-alt: #313244;
+  foreground: #cdd6f4;
+  foreground-alt: #bac2de;
+  primary: #89b4fa;
+  selected: #a6e3a1;
+}

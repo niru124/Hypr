@@ -69,12 +69,13 @@ if [ -z "$action" ]; then               # If actions are missing with mode/value
 fi
 
 send_notification() {
-    brightness=`brightnessctl info | grep -oP "(?<=\()\d+(?=%)" | cat`
+    brightness=$(brightnessctl info | grep -oP "(?<=\()\d+(?=%)")
     brightinfo=$(brightnessctl info | awk -F "'" '/Device/ {print $2}')
-    angle="$(((($brightness + 2) / 5) * 5))"
+    angle=$(( ((brightness + 2) / 5) * 5 ))
     ico="$HOME/.config/dunst/icons/vol/vol-${angle}.svg"
-    bar=$(seq -s "." $(($brightness / 15)) | sed 's/[0-9]//g')
-    notify-send -a "t2" -r 91190 -t 800 -i "${ico}" "${brightness}${bar}" "${brightinfo}"
+    bar=$(seq -s $(($brightness / 15)) | sed 's/[0-9]//g')
+
+notify -normal --app-name "t2" -r 91190 --notify-opts "-t 800 -i ${ico}" "${brightness}${bar} Bright" -audio-volume-change
 }
 
 get_brightness() {
