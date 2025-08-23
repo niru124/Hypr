@@ -1,6 +1,6 @@
 "custom/fan": {
   "exec": "sensors | grep 'fan' | awk '{print $2}' | tr -d 'RPM' | xargs echo",
-  "format": "  {} RPM",
+  "format": "  {}  RPM",
   "interval": 5,
   "tooltip-format": "{sensors | grep 'fan'}",
   "on-click": "btop",

@@ -1,5 +1,5 @@
 "custom/networki": {
-    "format": "",  // Just show the Wi-Fi icon
+    "format": "", // Just show the Wi-Fi icon
     "tooltip": true,
     "tooltip-format": "Click to manage Wi-Fi",
     "on-click": "~/.local/share/bin/rofi-wifi-menu.sh",
