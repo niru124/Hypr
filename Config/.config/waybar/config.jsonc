@@ -16,9 +16,9 @@
 
 // positions generated based on config.ctl //
 
-	"modules-left": ["custom/padd","custom/l_end","cpu","memory","custom/cpuinfo","disk","custom/gpu","custom/fan","custom/memory_swap","custom/r_end","custom/l_end","idle_inhibitor","clock","custom/r_end","","custom/padd"],
+	"modules-left": ["custom/padd","custom/l_end","cpu","memory","custom/cpuinfo","disk","custom/gpu","custom/fan","custom/memory_swap","custom/r_end","custom/l_end","idle_inhibitor","clock","custom/weather","custom/r_end","","custom/padd"],
 	"modules-center": ["custom/padd","","custom/l_end","hyprland/workspaces","custom/r_end","custom/padd"],
-	"modules-right": ["custom/padd","custom/l_end","network","custom/net_usage","pulseaudio","pulseaudio#microphone","custom/r_end","custom/l_end","privacy","tray","battery","custom/r_end","custom/l_end","","custom/notifications","custom/power","custom/r_end","custom/padd"],
+	"modules-right": ["custom/padd","custom/l_end","custom/tor","network","custom/net_usage","pulseaudio","pulseaudio#microphone","custom/powerprofile","custom/r_end","custom/l_end","privacy","tray","battery","custom/r_end","custom/l_end","","custom/notifications","custom/power","custom/r_end","custom/padd"],
 
 
 // sourced from modules based on config.ctl //
@@ -73,10 +73,10 @@
 },
 
 "custom/fan": {
-  "exec": "sensors | awk '/fan1:/ {print $2,$3}'",
-  "format": "  {}",
+  "exec": "sensors | grep 'fan' | awk '{print $2}' | tr -d 'RPM' | xargs echo",
+  "format": "  {}  RPM",
   "interval": 5,
-  "tooltip-format": "{sensors | awk '/fan1:/ {print $2,$3}'}\n { sensors | awk '/fan2:/ {print $2,$3}'}\n",
+  "tooltip-format": "{sensors | grep 'fan'}",
   "on-click": "btop",
 },
 "custom/memory_swap": {
@@ -123,6 +123,13 @@
         }
     },
 
+"custom/weather": {
+  "format": "{}°",
+  "tooltip": true,
+  "interval": 3600,
+  "exec": "wttrbar --location kolkata",
+  "return-type": "json"
+},
     "hyprland/workspaces": {
         "disable-scroll": true,
         "rotate": 0,
@@ -136,6 +143,13 @@
         }
     },
 
+"custom/tor": {
+  "format": "🧅 {} ", // This will be replaced by the IP
+  "exec": "~/.local/share/bin/tor.sh",
+  "return-type": "json",
+  "interval": 60,
+  "tooltip": true
+},
     "network": {
         "tooltip": true,
     "format-wifi": "<span foreground='#99ffdd'> {bandwidthDownBytes}</span> <span foreground='#ffcc66'> {bandwidthUpBytes}</span>",
@@ -190,6 +204,12 @@
     "scroll-step": 5
 },
 
+"custom/powerprofile": {
+  "format": "{}",
+  "exec": "sh -c 'case $(powerprofilesctl get) in performance) echo \"⚡\" ;; balanced) echo \"⚙️\" ;; power-saver) echo \"🌿 \" ;; *) echo \"❓\" ;; esac'",
+  "interval": 10,
+  "on-click": "sh -c 'case $(powerprofilesctl get) in performance) powerprofilesctl set balanced ;; balanced) powerprofilesctl set power-saver ;; power-saver) powerprofilesctl set performance ;; esac'"
+},
     "privacy": {
         "icon-size": 12,
         "icon-spacing": 5,

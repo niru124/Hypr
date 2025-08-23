@@ -118,16 +118,19 @@ tooltip {
 #custom-notification,
 #custom-notifications,
 #custom-power,
+#custom-powerprofile,
 #privacy,
 #pulseaudio,
 #custom-spotify,
 #taskbar,
 #temperature,
 #custom-theme,
+#custom-tor,
 #tray,
 #custom-updates,
 #custom-wallchange,
 #custom-wbar,
+#custom-weather,
 #window,
 #workspaces,
 #custom-l_end,
@@ -188,3 +191,4 @@ tooltip {
 #custom-notification {
   font-family: "NotoSansMono Nerd Font";
 }
+
