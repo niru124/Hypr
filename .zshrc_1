@@ -9,6 +9,7 @@ export ZSH="$HOME/.oh-my-zsh"
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 ZSH_THEME="powerlevel10k/powerlevel10k"
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -112,6 +113,7 @@ plugins=(
   fast-syntax-highlighting
   # zsh-autocomplete
   fzf
+  fzf-tab
   history
   extract
   zsh-vi-mode
@@ -140,24 +142,25 @@ eval "$(zoxide init zsh)"
 # FZF integration for cd & history
 # -------------------------
 
-export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
-
-fzf_cd() {
-  local dir
-  dir=$(find ${1:-.} -path '*/\.*' -prune -o -type d -print 2> /dev/null | fzf +m) && cd "$dir"
-}
-
-alias cdf='fzf_cd'
-
-fzf_history() {
-  BUFFER=$(history | fzf +s --tac | sed 's/ *[0-9]* *//')
-  CURSOR=$#BUFFER
-  zle reset-prompt
-}
-zle -N fzf_history
-bindkey '^R' fzf_history
-
-source <(fzf --zsh)
+# export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
+#
+# fzf_cd() {
+#   local dir
+#   dir=$(find ${1:-.} -path '*/\.*' -prune -o -type d -print 2> /dev/null | fzf +m) && cd "$dir"
+# }
+#
+# alias cdf='fzf_cd'
+#
+# fzf_history() {
+#   BUFFER=$(history | fzf +s --tac | sed 's/ *[0-9]* *//')
+#   CURSOR=$#BUFFER
+#   zle reset-prompt
+# }
+# zle -N fzf_history
+# bindkey '^R' fzf_history
+# DISABLE_FZF_AUTO_COMPLETION="false"
+# DISABLE_FZF_KEY_BINDINGS="false"
+# source <(fzf --zsh)
 
 # -------------------------
 # Other useful aliases

@@ -1,58 +1,76 @@
 configuration {
-  modi: "dmenu"; /* Changed to dmenu as it's used for input */
-  show-icons: false;
-  font: "CaskaydiaCove Nerd Font 10";
+  modi: "dmenu"; 
+  // show-icons: true;
+  font: "CaskaydiaCove Nerd Font 18";
 }
 
 @theme "~/.config/rofi/theme.rasi"
 
 window {
-  width: 25em; /* Adjusted width */
-  border-radius: 10px;
-  background-color: @main-bg; /* Use theme colors */
+  width: 25em;
+  border-radius: 70px;
+  background-color: @main-bg;
 }
 
 mainbox {
-    enabled:                     true;
-    spacing:                     0em;
-    padding:                     0.5em;
-    orientation:                 vertical;
-    children:                    [ "inputbar" , "listview" ]; /* Simplified for timer */
-    background-color:            transparent;
+    enabled: true;
+    spacing: 0em;
+    padding: 0.5em;
+    orientation: vertical;
+    children: [ "inputbar", "listview" ];
+    background-color: transparent;
 }
 
 inputbar {
   children: [ prompt, entry ];
   background-color: @main-bg;
-  border-radius: 8px;
+  border-radius: 50px;
   padding: 0.8em;
   margin: 0.5em;
 }
 
 prompt {
-  text-color: @primary;
-  padding: 0 10px 0 0;
+  text-color: @select-bg;
+  background-color: transparent;
+  padding: 20px 20px 20px 10px;
 }
 
 entry {
-  placeholder: "Set timer (e.g. 10m, 30s, 1h):";
+  placeholder: "TIME";
   placeholder-color: @main-fg;
   text-color: @main-fg;
   background-color: transparent;
+  padding: 20px 40px 20px 10px;
 }
 
 listview {
-  lines: 0;
+  lines: 5;
+  fixed-height: false;
+  dynamic: true;
+  scrollbar: false;
   background-color: transparent;
+  spacing: 0.5em;
 }
 
 element {
-  padding: 0.5em;
+  padding: 1.5em;
   background-color: transparent;
   text-color: @main-fg;
+  border-radius: 50px;
+  cursor: pointer;
+  border: 0;
+}
+
+element selected {
+  background-color: @select-bg;  /* Use your theme's highlight color */
+  text-color: @select-fg;        /* Ensure good contrast */
 }
 
 element-text {
-  background-color: inherit;
+  background-color: transparent;
   text-color: inherit;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  horizontal-align: 0.5;
 }
