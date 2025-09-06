@@ -15,7 +15,7 @@ return {
       -- transparency
       init = {
         Comment = {
-          fg = "#6c7086",
+          fg = "#a6d189",
           bg = "NONE",
           italic = true,
         },
@@ -33,9 +33,9 @@ return {
         VertSplit = { bg = "NONE" },
         StatusLine = { bg = "NONE" },
         -- LineNr = { bg = "NONE" },
-        LineNr = { fg = "#7f7f7f", bg = "NONE" }, -- Muted foreground for non-current lines
+        LineNr = { fg = "#949cbb", bg = "NONE" }, -- Muted foreground for non-current lines
         CursorLineNr = {
-          fg = "#ffffff",
+          fg = "#a6d189",
           bg = "NONE",
           bold = true,
         },
@@ -45,7 +45,7 @@ return {
         TabLineSel = { bg = "NONE" },
         TabLineFill = { bg = "NONE" },
         NeoTreeDotfile = {
-          fg = "#ffffff",
+          fg = "#a6d189",
           bg = "NONE",
           bold = true,
         },

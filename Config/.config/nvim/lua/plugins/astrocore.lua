@@ -112,13 +112,14 @@ return {
           size = 20, -- You can customize the size of the floating terminal if needed
           direction = "float", -- Set terminal direction to 'float'
           float_opts = {
-            border = "rounded", -- Set border style (e.g., 'rounded', 'single', 'double', etc.)
+            border = "double", -- Set border style (e.g., 'rounded', 'single', 'double', etc.)
           },
           open_mapping = [[<c-\>]], -- Optional: Set the default toggle mapping (you can remove this line)
         },
 
         vim.api.nvim_set_keymap('n', '<S-e>', '$', { noremap = true, silent = true }),
         vim.api.nvim_set_keymap('n', '<S-b>', '0', { noremap = true, silent = true }),
+
         vim.api.nvim_set_keymap(
           "t",
           "<C-n>",

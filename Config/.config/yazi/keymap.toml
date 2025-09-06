@@ -3,7 +3,7 @@ on   = "<Esc>"
 run  = "close"
 desc = "Cancel input"
 
-[[manager.prepend_keymap]]
+[[mgr.prepend_keymap]]
 on   = "<C-s>"
 run  = [
   '''
@@ -25,7 +25,7 @@ run  = [
 ]
 desc = "Open floating kitty terminal here"
 
-[[manager.prepend_keymap]]
+[[mgr.prepend_keymap]]
 on = [ "i", "a" ]
 run = "plugin custom-shell --args=auto"
 desc = "custom-shell as default"

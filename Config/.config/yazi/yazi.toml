@@ -1,5 +1,5 @@
 # yazi.toml
-[manager]
+[mgr]
 show_hidden = true
 ratio = [2,3,4]
 # sort_by = "created"
@@ -11,5 +11,5 @@ edit = [
 	{ run = 'nvim "$@"', block = true, for = "linux" },
 ]
 play = [
-	{ run = 'mpv "$@"', orphan = true, for = "linux" },
+	{ run = 'mpv "$@"', block = true, for = "linux" },
 ]
