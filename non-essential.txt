@@ -2,3 +2,5 @@ tmux
 keyd
 hyprshader
 youtube-local
+tor
+sushi

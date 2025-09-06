@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+
+# 🔗 Function to create a symbolic link with safety checks
+link_item() {
+    local src="$1"
+    local dst="$2"
+
+    # Expand tilde (~) to $HOME
+    src="${src/#\~/$HOME}"
+    dst="${dst/#\~/$HOME}"
+
+    # Check if source exists
+    if [[ ! -e "$src" ]]; then
+        echo "❌ Source does not exist: $src"
+        return
+    fi
+
+    # Check if destination exists
+    if [[ -e "$dst" ]]; then
+        echo "⚠️ Destination exists: $dst"
+        read -p "❓ Overwrite? (y/N): " confirm
+        [[ "$confirm" == "y" ]] || return
+        rm -rf "$dst"
+    fi
+
+    # Create symbolic link
+    ln -s "$src" "$dst" && echo "✅ Linked: $src -> $dst"
+}
+
+# 📄 Function to process a .txt file with multiple links
+process_txt_file() {
+    local file="$1"
+
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        [[ -z "$line" || "$line" == \#* ]] && continue  # Skip empty or comment lines
+
+        # Split by colon
+        src="${line%%:*}"
+        dst="${line##*:}"
+
+        # If either side is empty, skip
+        if [[ -z "$src" || -z "$dst" ]]; then
+            echo "⚠️ Invalid line (missing src or dst): $line"
+            continue
+        fi
+
+        link_item "$src" "$dst"
+    done < "$file"
+}
+
+# 🚀 Main script logic
+main() {
+    if [[ $# -lt 1 ]]; then
+        echo "Usage:"
+        echo "  $0 source_path destination_path"
+        echo "  $0 links.txt                # For bulk linking via file"
+        exit 1
+    fi
+
+    src="$1"
+
+    # If first argument is a .txt file, do batch linking
+    if [[ "$src" == *.txt && -f "$src" ]]; then
+        process_txt_file "$src"
+    elif [[ $# -eq 2 ]]; then
+        dst="$2"
+        link_item "$src" "$dst"
+    else
+        echo "❌ Error: Invalid usage"
+        echo "Either provide:"
+        echo "  - A .txt file with source:dest entries"
+        echo "  - A source and destination path"
+        exit 1
+    fi
+}
+
+main "$@"
+

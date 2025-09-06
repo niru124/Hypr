@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+
+# 🔁 Sync function using rsync
+sync_config() {
+    local src="$1"
+    local dst="$2"
+
+    # Expand ~
+    src="${src/#\~/$HOME}"
+    dst="${dst/#\~/$HOME}"
+
+    # Ensure destination directory exists
+    mkdir -p "$dst"
+
+    # Sync with rsync
+    echo "🔄 Syncing: $src → $dst"
+    rsync -avh --delete "$src"/ "$dst"/
+}
+
+# 📁 If input is a text file
+process_txt_file() {
+    local file="$1"
+
+    # Convert line breaks and multiple spaces/tabs into single space
+    entries=$(tr '\n' ' ' < "$file" | tr -s ' ')
+
+    for pair in $entries; do
+        # Split by colon
+        src="${pair%%:*}"
+        dst="${pair##*:}"
+
+        # Check that both parts exist
+        if [[ -z "$src" || -z "$dst" ]]; then
+            echo "⚠️ Invalid pair: $pair"
+            continue
+        fi
+
+        sync_config "$src" "$dst"
+    done
+}
+
+# 🚀 Main logic
+main() {
+    if [[ $# -eq 1 && "$1" == *.txt ]]; then
+        process_txt_file "$1"
+    elif [[ $# -eq 2 ]]; then
+        sync_config "$1" "$2"
+    else
+        echo "❌ Usage:"
+        echo "  $0 source_path destination_path"
+        echo "  $0 links.txt   # with src:dst src:dst ..."
+        exit 1
+    fi
+}
+
+main "$@"
+
