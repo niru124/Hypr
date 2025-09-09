@@ -1,58 +1,98 @@
+// Config //
 configuration {
-  modi: "calc";
-  show-icons: false;
-  font: "JetBrainsMono Nerd Font 10";
+    modi: "calc";
+    show-icons: false;
 }
 
 @theme "~/.config/rofi/theme.rasi"
 
+// Main //
 window {
-  width: 25em; /* Adjusted width */
-  border-radius: 10px;
-  background-color: @main-bg; /* Use theme colors */
+    width: 40em;
+    height: 28em;
+    border-radius: 15px;
+    border: 3px;
+    border-color: @main-br;
+    transparency: "real";
+    fullscreen: false;
+    enabled: true;
+    cursor: "default";
+    spacing: 0em;
+    padding: 0em;
+    background-color: @main-bg;
 }
 
 mainbox {
-    enabled:                     true;
-    spacing:                     0em;
-    padding:                     0.5em;
-    orientation:                 vertical;
-    children:                    [ "inputbar" , "listview" ]; /* Simplified for calculator */
-    background-color:            transparent;
+    enabled: true;
+    spacing: 0em;
+    padding: 0.5em;
+    orientation: vertical;
+    // Add "message" here so calc result shows up!
+    children: [ "inputbar", "message", "listview" ];
+    background-color: transparent;
 }
 
+// Inputs //
 inputbar {
-  children: [ prompt, entry ];
-  background-color: @main-bg;
-  border-radius: 8px;
-  padding: 0.8em;
-  margin: 0.5em;
-}
-
-prompt {
-  text-color: @primary;
-  padding: 0 10px 0 0;
+    enabled: true;
+    padding: 0em;
+    children: [ "entry" ];
+    background-color: @main-bg;
+    expand: true;
 }
 
 entry {
-  placeholder: "Calculate...";
-  placeholder-color: @main-fg;
-  text-color: @main-fg;
-  background-color: transparent;
+    enabled: true;
+    padding: 1.8em;
+    text-color: @main-fg;
+    background-color: transparent;
+    font: "JetBrainsMono Nerd Font 14"; // Optional: better mono font
 }
 
+// Result message (calculator output)
+message {
+    enabled: true;
+    padding:  0.8em;
+    text-color: @main-fg;
+    font: "JetBrainsMono Nerd Font 14";
+    border-radius: 8px;
+    border: 1px;
+    border-color: @main-br;
+}
+
+// List (Results or suggestions) //
 listview {
-  lines: 0;
-  background-color: transparent;
+    enabled: true;
+    padding: 0.5em;
+    columns: 1;
+    cycle: 4;
+    fixed-height: true;
+    expand: true;
+    cursor: pointer;
+    background-color: transparent;
+    text-color: @main-fg;
 }
 
+// Elements //
 element {
-  padding: 0.5em;
-  background-color: transparent;
-  text-color: @main-fg;
+    enabled: true;
+    padding: 0.5em;
+    cursor: pointer;
+    border-radius: 8px;
+    background-color: transparent;
+    text-color: @main-fg;
+}
+
+element selected.normal {
+    background-color: @select-bg;
+    text-color: @select-fg;
 }
 
 element-text {
-  background-color: inherit;
-  text-color: inherit;
+    vertical-align: 0.0;
+    horizontal-align: 0.0;
+    cursor: inherit;
+    background-color: transparent;
+    text-color: inherit;
 }
+
