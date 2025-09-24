@@ -4,3 +4,4 @@ hyprshader
 youtube-local
 tor
 sushi
+sshfs
