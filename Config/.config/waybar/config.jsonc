@@ -165,10 +165,10 @@
   "exec": "~/.local/share/bin/net.sh",
   "interval": 10,
   "return-type": "json",
-  "format": "{}",
-  "markup": "pango"
+  "tooltip": true,
+  "tooltip-format": "{alt}",
+  "format": "{}"
 },
-
 "pulseaudio": {
     "format": "{icon} {volume}",
     "rotate": 0,

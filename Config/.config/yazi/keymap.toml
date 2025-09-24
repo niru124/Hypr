@@ -29,3 +29,8 @@ desc = "Open floating kitty terminal here"
 on = [ "i", "a" ]
 run = "plugin custom-shell --args=auto"
 desc = "custom-shell as default"
+
+# [mgr]
+# prepend_keymap = [
+#   { on = ["M","s"], run = "plugin sshfs -- menu",            desc = "Open SSHFS options" },
+# ]
