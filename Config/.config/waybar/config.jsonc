@@ -162,7 +162,7 @@
     "interval": 2,
 },
 "custom/net_usage": {
-  "exec": "~/.local/share/bin/net.sh",
+  "exec": "~/.local/share/bin/take/net_usage.sh & ~/.local/share/bin/take/net.sh",
   "interval": 10,
   "return-type": "json",
   "tooltip": true,

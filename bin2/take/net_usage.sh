@@ -1,0 +1,64 @@
+#!/bin/bash
+
+DB_FILE="$HOME/.local/share/bin/take/net_usage.db"
+LOG_FILE="$HOME/.local/share/bin/take/net_usage.log"
+# Auto-detect the active network interface
+IFACE=$(ip route | grep default | awk '{print $5}')
+STATE_FILE="$HOME/.local/share/bin/take/net_usage_state"
+
+# Exit if no active interface found
+if [[ -z "$IFACE" ]]; then
+  echo "$(date '+%Y-%m-%d %H:%M:%S') ERROR: No active network interface found." >> "$LOG_FILE.error"
+  exit 1
+fi
+
+# Ensure db directory exists
+mkdir -p "$(dirname "$DB_FILE")"
+
+# Create table if not exists
+sqlite3 "$DB_FILE" "CREATE TABLE IF NOT EXISTS net_usage (date TEXT PRIMARY KEY, rx_bytes INTEGER, tx_bytes INTEGER);"
+
+# Read previous counters from state file (or default to zero)
+if [[ -f "$STATE_FILE" ]]; then
+  read PREV_RX PREV_TX < "$STATE_FILE"
+else
+  PREV_RX=0
+  PREV_TX=0
+fi
+
+# Get current raw byte counters
+# Check if the interface exists before trying to read
+if [[ -d "/sys/class/net/$IFACE" ]]; then
+  CURRENT_RX=$(cat /sys/class/net/"$IFACE"/statistics/rx_bytes)
+  CURRENT_TX=$(cat /sys/class/net/"$IFACE"/statistics/tx_bytes)
+else
+  # If interface not found, log an error and exit
+  echo "$(date '+%Y-%m-%d %H:%M:%S') ERROR: Network interface $IFACE not found. Please update IFACE in net_usage.sh" >> "$LOG_FILE.error"
+  exit 1
+fi
+
+# Calculate deltas (handle possible counter resets)
+# If current counter is less than previous, assume a reset and take current value
+DELTA_RX=$(( CURRENT_RX >= PREV_RX ? CURRENT_RX - PREV_RX : CURRENT_RX ))
+DELTA_TX=$(( CURRENT_TX >= PREV_TX ? CURRENT_TX - PREV_TX : CURRENT_TX ))
+
+# Store current counters for next run
+echo "$CURRENT_RX $CURRENT_TX" > "$STATE_FILE"
+
+# Only proceed if there's actual usage
+if (( DELTA_RX > 0 || DELTA_TX > 0 )); then
+  CURRENT_DATE=$(date '+%Y-%m-%d')
+
+  # Check if entry for today exists
+  EXISTING=$(sqlite3 "$DB_FILE" "SELECT rx_bytes, tx_bytes FROM net_usage WHERE date='$CURRENT_DATE';")
+  if [[ -n "$EXISTING" ]]; then
+    OLD_RX=$(echo "$EXISTING" | cut -d'|' -f1)
+    OLD_TX=$(echo "$EXISTING" | cut -d'|' -f2)
+    NEW_RX=$(( OLD_RX + DELTA_RX ))
+    NEW_TX=$(( OLD_TX + DELTA_TX ))
+    sqlite3 "$DB_FILE" "UPDATE net_usage SET rx_bytes=$NEW_RX, tx_bytes=$NEW_TX WHERE date='$CURRENT_DATE';"
+  else
+    sqlite3 "$DB_FILE" "INSERT INTO net_usage (date, rx_bytes, tx_bytes) VALUES ('$CURRENT_DATE', $DELTA_RX, $DELTA_TX);"
+  fi
+fi
+
