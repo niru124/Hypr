@@ -1,0 +1,18 @@
+[
+    {
+        "input_combination": [
+            {
+                "type": 2,
+                "code": 0,
+                "origin_hash": "a2c7d66f02da7620e009a2fc7ff88459",
+                "analog_threshold": -1
+            }
+        ],
+        "target_uinput": "mouse",
+        "output_type": 2,
+        "output_code": 0,
+        "mapping_type": "analog",
+        "gain": -1.26,
+        "expo": 0.76
+    }
+]

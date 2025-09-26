@@ -3,6 +3,8 @@
     "autoload": {
         "AT Translated Set 2 keyboard": "new preset",
         "Logitech USB Optical Mouse": "REVERSE_X",
-        "SYNA32A5:00 06CB:CE17 Mouse": "new preset"
+        "SYNA32A5:00 06CB:CE17 Mouse": "new preset",
+        "HS6209 2.4G Wireless Receiver": "PICO MOUSI",
+        "Raspberry Pi Pico Mouse": "faster"
     }
 }
