@@ -1,6 +1,5 @@
 #!/usr/bin/env sh
 
-
 #// hyde envs
 
 export confDir="${XDG_CONFIG_HOME:-$HOME/.config}"
@@ -17,36 +16,47 @@ get_hashmap()
     unset skipStrays
     unset verboseMap
 
+    echo "DEBUG: get_hashmap called with sources: $@" >&2
+
     for wallSource in "$@"; do
         [ -z "${wallSource}" ] && continue
-        [ "${wallSource}" == "--skipstrays" ] && skipStrays=1 && continue
-        [ "${wallSource}" == "--verbose" ] && verboseMap=1 && continue
+        [ "${wallSource}" = "--skipstrays" ] && skipStrays=1 && continue
+        [ "${wallSource}" = "--verbose" ] && verboseMap=1 && continue
+
+        echo "DEBUG: scanning source: ${wallSource}" >&2
 
         hashMap=$(find "${wallSource}" -type f \( -iname "*.gif" -o -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \) -exec "${hashMech}" {} + | sort -k2)
-        if [ -z "${hashMap}" ] ; then
-            echo "WARNING: No image found in \"${wallSource}\""
+
+        echo "DEBUG: result of find (first few lines):" >&2
+        echo "${hashMap}" | head -n5 >&2
+
+        if [ -z "${hashMap}" ]; then
+            echo "WARNING: No image found in \"${wallSource}\"" >&2
             continue
         fi
 
-        while read -r hash image ; do
+        while read -r hash image; do
             wallHash+=("${hash}")
             wallList+=("${image}")
+            echo "DEBUG: adding image: ${image}" >&2
         done <<< "${hashMap}"
     done
 
-    if [ -z "${#wallList[@]}" ] || [[ "${#wallList[@]}" -eq 0 ]] ; then
-        if [[ "${skipStrays}" -eq 1 ]] ; then
+    echo "DEBUG: total images found: ${#wallList[@]}" >&2
+
+    if [ -z "${#wallList[@]}" ] || [[ "${#wallList[@]}" -eq 0 ]]; then
+        if [[ "${skipStrays}" -eq 1 ]]; then
             return 1
         else
-            echo "ERROR: No image found in any source"
+            echo "ERROR: No image found in any source" >&2
             exit 1
         fi
     fi
 
-    if [[ "${verboseMap}" -eq 1 ]] ; then
-        echo "// Hash Map //"
-        for indx in "${!wallHash[@]}" ; do
-            echo ":: \${wallHash[${indx}]}=\"${wallHash[indx]}\" :: \${wallList[${indx}]}=\"${wallList[indx]}\""
+    if [[ "${verboseMap}" -eq 1 ]]; then
+        echo "// Hash Map //" >&2
+        for indx in "${!wallHash[@]}"; do
+            echo ":: \${wallHash[${indx}]}=\"${wallHash[indx]}\" :: \${wallList[${indx}]}=\"${wallList[indx]}\"" >&2
         done
     fi
 }
@@ -60,8 +70,8 @@ get_themes()
     unset thmList
     unset thmWall
 
-    while read thmDir ; do
-        if [ ! -e "$(readlink "${thmDir}/wall.set")" ] ; then
+    while read thmDir; do
+        if [ ! -e "$(readlink "${thmDir}/wall.set")" ]; then
             get_hashmap "${thmDir}" --skipstrays || continue
             echo "fixig link :: ${thmDir}/wall.set"
             ln -fs "${wallList[0]}" "${thmDir}/wall.set"
@@ -71,15 +81,15 @@ get_themes()
         thmWallS+=("$(readlink "${thmDir}/wall.set")")
     done < <(find "${hydeConfDir}/themes" -mindepth 1 -maxdepth 1 -type d)
 
-    while IFS='|' read -r sort theme wall ; do
+    while IFS='|' read -r sort theme wall; do
         thmSort+=("${sort}")
         thmList+=("${theme}")
         thmWall+=("${wall}")
     done < <(parallel --link echo "{1}\|{2}\|{3}" ::: "${thmSortS[@]}" ::: "${thmListS[@]}" ::: "${thmWallS[@]}" | sort -n -k 1 -k 2)
 
-    if [ "${1}" == "--verbose" ] ; then
+    if [ "${1}" = "--verbose" ]; then
         echo "// Theme Control //"
-        for indx in "${!thmList[@]}" ; do
+        for indx in "${!thmList[@]}"; do
             echo -e ":: \${thmSort[${indx}]}=\"${thmSort[indx]}\" :: \${thmList[${indx}]}=\"${thmList[indx]}\" :: \${thmWall[${indx}]}=\"${thmWall[indx]}\""
         done
     fi
@@ -92,7 +102,7 @@ case "${enableWallDcol}" in
     *) enableWallDcol=0 ;;
 esac
 
-if [ -z "${hydeTheme}" ] || [ ! -d "${hydeConfDir}/themes/${hydeTheme}" ] ; then
+if [ -z "${hydeTheme}" ] || [ ! -d "${hydeConfDir}/themes/${hydeTheme}" ]; then
     get_themes
     hydeTheme="${thmList[0]}"
 fi
@@ -102,14 +112,12 @@ export hydeThemeDir="${hydeConfDir}/themes/${hydeTheme}"
 export wallbashDir="${hydeConfDir}/wallbash"
 export enableWallDcol
 
-
 #// hypr vars
 
 if printenv HYPRLAND_INSTANCE_SIGNATURE &> /dev/null; then
     export hypr_border="$(hyprctl -j getoption decoration:rounding | jq '.int')"
     export hypr_width="$(hyprctl -j getoption general:border_size | jq '.int')"
 fi
-
 
 #// extra fns
 
@@ -144,7 +152,7 @@ set_conf()
     local varData="${2}"
     touch "${hydeConfDir}/hyde.conf"
 
-    if [ $(grep -c "^${varName}=" "${hydeConfDir}/hyde.conf") -eq 1 ] ; then
+    if [ $(grep -c "^${varName}=" "${hydeConfDir}/hyde.conf") -eq 1 ]; then
         sed -i "/^${varName}=/c${varName}=\"${varData}\"" "${hydeConfDir}/hyde.conf"
     else
         echo "${varName}=\"${varData}\"" >> "${hydeConfDir}/hyde.conf"
