@@ -10,18 +10,20 @@ DB_FILE="$HOME/.local/share/bin/take/net_usage.db"
 #    and the total usage in MB on the second line.
 output=$(sqlite3 -separator ' ' "$DB_FILE" "SELECT date, rx_bytes, tx_bytes FROM net_usage WHERE date LIKE '$(date +%Y-%m)%';" | awk -v current_month="$(date +%Y-%m)" \
      -v current_date="$(date +%Y-%m-%d)" \
-     '\
-     BEGIN {
-         monthly_total_bytes = 0
-         daily_total_bytes = 0
-     }
+'\
+      BEGIN {
+          monthly_total_bytes = 0
+          daily_total_bytes = 0
+      }
      {
          day = $1 # Date is the first field
          rx_bytes = $2
          tx_bytes = $3
-         
+
          total_day_bytes = rx_bytes + tx_bytes
-         
+
+         daily_rx[day] += rx_bytes
+         daily_tx[day] += tx_bytes
          daily_breakdown[day] += total_day_bytes # Aggregate for tooltip
          monthly_total_bytes += total_day_bytes
 
@@ -45,20 +47,50 @@ output=$(sqlite3 -separator ' ' "$DB_FILE" "SELECT date, rx_bytes, tx_bytes FROM
              if (i > 1) {
                  tooltip = tooltip "\\n"
              }
-             tooltip = tooltip sprintf("%s: %.2f MB", day_key, daily_breakdown[day_key] / 1048576)
+
+             rx_mb = daily_rx[day_key] / 1048576
+             tx_mb = daily_tx[day_key] / 1048576
+             total_mb = daily_breakdown[day_key] / 1048576
+
+             if (rx_mb >= 1024) {
+                 rx_display = sprintf("%.2f GB", rx_mb / 1024)
+             } else {
+                 rx_display = sprintf("%.2f MB", rx_mb)
+             }
+
+             if (tx_mb >= 1024) {
+                 tx_display = sprintf("%.2f GB", tx_mb / 1024)
+             } else {
+                 tx_display = sprintf("%.2f MB", tx_mb)
+             }
+
+             if (total_mb >= 1024) {
+                 total_display = sprintf("%.2f GB", total_mb / 1024)
+             } else {
+                 total_display = sprintf("%.2f MB", total_mb)
+             }
+
+             tooltip = tooltip sprintf("%s: %s (RX: %s, TX: %s)", day_key, total_display, rx_display, tx_display)
          }
-         
+
          monthly_total_mb = monthly_total_bytes / 1048576
          daily_total_mb = daily_total_bytes / 1048576
 
          # Add current day and monthly total to the tooltip
          tooltip = tooltip sprintf("\\n\\nToday: %.2f MB", daily_total_mb)
-         tooltip = tooltip sprintf("\\nMonthly Total: %.2f MB", monthly_total_mb)
-         
+
+         if (monthly_total_mb >= 1024) {
+             monthly_total_gb = monthly_total_mb / 1024
+             tooltip = tooltip sprintf("\\nMonthly Total: %.2f GB", monthly_total_gb)
+         } else {
+             tooltip = tooltip sprintf("\\nMonthly Total: %.2f MB", monthly_total_mb)
+         }
+
          print tooltip
          printf "%.2f", monthly_total_mb
      }
- ')
+')
+
 
 # Read the two lines of output from awk into variables
 tooltip_escaped=$(echo "$output" | head -n 1)
@@ -66,8 +98,8 @@ monthly_total_mb=$(echo "$output" | tail -n 1)
 
 # Convert monthly_total_mb to GiB for the main text, if it's large enough
 if (( $(echo "$monthly_total_mb >= 1024" | bc -l) )); then
-    monthly_total_gib=$(echo "scale=1; $monthly_total_mb / 1024" | bc -l)
-    display_text="󰈀 ${monthly_total_gib} GiB"
+    monthly_total_gb=$(echo "scale=1; $monthly_total_mb / 1024" | bc -l)
+    display_text="󰈀 ${monthly_total_gb} GB"
 else
     display_text="󰈀 ${monthly_total_mb} MB"
 fi
