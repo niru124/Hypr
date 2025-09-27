@@ -86,22 +86,24 @@ output=$(sqlite3 -separator ' ' "$DB_FILE" "SELECT date, rx_bytes, tx_bytes FROM
              tooltip = tooltip sprintf("\\nMonthly Total: %.2f MB", monthly_total_mb)
          }
 
-         print tooltip
-         printf "%.2f", monthly_total_mb
+          print tooltip
+          printf "%.2f\n", monthly_total_mb
+          printf "%.2f", daily_total_mb
      }
 ')
 
 
-# Read the two lines of output from awk into variables
-tooltip_escaped=$(echo "$output" | head -n 1)
-monthly_total_mb=$(echo "$output" | tail -n 1)
+# Read the three lines of output from awk into variables
+tooltip_escaped=$(echo "$output" | sed -n '1p')
+monthly_total_mb=$(echo "$output" | sed -n '2p')
+daily_total_mb=$(echo "$output" | sed -n '3p')
 
-# Convert monthly_total_mb to GiB for the main text, if it's large enough
-if (( $(echo "$monthly_total_mb >= 1024" | bc -l) )); then
-    monthly_total_gb=$(echo "scale=1; $monthly_total_mb / 1024" | bc -l)
-    display_text="󰈀 ${monthly_total_gb} GB"
+# Convert daily_total_mb to GiB for the main text, if it's large enough
+if (( $(echo "$daily_total_mb >= 1024" | bc -l) )); then
+    daily_total_gb=$(echo "scale=1; $daily_total_mb / 1024" | bc -l)
+    display_text="󰈀 ${daily_total_gb} GB"
 else
-    display_text="󰈀 ${monthly_total_mb} MB"
+    display_text="󰈀 ${daily_total_mb} MB"
 fi
 
 
