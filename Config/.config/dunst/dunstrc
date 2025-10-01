@@ -449,15 +449,15 @@
     timeout = 0
 
 [urgency_low]
-    background = "#6580A380"
-    foreground = "#CCE2FFE6"
-    frame_color = "#6580A303"
+    background = "#A3716580"
+    foreground = "#FFD6CCE6"
+    frame_color = "#A3716503"
     icon = "/home/nirantar/.config/dunst/icons/hyprdots.svg"
     timeout = 5
 
 [urgency_normal]
-    background = "#3A4A6B80"
-    foreground = "#CCDDFFE6"
-    frame_color = "#3A4A6B03"
+    background = "#6B3C3A80"
+    foreground = "#FFCECCE6"
+    frame_color = "#6B3C3A03"
     icon = "/home/nirantar/.config/dunst/icons/hyprdots.svg"
     timeout = 5
