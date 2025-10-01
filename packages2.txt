@@ -11,4 +11,5 @@ wl-logout
 wl-clipboard
 input-remapper-bin
 pdftk
-
+polkit-gnome
+xdg-desktop-portal-hyprland
