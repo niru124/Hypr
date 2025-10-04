@@ -16,5 +16,6 @@
 ~/myapp/:~/Downloads/mar/HyDE/Config/.config/api
 ~/files.txt:~/Downloads/mar/HyDE/Config/.config/files.txt
 ~/.tmux.conf:~/Downloads/mar/HyDE/Config/.config/tmux/.tmux.conf
+~/.zshrc:~/Downloads/mar/HyDE/.zshrc
 ~/.local/share/bin/:~/Downloads/mar/HyDE/bin2,take/net_usage.db,take/net_usage_state,take/net_usage.log.error
 ~/.config/input-remapper-2/:~/Downloads/mar/HyDE/Config/.config/input-remapper-2

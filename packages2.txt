@@ -13,3 +13,4 @@ input-remapper-bin
 pdftk
 polkit-gnome
 xdg-desktop-portal-hyprland
+carapace-bin
