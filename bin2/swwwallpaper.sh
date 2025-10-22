@@ -104,7 +104,7 @@ fi
 
 #// set defaults
 
-[ -z "${xtrans}" ] && xtrans="grow"
+[ -z "${xtrans}" ] && xtrans="random"
 [ -z "${wallFramerate}" ] && wallFramerate=60
 [ -z "${wallTransDuration}" ] && wallTransDuration=0.4
 

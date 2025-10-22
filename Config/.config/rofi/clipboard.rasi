@@ -2,6 +2,7 @@
 configuration {
     modi:                        "drun";
     show-icons:                  false;
+    font: "CaskaydiaCove Nerd Font 18";
 }
 
 @theme "~/.config/rofi/theme.rasi"

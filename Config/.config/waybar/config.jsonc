@@ -18,7 +18,7 @@
 
 	"modules-left": ["custom/padd","custom/l_end","cpu","memory","custom/cpuinfo","disk","custom/gpu","custom/fan","custom/memory_swap","custom/r_end","custom/l_end","idle_inhibitor","clock","custom/weather","custom/r_end","","custom/padd"],
 	"modules-center": ["custom/padd","","custom/l_end","hyprland/workspaces","custom/r_end","custom/padd"],
-	"modules-right": ["custom/padd","custom/l_end","custom/tor","network","custom/net_usage","pulseaudio","pulseaudio#microphone","custom/powerprofile","custom/r_end","custom/l_end","privacy","tray","battery","custom/r_end","custom/l_end","","custom/notifications","custom/power","custom/r_end","custom/padd"],
+	"modules-right": ["custom/padd","custom/l_end","","custom/tor","network","custom/net_usage","pulseaudio","pulseaudio#microphone","custom/powerprofile","custom/r_end","custom/l_end","privacy","tray","battery","custom/r_end","custom/l_end","custom/mount","custom/notifications","custom/power","custom/r_end","custom/padd"],
 
 
 // sourced from modules based on config.ctl //
@@ -248,6 +248,13 @@
         "format-icons": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"]
     },
 
+"custom/mount": {
+  "format-json": "{text}", // Waybar will use the "text" field from your JSON output
+  "tooltip-format": "{tooltip}", // Waybar will use the "tooltip" field
+  "exec": "~/.local/share/bin/disk/udisk.sh",
+  "return-type": "json",
+  "on-click": "~/.local/share/bin/disk/udisk-waybar-action.sh"
+},
     "custom/notifications": {
       // "format": "{icon} {}",
         "format": "{} {icon}", // TODO: workaround for the module not showing up // revert when fixed

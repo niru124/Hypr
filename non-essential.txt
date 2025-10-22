@@ -5,3 +5,4 @@ youtube-local
 tor
 sushi
 sshfs
+cruise-bin
