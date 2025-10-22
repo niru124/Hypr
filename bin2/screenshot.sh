@@ -54,8 +54,8 @@ sf) # frozen screen, drag to manually snip an area / click on a window to print 
 	notify "" -screen-capture 
 	grimblast --freeze copysave area $temp_screenshot && restore_shader && swappy -f $temp_screenshot;;
 m) # print focused monitor
-notify "" -screen-capture 
-grimblast copysave output $temp_screenshot && restore_shader && swappy -f $temp_screenshot;;
+	notify "" -screen-capture 
+	grimblast copysave output $temp_screenshot && restore_shader && swappy -f $temp_screenshot;;
 *) # invalid option
 	print_error ;;
 esac

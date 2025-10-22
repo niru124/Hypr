@@ -1,6 +1,6 @@
 ~/.config/mpv/:~/Downloads/mar/HyDE/Config/.config/mpv
 ~/.config/yazi/:~/Downloads/mar/HyDE/Config/.config/yazi
-~/.config/zathura/:~/Downloads/mar/HyDE/Config/.config/zathura
+~/.config/zathura/:~/Downloads/mar/HyDE/Config/.config/zathura,md_notes/,notes.db
 ~/.config/wlogout/:~/Downloads/mar/HyDE/Config/.config/wlogout
 ~/.config/weylus/:~/Downloads/mar/HyDE/Config/.config/weylus
 ~/.config/waybar/:~/Downloads/mar/HyDE/Config/.config/waybar
@@ -19,3 +19,4 @@
 ~/.zshrc:~/Downloads/mar/HyDE/.zshrc
 ~/.local/share/bin/:~/Downloads/mar/HyDE/bin2,take/net_usage.db,take/net_usage_state,take/net_usage.log.error
 ~/.config/input-remapper-2/:~/Downloads/mar/HyDE/Config/.config/input-remapper-2
+~/.config/mimeapps.list:~/Downloads/mar/HyDE/Config/.config/mimeapps.list

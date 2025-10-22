@@ -25,3 +25,4 @@ xdg-desktop-portal-hyprland
 pipewire
 wireplumber 
 jq
+ncdu

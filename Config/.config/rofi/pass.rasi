@@ -1,0 +1,75 @@
+configuration {
+  modi: "dmenu"; 
+  // show-icons: true;
+  font: "CaskaydiaCove Nerd Font 18";
+}
+
+@theme "~/.config/rofi/theme.rasi"
+
+window {
+  width: 35em;
+  border-radius: 30px;
+  background-color: @main-bg;
+}
+
+mainbox {
+    enabled: true;
+    spacing: 0em;
+    padding: 0.5em;
+    orientation: vertical;
+    children: [ "inputbar", "listview" ];
+    background-color: transparent;
+}
+
+inputbar {
+  children: [ prompt, entry ];
+  background-color: @main-bg;
+  border-radius: 20px;
+  padding: 0.8em;
+  margin: 0.5em;
+}
+
+prompt {
+  text-color: @select-bg;
+  background-color: transparent;
+  padding: 10px 10px 10px 10px;
+}
+
+entry {
+  placeholder-color: @main-fg;
+  text-color: @main-fg;
+  background-color: transparent;
+  padding: 10px 10px 10px 10px;
+}
+
+listview {
+  lines: 10;
+  fixed-height: false;
+  dynamic: true;
+  scrollbar: false;
+  background-color: transparent;
+  // spacing: 0.5em;
+}
+
+element {
+  padding: 0.5em;
+  background-color: transparent;
+  text-color: @main-fg;
+  border-radius: 50px;
+  cursor: pointer;
+  border: 0;
+}
+
+element selected {
+  background-color: @select-bg;  /* Use your theme's highlight color */
+  text-color: @select-fg;        /* Ensure good contrast */
+}
+
+element-text {
+  background-color: transparent;
+  text-color: inherit;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  // horizontal-align: 0.5;
+}

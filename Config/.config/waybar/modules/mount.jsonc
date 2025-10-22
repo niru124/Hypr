@@ -1,0 +1,7 @@
+"custom/mount": {
+  "format-json": "{text}", // Waybar will use the "text" field from your JSON output
+  "tooltip-format": "{tooltip}", // Waybar will use the "tooltip" field
+  "exec": "~/.local/share/bin/disk/udisk.sh",
+  "return-type": "json",
+  "on-click": "~/.local/share/bin/disk/udisk-waybar-action.sh"
+},

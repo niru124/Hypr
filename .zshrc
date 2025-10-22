@@ -183,3 +183,9 @@ zstyle ':autocomplete:*complete*:*' insert-unambiguous yes
 
 # aliases
 alias ball='input-remapper-control --command start --device "HS6209 2.4G Wireless Receiver" --preset "PICO MOUSI"'
+# kmk keyboard
+alias mountcircuit='udisksctl mount -b /dev/sda1'
+export PATH="$HOME/.local/bin:$PATH"
+
+# opencode
+export PATH=/home/nirantar/.opencode/bin:$PATH
