@@ -1,6 +1,33 @@
 -- This file simply bootstraps the installation of Lazy.nvim and then calls other files for execution
 -- This file doesn't necessarily need to be touched, BE CAUTIOUS editing this file and proceed at your own risk.
 
+vim.api.nvim_create_autocmd("BufNewFile", {
+  pattern = "*.cpp",
+  callback = function()
+    local template_path =
+      vim.fn.expand "~/.config/nvim/templates/cpp.template"
+    vim.cmd("0r " .. template_path) -- Read the template into the buffer
+  end,
+})
+
+vim.api.nvim_create_autocmd("BufNewFile", {
+  pattern = "*.sh",
+  callback = function()
+    local template_path =
+      vim.fn.expand "~/.config/nvim/templates/bash.template"
+    vim.cmd("0r " .. template_path)
+  end,
+})
+
+vim.api.nvim_create_autocmd("BufNewFile", {
+  pattern = "*.ino",
+  callback = function()
+    local template_path =
+      vim.fn.expand "~/.config/nvim/templates/ino.template"
+    vim.cmd("0r " .. template_path)
+  end,
+})
+
 local lazypath = vim.env.LAZY
   or vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
 if

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Script description:
+#
+
+# Main function
+main() {
+  echo "Hello from bash template!"
+}
+
+# Call the main function
+main "$@"

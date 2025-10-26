@@ -5,7 +5,7 @@
 ~/.config/weylus/:~/Downloads/mar/HyDE/Config/.config/weylus
 ~/.config/waybar/:~/Downloads/mar/HyDE/Config/.config/waybar
 ~/.config/rofi/:~/Downloads/mar/HyDE/Config/.config/rofi
-~/.config/nvim/:~/Downloads/mar/HyDE/Config/.config/nvim,lazy-lock.json
+~/.config/nvim/:~/Downloads/mar/HyDE/Config/.config/nvim,lazy-lock.json,todo.md
 ~/.config/kitty/:~/Downloads/mar/HyDE/Config/.config/kitty,kitty.conf.bak,1.sh
 ~/.config/hyde/:~/Downloads/mar/HyDE/Config/.config/hyde
 ~/.config/hypr/:~/Downloads/mar/HyDE/Config/.config/hypr
