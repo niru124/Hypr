@@ -81,21 +81,42 @@ generate_password() {
     length=$(rofi -dmenu -p "Password length (default 16):" -theme "$ROFI_THEME")
     [[ -z "$length" ]] && length=16
 
-    include_symbols=$(printf "Yes\nNo" | rofi -dmenu -p "Include symbols?" -theme "$ROFI_THEME")
+    local include_digits include_special_characters custom_symbols chars
 
-    if [[ "$include_symbols" == "Yes" ]]; then
-        if command -v pwgen >/dev/null 2>&1; then
-            password=$(pwgen -s "$length" 1)
+    include_digits=$(printf "Yes\nNo" | rofi -dmenu -p "Include digits?" -theme "$ROFI_THEME")
+    include_special_characters=$(printf "Yes\nNo\nAdvanced" | rofi -dmenu -p "Include special characters?" -theme "$ROFI_THEME")
+
+    chars="a-zA-Z"
+    if [[ "$include_digits" == "Yes" ]]; then
+        chars+="0-9"
+    fi
+
+    if [[ "$include_special_characters" == "Yes" ]]; then
+        chars+="!@#$%^&*()_+-=[]{}|;:,.<>?"
+    elif [[ "$include_special_characters" == "Advanced" ]]; then
+        custom_symbols=$(rofi -dmenu -p "Enter custom special characters:" -theme "$ROFI_THEME")
+        if [[ -n "$custom_symbols" ]]; then
+            chars+="$custom_symbols"
         else
-            # fallback: openssl
-            password=$(openssl rand -base64 $((length*3/4)) | head -c "$length")
+            notify-send "pass" "No custom symbols entered. Generating without special characters."
+        fi
+    fi
+
+    if command -v pwgen >/dev/null 2>&1; then
+        # pwgen doesn't offer fine-grained control over character sets like openssl
+        # For simplicity, if custom symbols are requested, we'll fall back to openssl
+        if [[ "$include_special_characters" == "Advanced" && -n "$custom_symbols" ]]; then
+            password=$(openssl rand -base64 $((length*3/4)) | tr -dc "$chars" | head -c "$length")
+        elif [[ "$include_special_characters" == "Yes" ]]; then
+            password=$(pwgen -s "$length" 1)
+        elif [[ "$include_digits" == "Yes" ]]; then
+            password=$(pwgen "$length" 1) # pwgen includes digits by default
+        else
+            password=$(pwgen -0 "$length" 1) # pwgen -0 excludes digits and symbols
         fi
     else
-        if command -v pwgen >/dev/null 2>&1; then
-            password=$(pwgen "$length" 1)
-        else
-            password=$(openssl rand -base64 $((length*3/4)) | tr -dc 'a-zA-Z0-9' | head -c "$length")
-        fi
+        # fallback: openssl
+        password=$(openssl rand -base64 $((length*3/4)) | tr -dc "$chars" | head -c "$length")
     fi
 
     entry=$(rofi -dmenu -p "Store as (e.g. mail/account):" -theme "$ROFI_THEME")

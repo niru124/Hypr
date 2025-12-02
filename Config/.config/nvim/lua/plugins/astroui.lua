@@ -44,11 +44,11 @@ return {
         TabLine = { bg = "NONE" },
         TabLineSel = { bg = "NONE" },
         TabLineFill = { bg = "NONE" },
-        NeoTreeDotfile = {
-          fg = "#a6d189",
-          bg = "NONE",
-          bold = true,
-        },
+        -- NeoTreeDotfile = {
+        --   fg = "#a6d189",
+        --   bg = "NONE",
+        --   bold = true,
+        -- },
       },
     },
     icons = {

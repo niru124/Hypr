@@ -31,19 +31,15 @@ run = "plugin custom-shell --args=auto"
 desc = "custom-shell as default"
 
 [[mgr.prepend_keymap]]
-on = "<C-y>"
-run = ["plugin system-clipboard"]
-desc = "Copy to system clipboard"
-
-[[mgr.prepend_keymap]]
 on = "<C-r>"
 run = "reload"
 desc = "Reload Yazi configuration"
 
-# [mgr]
-# prepend_keymap = [
-#   { on = ["M","s"], run = "plugin sshfs -- menu",            desc = "Open SSHFS options" },
-# ]
+[[mgr.prepend_keymap]]
+on = ["M","s"]
+run = "plugin sshfs -- menu" 
+desc = "Open SSHFS options" 
+
 ############### whoosh.yazi
 [[mgr.prepend_keymap]]
 on = "["
@@ -116,3 +112,17 @@ desc = "Rename bookmark by fzf"
 on = "<C-\\>"      # Ctrl + backslash (you can pick any key combo)
 run = "plugin floating-term"
 desc = "Toggle floating terminal"
+
+[[mgr.prepend_keymap]]
+on = "<C-y>"
+run = ["plugin wl-clipboard"]
+
+[[manager.prepend_keymap]]
+on = "<C-o>"
+run = "plugin file-actions -- --around debug=true"
+desc= "Perform actions on selected files"
+
+[[manager.prepend_keymap]]
+on = "<C-x>"
+run = "log 'Test log from Ctrl+x'"
+desc = "Test logging functionality"

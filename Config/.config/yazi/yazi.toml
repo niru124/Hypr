@@ -13,3 +13,13 @@ edit = [
 play = [
 	{ run = 'mpv "$@"', block = true, for = "linux" },
 ]
+
+[plugin.custom-actions]
+block = false  # Run commands in a non-blocking shell by default
+commands = [
+    { name = "Open with nano", cmd = "/usr/bin/nano", block = true },
+    { name = "Open with zathura", cmd = "zathura" },
+]
+
+[plugin.file-actions]
+block = false  # Run commands in a non-blocking shell by default
