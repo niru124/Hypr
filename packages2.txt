@@ -15,3 +15,6 @@ polkit-gnome
 xdg-desktop-portal-hyprland
 carapace-bin
 udiskie
+zathura
+zathura-pdf-poppler
+feh

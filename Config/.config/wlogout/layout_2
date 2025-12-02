@@ -8,7 +8,7 @@
 
 {
     "label" : "logout",
-    "action" : "logout && hyprlock",
+    "action" : "hyprctl dispatch exit && hyprlock",
     "text" : "Logout",
     "keybind" : "e"
 }

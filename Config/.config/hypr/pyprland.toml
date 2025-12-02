@@ -1,5 +1,5 @@
 [pyprland]
-plugins = ["scratchpads","layout_center"]
+plugins = ["scratchpads","layout_center","toggle_special"]
 style = ["opacity 0.8", "bordercolor rgb(FFFF00)"]
 
 [pyprland.variables]

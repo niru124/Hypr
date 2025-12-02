@@ -19,9 +19,9 @@ return {
   -- {
   -- import = "astrocommunity.scrolling.mini-animate",
   -- },
-  {
-    import = "astrocommunity.media.codesnap-nvim",
-  },
+  -- {
+  --   import = "astrocommunity.media.codesnap-nvim",
+  -- },
   { import = "astrocommunity.motion.leap-nvim" },
   -- { import = "astrocommunity.pack.java" },
   {

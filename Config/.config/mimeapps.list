@@ -1,7 +1,7 @@
 [Default Applications]
-application/pdf=org.pwmt.zathura-pdf-poppler.desktop
-image/jpeg=org.gnome.Loupe.desktop
-image/png=org.gnome.Loupe.desktop
+application/pdf=org.gnome.Evince.desktop
+image/jpeg=nsxiv.desktop
+image/png=nsxiv.desktop
 x-scheme-handler/msteams=teams.desktop
 x-scheme-handler/http=librewolf.desktop
 x-scheme-handler/https=librewolf.desktop
@@ -24,22 +24,22 @@ text/x-c=nvim.desktop
 text/x-c++=nvim.desktop
 inode/directory=thunar.desktop  # or your preferred GUI file manager
 image/gif=mpv.desktop
-image/webp=org.gnome.Loupe.desktop
-image/svg+xml=org.gnome.Loupe.desktop
+image/webp=feh.desktop
+image/svg+xml=feh.desktop
 audio/mpeg=mpv.desktop
 audio/x-wav=mpv.desktop
 audio/flac=mpv.desktop
 
 [Added Associations]
-application/pdf=org.gnome.Evince.desktop;org.pwmt.zathura-pdf-poppler.desktop;
-image/jpeg=org.gnome.Loupe.desktop;
-image/png=org.gnome.Loupe.desktop;
+application/pdf=org.pwmt.zathura-pdf-poppler.desktop;org.gnome.Evince.desktop;sioyek.desktop;
+image/jpeg=feh.desktop;org.gnome.Loupe.desktop;nsxiv.desktop;
+image/png=org.gnome.Loupe.desktop;nsxiv.desktop;feh.desktop;
 x-scheme-handler/sms=org.gnome.Shell.Extensions.GSConnect.desktop;
 x-scheme-handler/tel=org.gnome.Shell.Extensions.GSConnect.desktop;
 x-scheme-handler/http=librewolf.desktop;
 x-scheme-handler/https=librewolf.desktop;
 x-scheme-handler/chrome=librewolf.desktop;
-text/html=librewolf.desktop;
+text/html=nsxiv.desktop;librewolf.desktop;
 application/x-extension-htm=librewolf.desktop;
 application/x-extension-html=librewolf.desktop;
 application/x-extension-shtml=librewolf.desktop;
@@ -47,3 +47,5 @@ application/xhtml+xml=librewolf.desktop;
 application/x-extension-xhtml=librewolf.desktop;
 application/x-extension-xht=librewolf.desktop;
 text/markdown=nvim.desktop;
+text/x-python=org.gnome.TextEditor.desktop;
+application/x-shellscript=org.gnome.TextEditor.desktop;
