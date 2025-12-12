@@ -18,3 +18,5 @@ udiskie
 zathura
 zathura-pdf-poppler
 feh
+grimblast
+swappy
