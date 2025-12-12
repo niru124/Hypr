@@ -144,7 +144,7 @@
     },
 
 "custom/tor": {
-  "format": "🧅 {} ", // This will be replaced by the IP
+  "format": " {} ", // This will be replaced by the IP
   "exec": "~/.local/share/bin/tor.sh",
   "return-type": "json",
   "interval": 60,
