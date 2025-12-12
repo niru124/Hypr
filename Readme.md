@@ -22,7 +22,7 @@ Built around modular and powerful shell scripts, **HyDE** manages everything fro
 
 - **Pre-configured Applications**
   Comes bundled with tuned configs for:
-
+  
   - **Neovim**
   - **Yazi**
   - **Cava**
@@ -34,8 +34,106 @@ Built around modular and powerful shell scripts, **HyDE** manages everything fro
   Pre-installed and configured with:
 
 - `scratchpad` (Yazi, floating terminal, Cava)
+
 - `center` layout for better small-screen usage
+
 - Extend easily via `~/.config/hypr/myenv/pyprland.toml`
+
+---
+
+## 📸 Screenshots and Videos
+
+### Screenshots
+
+#### Overall Layout
+
+![Overall Layout](assets/images/overall.png)
+
+#### Dwindle Layout
+
+![Dwindle Layout](assets/images/dwindle.png)
+
+#### Scrolling Layout
+
+![Scrolling Layout](assets/images/scrolling.png)
+
+#### Hyprlock
+
+![Hyprlock Preview](assets/images/hyprlock/preview_hyprlock.png)
+
+#### Rofi
+
+##### App Launcher
+
+![Rofi App Launcher](assets/images/rofi/app_launcher.png)
+
+##### ****Laucher Picker
+
+![Rofi App Launcher Picker](assets/images/rofi/app_launcher_picker.png)
+
+##### ****Animation Picker
+
+![Rofi Animation Picker](assets/images/rofi/animation_picker.png)
+
+##### Calculator
+
+![Rofi Calculator](assets/images/rofi/calculator.png)
+
+##### Clipboard
+
+![Rofi Clipboard](assets/images/rofi/clipboard.png)
+
+##### Drive
+
+![Rofi Drive](assets/images/rofi/drive.png)
+
+##### Emoji Picker
+
+![Rofi Emoji Picker](assets/images/rofi/emoji_picker.png)
+
+##### Key Pass
+
+![Rofi Key Pass](assets/images/rofi/key_pass.png)
+
+##### Keybindings
+
+![Rofi Keybindings](assets/images/rofi/keybindings.png)
+
+##### Logout
+
+![Rofi Logout 1](assets/images/rofi/logout1.png)
+![Rofi Logout 2](assets/images/rofi/logout2.png)
+
+##### Timer
+
+![Rofi Timer](assets/images/rofi/timer.png)
+
+##### To-Do List
+
+![Rofi To-Do List](assets/images/rofi/to-do_list.png)
+
+##### Wallpaper Picker
+
+![Rofi Wallpaper Picker](assets/images/rofi/wallpaper_picker.png)
+
+##### Wifi Menu
+
+![Rofi Wifi Menu](assets/images/rofi/wifi_menu.png)
+
+#### Waybar
+
+![Waybar Screenshot 1](assets/images/waybar/250727_21h25m02s_screenshot.png)
+![Waybar Screenshot 2](assets/images/waybar/251031_19h50m53s_screenshot.png)
+
+### Videos
+
+#### Scratchpad
+
+<video src="assets/videos/scratchpad.mkv" controls></video>
+
+#### Scratchpad 2
+
+<video src="assets/videos/scratchpad2.mkv" controls></video>
 
 ---
 
@@ -58,10 +156,12 @@ This interactive script will guide you through the installation process, prompti
 - **Core Packages**: Updates your system, installs essential packages (Pacman + AUR), copies core configuration files to `~/.config`, sets up custom scripts in `~/.local/share/bin`, and installs `zoxide`.
 - **Non-Essential Packages**: Installs additional packages from `non-essential.txt`.
 - **Fonts**: Installs Nerd Fonts (CaskaydiaCove, 0xProto, JetBrainsMono) and custom fonts (Abocat, Steelfish Outline, Mexcellent).
+  
   > **Note:** For custom fonts, you may need to update the placeholder download URLs in `install_all.sh` with direct `.zip` links.
 - **GTK Theme**: Installs the Catppuccin GTK Theme and configures Flatpak access.
 - **Pyprland**: Installs Pyprland in a dedicated Python virtual environment.
 - **TUI Greet Configuration**: Configures the `tuigreet` display manager.
+  
   > **Note:** This step requires `sudo` privileges.
 - **AstroNvim**: Installs the AstroNvim Neovim configuration (requires Neovim v0.7+ and Nerd Fonts to be pre-installed).
 
