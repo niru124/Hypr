@@ -110,3 +110,4 @@ decrease) # decrease the backlight
 
     [ "$notify" = true ] && send_notification ;;
 esac
+

@@ -67,11 +67,11 @@ Built around modular and powerful shell scripts, **HyDE** manages everything fro
 
 ![Rofi App Launcher](assets/images/rofi/app_launcher.png)
 
-##### ****Laucher Picker
+##### Laucher Picker
 
 ![Rofi App Launcher Picker](assets/images/rofi/app_launcher_picker.png)
 
-##### ****Animation Picker
+##### Animation Picker
 
 ![Rofi Animation Picker](assets/images/rofi/animation_picker.png)
 
@@ -192,11 +192,3 @@ To add more plugins, edit:
 ```
 
 other plugins and configurations could be found at https://hyprland-community.github.io/pyprland/Plugins.html
-
----
-
-## Summary
-
-- This environment is tailored for **power users**, but easy enough for beginners to explore.
-- Most of the configuration is commented and self-documented.
-- Additional instructions for customizing keybindings, layouts, and plugin behavior can be found inside the respective `.config` directories.
