@@ -124,9 +124,7 @@ on = "<C-x>"
 run = "log 'Test log from Ctrl+x'"
 desc = "Test logging functionality"
 
-
-
 [[mgr.prepend_keymap]]
-on = "z"
+on = "e"
 run = "plugin command-menu"
 desc = "Open command menu"
