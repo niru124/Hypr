@@ -20,5 +20,7 @@ return {
 		{ name = "List files", cmd = "ls -la" },
 		{ name = "Git status", cmd = "git status" },
 		{ name = "Open editor", cmd = "nvim" },
+		{ name = "Zip file", cmd = "$(zip_hovered.sh)" },
+		{ name = "Zip files", cmd = "${zip_selected.sh}" },
 	},
 }
