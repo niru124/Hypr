@@ -26,3 +26,5 @@ pipewire
 wireplumber 
 jq
 ncdu
+network-manager-applet
+polkit-gnome
