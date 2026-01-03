@@ -35,10 +35,7 @@ on = "<C-r>"
 run = "reload"
 desc = "Reload Yazi configuration"
 
-[[mgr.prepend_keymap]]
-on = ["M","s"]
-run = "plugin sshfs -- menu" 
-desc = "Open SSHFS options" 
+
 
 ############### whoosh.yazi
 [[mgr.prepend_keymap]]
@@ -126,3 +123,10 @@ desc= "Perform actions on selected files"
 on = "<C-x>"
 run = "log 'Test log from Ctrl+x'"
 desc = "Test logging functionality"
+
+
+
+[[mgr.prepend_keymap]]
+on = "z"
+run = "plugin command-menu"
+desc = "Open command menu"

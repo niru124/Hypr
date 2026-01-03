@@ -3,10 +3,7 @@ use = "gesellkammer/audio-preview"
 rev = "74dfea3"
 hash = "6f185a283a3756475272d147a3c1d29c"
 
-[[plugin.deps]]
-use = "uhs-robert/sshfs"
-rev = "a6ddd03"
-hash = "617d83a0e1d916a5ddcb90968eb3b5f6"
+
 
 [[plugin.deps]]
 use = "grappas/wl-clipboard"

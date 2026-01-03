@@ -18,7 +18,7 @@
 
 	"modules-left": ["custom/padd","custom/l_end","cpu","memory","custom/cpuinfo","disk","custom/gpu","custom/fan","custom/memory_swap","custom/r_end","custom/l_end","idle_inhibitor","clock","custom/weather","custom/r_end","","custom/padd"],
 	"modules-center": ["custom/padd","","custom/l_end","hyprland/workspaces","custom/r_end","custom/padd"],
-	"modules-right": ["custom/padd","custom/l_end","","custom/tor","network","custom/net_usage","pulseaudio","pulseaudio#microphone","custom/powerprofile","custom/r_end","custom/l_end","privacy","tray","battery","custom/r_end","custom/l_end","custom/mount","custom/notifications","custom/power","custom/r_end","custom/padd"],
+	"modules-right": ["custom/padd","custom/l_end","","custom/tor","network","custom/net_usage","pulseaudio","pulseaudio#microphone","custom/powerprofile","custom/r_end","custom/l_end","privacy","bluetooth","tray","battery","custom/r_end","custom/l_end","custom/mount","custom/notifications","custom/power","custom/r_end","custom/padd"],
 
 
 // sourced from modules based on config.ctl //
@@ -31,24 +31,23 @@
         "format-icons": ["▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"]
     },
 
-    "memory": {
-        "states": {
-            "c": 90, // critical
-            "h": 60, // high
-            "m": 30, // medium
-        },
-        "interval": 30,
-        "format": "󰾆 {used}GB",
-        "rotate": 0,
-        "format-m": "󰾅 {used}GB",
-        "format-h": "󰓅 {used}GB",
-        "format-c": " {used}GB",
-        "format-alt": "󰾆 {percentage}%",
-        "max-length": 10,
-        "tooltip": true,
-        "tooltip-format": "󰾆 {percentage}%\n {used:0.1f}GB/{total:0.1f}GB"
+"memory": {
+    "states": {
+        "c": 90,
+        "h": 60,
+        "m": 30
     },
-
+    "interval": 30,
+    "format": "󰾆 {used}GB",
+    "rotate": 0,
+    "format-m": "󰾅 {used}GB",
+    "format-h": "󰓅 {used}GB",
+    "format-c": " {used}GB",
+    "format-alt": "󰾆 {percentage}%",
+    "max-length": 10,
+    "tooltip": true,
+    "tooltip-format": "󰾆 RAM: {percentage}%\n {used:0.1f}GB / {total:0.1f}GB\n󰓡 Swap: {swapPercentage}%\n {swapUsed:0.1f}GB / {swapTotal:0.1f}GB"
+},
 "custom/cpuinfo": {
     "exec": "NO_EMOJI=1 cpuinfo.sh",
     "return-type": "json",
@@ -226,6 +225,21 @@
                 "tooltip-icon-size": 24
             }
         ]
+    },
+
+    "bluetooth": {
+        "format": "",
+        "rotate": 0,
+        "format-disabled": "",
+        "format-connected": " {num_connections}",
+        "format-connected-battery": "{icon} {num_connections}",
+        // "format-connected-battery": "{icon} {device_alias}-{device_battery_percentage}%",
+        "format-icons": ["󰥇", "󰤾", "󰤿", "󰥀", "󰥁", "󰥂", "󰥃", "󰥄", "󰥅", "󰥆", "󰥈"],
+        // "format-device-preference": [ "device1", "device2" ], // preference list deciding the displayed device If this config option is not defined or none of the devices in the list are connected, it will fall back to showing the last connected device.
+        "tooltip-format": "{controller_alias}\n{num_connections} connected",
+        "tooltip-format-connected": "{controller_alias}\n{num_connections} connected\n\n{device_enumerate}",
+        "tooltip-format-enumerate-connected": "{device_alias}",
+        "tooltip-format-enumerate-connected-battery": "{device_alias}\t{icon} {device_battery_percentage}%"
     },
 
     "tray": {
