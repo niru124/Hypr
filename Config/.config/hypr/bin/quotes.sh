@@ -2,33 +2,33 @@
 
 # Config
 JSON_FILE="$HOME/.config/hypr/quotes.json"
-CHAR_LIMIT=40
+CHAR_LIMIT=100
 
 # Function to wrap text at CHAR_LIMIT
 wrap_text() {
-    local text="$1"
-    local wrapped=""
-    local line=""
+	local text="$1"
+	local wrapped=""
+	local line=""
 
-    for word in $text; do
-        local line_length=${#line}
-        local word_length=${#word}
-        local total_length=$((line_length + word_length + 1))  # +1 for space
+	for word in $text; do
+		local line_length=${#line}
+		local word_length=${#word}
+		local total_length=$((line_length + word_length + 1)) # +1 for space
 
-        if (( total_length > CHAR_LIMIT )); then
-            wrapped+="$line\n"
-            line="$word"
-        else
-            if [[ -z "$line" ]]; then
-                line="$word"
-            else
-                line="$line $word"
-            fi
-        fi
-    done
+		if ((total_length > CHAR_LIMIT)); then
+			wrapped+="$line\n"
+			line="$word"
+		else
+			if [[ -z "$line" ]]; then
+				line="$word"
+			else
+				line="$line $word"
+			fi
+		fi
+	done
 
-    wrapped+="$line"
-    echo -e "$wrapped"
+	wrapped+="$line"
+	echo -e "$wrapped"
 }
 
 # Get total number of quotes
@@ -46,4 +46,3 @@ wrapped_quote=$(wrap_text "$quote")
 
 # Output for Waybar/Hyprlock
 echo -e "$wrapped_quote\n- $author"
-

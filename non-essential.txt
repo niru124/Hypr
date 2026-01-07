@@ -6,3 +6,4 @@ tor
 sushi
 sshfs
 cruise-bin
+hyprdynamicmonitors-bin
