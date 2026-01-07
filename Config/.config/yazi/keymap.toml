@@ -3,32 +3,11 @@ on   = "<Esc>"
 run  = "close"
 desc = "Cancel input"
 
-[[mgr.prepend_keymap]]
-on   = "<C-s>"
-run  = [
-  '''
-  #!/bin/bash
 
-  # Launch kitty terminal with the current directory
-  kitty --working-directory "$(pwd)" &
-
-  # Wait for the window to open
-  sleep 1
-
-  # Use xdotool to manage the window
-  window_id=$(xdotool search --name "kitty" | head -n 1)
-  xdotool windowmap "$window_id"
-  xdotool windowsize "$window_id" 800 600
-  xdotool windowmove "$window_id" 100 100
-  xdotool windowactivate "$window_id"
-  ''',
-]
-desc = "Open floating kitty terminal here"
-
-[[mgr.prepend_keymap]]
-on = [ "i", "a" ]
-run = "plugin custom-shell --args=auto"
-desc = "custom-shell as default"
+# [[mgr.prepend_keymap]]
+# on = [ "i", "a" ]
+# run = "plugin custom-shell --args=auto"
+# desc = "custom-shell as default"
 
 [[mgr.prepend_keymap]]
 on = "<C-r>"
@@ -37,94 +16,94 @@ desc = "Reload Yazi configuration"
 
 
 
-############### whoosh.yazi
-[[mgr.prepend_keymap]]
-on = "["
-run = "plugin whoosh jump_by_key"
-desc = "Jump bookmark by key"
+# ############### whoosh.yazi disabled due to load error
+# [[mgr.prepend_keymap]]
+# on = "["
+# run = "plugin whoosh jump_by_key"
+# desc = "Jump bookmark by key"
 
-# Direct fuzzy search access
-[[mgr.prepend_keymap]]
-on = "}"
-run = "plugin whoosh fuzzy"
-desc = "Direct fuzzy search for bookmarks"
+# # Direct fuzzy search access
+# [[mgr.prepend_keymap]]
+# on = "}"
+# run = "plugin whoosh fuzzy"
+# desc = "Direct fuzzy search for bookmarks"
 
-# Basic bookmark operations
-[[mgr.prepend_keymap]]
-on = [ "]", "a" ]
-run = "plugin whoosh save"
-desc = "Add bookmark (hovered file/directory)"
+# # Basic bookmark operations
+# [[mgr.prepend_keymap]]
+# on = [ "]", "a" ]
+# run = "plugin whoosh save"
+# desc = "Add bookmark (hovered file/directory)"
 
-[[mgr.prepend_keymap]]
-on = [ "]", "A" ]
-run = "plugin whoosh save_cwd"
-desc = "Add bookmark (current directory)"
+# [[mgr.prepend_keymap]]
+# on = [ "]", "A" ]
+# run = "plugin whoosh save_cwd"
+# desc = "Add bookmark (current directory)"
 
-# Temporary bookmarks
-[[mgr.prepend_keymap]]
-on = [ "]", "t" ]
-run = "plugin whoosh save_temp"
-desc = "Add temporary bookmark (hovered file/directory)"
+# # Temporary bookmarks
+# [[mgr.prepend_keymap]]
+# on = [ "]", "t" ]
+# run = "plugin whoosh save_temp"
+# desc = "Add temporary bookmark (hovered file/directory)"
 
-[[mgr.prepend_keymap]]
-on = [ "]", "T" ]
-run = "plugin whoosh save_cwd_temp"
-desc = "Add temporary bookmark (current directory)"
+# [[mgr.prepend_keymap]]
+# on = [ "]", "T" ]
+# run = "plugin whoosh save_cwd_temp"
+# desc = "Add temporary bookmark (current directory)"
 
-# Jump to bookmarks
-[[mgr.prepend_keymap]]
-on = [ "]", "f" ]
-run = "plugin whoosh jump_by_fzf"
-desc = "Jump bookmark by fzf"
+# # Jump to bookmarks
+# [[mgr.prepend_keymap]]
+# on = [ "]", "f" ]
+# run = "plugin whoosh jump_by_fzf"
+# desc = "Jump bookmark by fzf"
 
-# Delete bookmarks
-[[mgr.prepend_keymap]]
-on = [ "]", "d" ]
-run = "plugin whoosh delete_by_key"
-desc = "Delete bookmark by key"
+# # Delete bookmarks
+# [[mgr.prepend_keymap]]
+# on = [ "]", "d" ]
+# run = "plugin whoosh delete_by_key"
+# desc = "Delete bookmark by key"
 
-[[mgr.prepend_keymap]]
-on = [ "]", "D" ]
-run = "plugin whoosh delete_by_fzf"
-desc = "Delete bookmarks by fzf (use TAB to select multiple)"
+# [[mgr.prepend_keymap]]
+# on = [ "]", "D" ]
+# run = "plugin whoosh delete_by_fzf"
+# desc = "Delete bookmarks by fzf (use TAB to select multiple)"
 
-[[mgr.prepend_keymap]]
-on = [ "]", "C" ]
-run = "plugin whoosh delete_all"
-desc = "Delete all user bookmarks"
+# [[mgr.prepend_keymap]]
+# on = [ "]", "C" ]
+# run = "plugin whoosh delete_all"
+# desc = "Delete all user bookmarks"
 
-# Rename bookmarks
-[[mgr.prepend_keymap]]
-on = [ "]", "r" ]
-run = "plugin whoosh rename_by_key"
-desc = "Rename bookmark by key"
+# # Rename bookmarks
+# [[mgr.prepend_keymap]]
+# on = [ "]", "r" ]
+# run = "plugin whoosh rename_by_key"
+# desc = "Rename bookmark by key"
 
-[[mgr.prepend_keymap]]
-on = [ "]", "R" ]
-run = "plugin whoosh rename_by_fzf"
-desc = "Rename bookmark by fzf"
+# [[mgr.prepend_keymap]]
+# on = [ "]", "R" ]
+# run = "plugin whoosh rename_by_fzf"
+# desc = "Rename bookmark by fzf"
 
 ##############################
-[[mgr.prepend_keymap]]
-on = "<C-\\>"      # Ctrl + backslash (you can pick any key combo)
-run = "plugin floating-term"
-desc = "Toggle floating terminal"
+# [[mgr.prepend_keymap]]
+# on = "<C-\\>"      # Ctrl + backslash (you can pick any key combo)
+# run = "plugin floating-term"
+# desc = "Toggle floating terminal"
+
+# [[mgr.prepend_keymap]]
+# on = "<C-y>"
+# run = "plugin wl-clipboard"
 
 [[mgr.prepend_keymap]]
-on = "<C-y>"
-run = ["plugin wl-clipboard"]
-
-[[manager.prepend_keymap]]
 on = "<C-o>"
 run = "plugin file-actions -- --around debug=true"
 desc= "Perform actions on selected files"
 
-[[manager.prepend_keymap]]
+[[mgr.prepend_keymap]]
 on = "<C-x>"
 run = "log 'Test log from Ctrl+x'"
 desc = "Test logging functionality"
 
 [[mgr.prepend_keymap]]
-on = "e"
+on = "m"
 run = "plugin command-menu"
 desc = "Open command menu"

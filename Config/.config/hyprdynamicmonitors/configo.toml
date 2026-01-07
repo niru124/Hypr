@@ -1,0 +1,10 @@
+############################################
+# MANUAL LAPTOP OVERRIDE (hotkey only)
+############################################
+[profiles.manual_laptop_override]
+priority = 1000
+config_file = "$HOME/.config/hyprdynamicmonitors/hyprconfigs/laptop_only.go.tmpl"
+config_file_type = "template"
+
+[profiles.manual_laptop_override.conditions]
+# Intentionally empty — never auto-selected

@@ -11,7 +11,19 @@ return {
     opts = {
       ensure_installed = {
         "lua_ls",
-        -- add more arguments for adding more language servers
+        "arduino_language_server",
+        "ast_grep",
+        "bashls",
+        "clangd",
+        "jsonls",
+        "stylua",
+        -- cssls (keywords: css, scss, less)
+        -- emmet-ls emmet_ls (keywords: emmet)
+        -- eslint-lsp eslint (keywords: javascript, typescript)
+        -- html-lsp html (keywords: html)
+        -- jdtls (keywords: java)
+        -- lemminx (keywords: xml)
+        -- vtsls (keywords: javascript, typescript)
       },
     },
   },
@@ -22,6 +34,9 @@ return {
     opts = {
       ensure_installed = {
         "stylua",
+        "ast_grep",
+        "beautysh",
+        "clang-format",
         -- add more arguments for adding more null-ls sources
       },
     },
@@ -31,25 +46,9 @@ return {
     -- overrides `require("mason-nvim-dap").setup(...)`
     opts = {
       ensure_installed = {
-        "python",
+        "codelldb",
         -- add more arguments for adding more debuggers
       },
     },
   },
 }
---   {
---     "williamboman/mason-lspconfig.nvim",
---     dependencies = {
---       'williamboman/mason.nvim',
---     },
---     config = function()
---       require("mason-lspconfig").setup({
---         ensure_installed = {
---           'arduino_language_server',
---           -- We need to install clangd for arduino_language_server to work
---           'clangd'
---         }
---       })
---     end
---   }
--- }

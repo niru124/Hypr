@@ -15,8 +15,8 @@ map <C-f> feedkeys ":exec /home/nirantar/.config/zathura/scripts/zathura-fuzzy-s
 set pages-per-row 1
 
 #stop at page boundries
-set scroll-page-aware "true"
-set scroll-full-overlap 0.01
+# set scroll-page-aware "true"
+# set scroll-full-overlap 0.01
 # set scroll-step 100
 
 #zoom settings
@@ -25,8 +25,6 @@ set guioptions "sv"
 
 set render-loading "false"
 map f adjust_window width
-map n J
-map p K
 map <C-+> zoom in
 map <C--> zoom out
 
