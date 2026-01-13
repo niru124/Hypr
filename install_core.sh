@@ -8,8 +8,8 @@ CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo "--- Starting Core Packages and Configuration Installation ---"
 
-PACKAGE_FILE="$CURRENT_DIR/packages.txt"
-PACKAGE_FILE2="$CURRENT_DIR/packages2.txt"
+PACKAGE_FILE="$CURRENT_DIR/pacman_necessary.txt"
+PACKAGE_FILE2="$CURRENT_DIR/yay_necessary.txt"
 
 # Check if package files exist
 if [ ! -f "$PACKAGE_FILE" ]; then
@@ -30,9 +30,16 @@ sudo pacman -Syu --noconfirm
 echo "Installing packages from '$PACKAGE_FILE' using pacman..."
 xargs -a "$PACKAGE_FILE" sudo pacman -S --noconfirm --needed
 
-# Install packages via yay
-echo "Installing packages from '$PACKAGE_FILE2' using yay..."
-xargs -a "$PACKAGE_FILE2" yay -S --noconfirm --needed
+# Select and install packages via yay using fzf
+echo "Loading AUR packages from $PACKAGE_FILE2..."
+selected=$(cat "$PACKAGE_FILE2" | fzf -m --prompt="Select AUR packages to install (Tab to select, Enter to confirm): ")
+
+if [ -z "$selected" ]; then
+    echo "No AUR packages selected."
+else
+    echo "Installing selected AUR packages..."
+    echo "$selected" | xargs yay -S --noconfirm --needed
+fi
 
 echo "All core packages processed."
 
@@ -41,7 +48,7 @@ CONFIG_DIR="$CURRENT_DIR/Config/.config"
 if [ -d "$CONFIG_DIR" ] && [ "$(ls -A "$CONFIG_DIR")" ]; then
     echo "Copying configuration files from .config to ~/.config..."
     mkdir -p "$HOME/.config"
-    rsync -avv --exclude='.*' "$CONFIG_DIR/" "$HOME/.config/" > /dev/null 2>&1 # Suppress verbose output
+    rsync -avv --exclude='.*' "$CONFIG_DIR/" "$HOME/.config/" >/dev/null 2>&1 # Suppress verbose output
     echo "Configuration files copied."
 else
     echo "Warning: '$CONFIG_DIR' does not exist or is empty. Skipping configuration copy."
@@ -52,7 +59,7 @@ BIN_DIR="$CURRENT_DIR/bin2"
 if [ -d "$BIN_DIR" ] && [ "$(ls -A "$BIN_DIR")" ]; then
     echo "Copying scripts to ~/.local/share/bin..."
     mkdir -p ~/.local/share/bin
-    rsync -av --exclude='.*' "$BIN_DIR/" ~/.local/share/bin/ > /dev/null 2>&1 # Suppress verbose output
+    rsync -av --exclude='.*' "$BIN_DIR/" ~/.local/share/bin/ >/dev/null 2>&1 # Suppress verbose output
     echo "Scripts copied to ~/.local/share/bin."
 else
     echo "Warning: '$BIN_DIR' does not exist or is empty. Skipping script copy."
