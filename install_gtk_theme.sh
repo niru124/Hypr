@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+echo "--- Starting GTK Theme Installation ---"
 
 # Install Catppuccin GTK Theme
 echo "Installing Catppuccin GTK Theme using yay..."
@@ -10,4 +10,4 @@ yay -S --noconfirm --needed catppuccin-gtk-theme-lavender
 echo "Granting Flatpak access to ~/.local/share/themes..."
 sudo flatpak override --filesystem=$HOME/.local/share/themes
 
-echo "✅ Catppuccin GTK Theme installed and Flatpak access configured."
+echo "--- GTK Theme Installation Complete ---"
