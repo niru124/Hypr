@@ -5,7 +5,6 @@ yay
 kitty
 btop
 rofi-wayland
-zen-browser
 librewolf
 cava
 grimblast

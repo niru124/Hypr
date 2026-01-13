@@ -21,8 +21,8 @@ confirm_action() {
 install_core_packages() {
     echo "--- Starting Core Packages and Configuration Installation ---"
 
-    PACKAGE_FILE="$CURRENT_DIR/packages.txt"
-    PACKAGE_FILE2="$CURRENT_DIR/packages2.txt"
+    PACKAGE_FILE="$CURRENT_DIR/pacman_necessary.txt"
+    PACKAGE_FILE2="$CURRENT_DIR/yay_necessary.txt"
 
     # Check if package files exist
     if [ ! -f "$PACKAGE_FILE" ]; then
@@ -284,49 +284,120 @@ echo
 
 # Core Packages
 if confirm_action "Core Packages (pacman/yay packages, config files, scripts, zoxide)"; then
-    install_core_packages
+    if [ -f "./install_core.sh" ]; then
+        chmod +x ./install_core.sh
+        ./install_core.sh
+    else
+        echo "install_core.sh not found."
+    fi
     echo
 fi
 
 # Non-Essential Packages
 if confirm_action "Non-Essential Packages (from non-essential.txt)"; then
-    install_non_essential_packages
+    if [ -f "./install_non_essential.sh" ]; then
+        chmod +x ./install_non_essential.sh
+        ./install_non_essential.sh
+    else
+        echo "install_non_essential.sh not found."
+    fi
     echo
 fi
 
 # Fonts
 if confirm_action "Nerd Fonts (CaskaydiaCove, 0xProto, JetBrainsMono) and Custom Fonts (Abocat, Steelfish Outline, Mexcellent)"; then
-    install_fonts
+    if [ -f "./install_fonts.sh" ]; then
+        chmod +x ./install_fonts.sh
+        ./install_fonts.sh
+    else
+        echo "install_fonts.sh not found."
+    fi
     echo
 fi
 
 # GTK Theme
 if confirm_action "Catppuccin GTK Theme and Flatpak access"; then
-    install_gtk_theme
+    if [ -f "./install_gtk_theme.sh" ]; then
+        chmod +x ./install_gtk_theme.sh
+        ./install_gtk_theme.sh
+    else
+        echo "install_gtk_theme.sh not found."
+    fi
     echo
 fi
 
 # Pyprland
 if confirm_action "Pyprland (in a Python virtual environment)"; then
-    install_pyprland
+    if [ -f "./pyprland.sh" ]; then
+        chmod +x ./pyprland.sh
+        ./pyprland.sh
+    else
+        echo "pyprland.sh not found."
+    fi
     echo
 fi
 
 # TUI Greet Configuration
 if confirm_action "TUI Greet Display Manager Configuration (requires sudo)"; then
-    configure_tui_greet
+    if [ -f "./tui_greet.sh" ]; then
+        chmod +x ./tui_greet.sh
+        ./tui_greet.sh
+    else
+        echo "tui_greet.sh not found."
+    fi
     echo
 fi
 
 # AstroNvim
 if confirm_action "AstroNvim (Neovim configuration)"; then
-    install_astronvim
+    if [ -f "./install_astronvim.sh" ]; then
+        chmod +x ./install_astronvim.sh
+        ./install_astronvim.sh
+    else
+        echo "install_astronvim.sh not found."
+    fi
     echo
 fi
 
 # Cursor Theme
 if confirm_action "Bibata Cursor Theme Installation and Configuration"; then
-    install_cursor_theme
+    if [ -f "./install_cursor_theme.sh" ]; then
+        chmod +x ./install_cursor_theme.sh
+        ./install_cursor_theme.sh
+    else
+        echo "install_cursor_theme.sh not found."
+    fi
+    echo
+fi
+
+# Additional Installations
+if confirm_action "Run Non-Essential Packages Installation (install_non_essential.sh)"; then
+    if [ -f "./install_non_essential.sh" ]; then
+        chmod +x ./install_non_essential.sh
+        ./install_non_essential.sh
+    else
+        echo "install_non_essential.sh not found."
+    fi
+    echo
+fi
+
+if confirm_action "Run Hyprpm Plugins Installation (install_hyprpm_plugins.sh)"; then
+    if [ -f "./install_hyprpm_plugins.sh" ]; then
+        chmod +x ./install_hyprpm_plugins.sh
+        ./install_hyprpm_plugins.sh
+    else
+        echo "install_hyprpm_plugins.sh not found."
+    fi
+    echo
+fi
+
+if confirm_action "Run Packages Installation (install-packages.sh)"; then
+    if [ -f "./install-packages.sh" ]; then
+        chmod +x ./install-packages.sh
+        ./install-packages.sh
+    else
+        echo "install-packages.sh not found."
+    fi
     echo
 fi
 

@@ -16,6 +16,6 @@ carapace-bin
 udiskie
 zathura
 zathura-pdf-poppler
-feh
+evince
 grimblast
 swappy

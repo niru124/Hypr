@@ -1,11 +1,10 @@
 #!/bin/bash
 
 # Check if hyprpm is installed
-if ! command -v hyprpm &> /dev/null
-then
-    echo "hyprpm could not be found. Please ensure Hyprland (version 0.34.0 or later) or hyprland-git is installed."
-    echo "You might need to update your Hyprland installation or install a git version if hyprpm is not available."
-    exit 1
+if ! command -v hyprpm &>/dev/null; then
+	echo "hyprpm could not be found. Please ensure Hyprland (version 0.34.0 or later) or hyprland-git is installed."
+	echo "You might need to update your Hyprland installation or install a git version if hyprpm is not available."
+	exit 1
 fi
 
 echo "hyprpm found. Proceeding with plugin installation."
@@ -27,9 +26,6 @@ echo ""
 
 echo "Running hyprpm update..."
 hyprpm update
-
-echo "Adding hyprland-plugins repository..."
-hyprpm add https://github.com/hyprwm/hyprland-plugins
 
 echo "Adding hyprscroller plugin..."
 hyprpm -v add https://github.com/cpiber/hyprscroller
