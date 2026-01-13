@@ -11,8 +11,21 @@ if [ ! -f "$PACKAGE_FILE" ]; then
     exit 1
 fi
 
-# Install packages via yay
-echo "Installing packages from '$PACKAGE_FILE' using yay..."
-xargs -a "$PACKAGE_FILE" yay -S --noconfirm --needed
+# Select packages using fzf
+echo "Loading non-essential packages from $PACKAGE_FILE..."
+selected=$(cat "$PACKAGE_FILE" | fzf -m --prompt="Select non-essential packages to install (Tab to select, Enter to confirm): ")
 
-echo "All packages processed."
+if [ -z "$selected" ]; then
+    echo "No packages selected."
+    exit 0
+fi
+
+echo "Selected packages:"
+echo "$selected"
+echo
+
+# Install selected packages via yay
+echo "Installing selected packages..."
+echo "$selected" | xargs yay -S --noconfirm --needed
+
+echo "Installation complete."

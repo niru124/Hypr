@@ -7,7 +7,7 @@ HyDE is a Hyprland Desktop Environment setup. This repository contains installat
 The main script `install_all.sh` runs components in the following order (based on user confirmation with y/n):
 
 1. Core Packages (install_core.sh - installs pacman/yay packages, copies configs, scripts, installs zoxide)
-2. Non-Essential Packages (install_non_essential.sh - installs from non-essential.txt)
+2. Non-Essential Packages (install_non_essential.sh - interactive selection from non-essential.txt using fzf)
 3. Fonts (install_fonts.sh - installs Nerd and custom fonts)
 4. GTK Theme (install_gtk_theme.sh - installs Catppuccin theme, grants Flatpak access)
 5. Pyprland (pyprland.sh - sets up venv and installs pyprland)
