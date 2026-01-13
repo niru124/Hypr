@@ -100,7 +100,7 @@ return {
     },
     opts = {
       ensure_installed = {
-        "stylua",
+        -- "stylua",
       },
       automatic_installation = true,
     },

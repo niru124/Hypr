@@ -16,7 +16,7 @@ return {
         "bashls",
         "clangd",
         "jsonls",
-        "stylua",
+        -- "stylua",
         -- cssls (keywords: css, scss, less)
         -- emmet-ls emmet_ls (keywords: emmet)
         -- eslint-lsp eslint (keywords: javascript, typescript)
@@ -33,7 +33,7 @@ return {
     -- overrides `require("mason-null-ls").setup(...)`
     opts = {
       ensure_installed = {
-        "stylua",
+        -- "stylua",
         "ast_grep",
         "beautysh",
         "clang-format",

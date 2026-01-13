@@ -1,4 +1,4 @@
-~/.config/mpv/:~/Downloads/mar/HyDE/Config/.config/mpv
+~/.config/mpv/:~/Downloads/mar/HyDE/Config/.config/mpv,cache/,LOCAL_APPDATA_FONTCONFIG_CACHE/,script-opts/memo-history.log
 ~/.config/yazi/:~/Downloads/mar/HyDE/Config/.config/yazi
 ~/.config/zathura/:~/Downloads/mar/HyDE/Config/.config/zathura,md_notes/,notes.db
 ~/.config/wlogout/:~/Downloads/mar/HyDE/Config/.config/wlogout

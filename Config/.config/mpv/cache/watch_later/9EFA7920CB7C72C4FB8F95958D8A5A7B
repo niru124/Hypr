@@ -1,6 +1,0 @@
-start=7034.625000
-speed=1.210000
-volume=88.000000
-af=lavfi=graph=%113%lowpass=c=LFE:f=120,volume=1.6,pan=stereo|FL=0.5*FC+0.707*FL+0.707*BL+0.5*LFE|FR=0.5*FC+0.707*FR+0.707*BR+0.5*LFE
-aid=1
-video-aspect-override=1.777778
