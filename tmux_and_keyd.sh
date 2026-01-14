@@ -21,8 +21,19 @@ fi
 
 # Copy the keyd config to /etc/keyd (requires sudo)
 if [ -f "$keyd_source" ]; then
-    sudo cp "$keyd_source" "$keyd_dest"
-    echo "Copied keyd config to $keyd_dest"
+    # Check if keyd is installed
+    if ! command -v keyd &>/dev/null; then
+        echo "Error: 'keyd' is not installed. Please install keyd first."
+    else
+        sudo cp "$keyd_source" "$keyd_dest"
+        echo "Copied keyd config to $keyd_dest"
+
+        # Enable and start keyd service
+        sudo systemctl enable keyd
+        echo "Enabled keyd service."
+        sudo systemctl start keyd
+        echo "Started keyd service."
+    fi
 else
     echo "keyd config not found at $keyd_source"
 fi

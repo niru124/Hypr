@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Check if yay is installed (needed for potential AUR fonts)
+if ! command -v yay &>/dev/null; then
+    echo "Warning: 'yay' is not installed. If font installation fails, install yay first."
+fi
+
 echo "--- Starting Font Installation ---"
 
 install_nerd_font() {
@@ -53,11 +58,10 @@ install_nerd_font "CaskaydiaCove"
 install_nerd_font "0xProto"
 install_nerd_font "JetBrainsMono"
 
-# Install custom fonts (PLACEHOLDER URLs - YOU MAY NEED TO FIND ACTUAL DIRECT DOWNLOAD LINKS)
-# These URLs are examples and might not work. You'll need to find direct .zip download links.
-install_custom_font "Abocat" "https://example.com/abocat.zip" # Placeholder URL
-install_custom_font "SteelfishOutline" "https://example.com/steelfishoutline.zip" # Placeholder URL
-install_custom_font "Mexcellent" "https://example.com/mexcellent.zip" # Placeholder URL
+# Install custom fonts
+install_custom_font "Abocat" "https://font.download/dl/font/abocat.zip"
+install_custom_font "Steelfish" "https://dl.dafont.com/dl/?f=steelfish"
+install_custom_font "Mexcellent" "https://dl.dafont.com/dl/?f=mexcellent"
 
 # Update font cache once after all installations
 echo "Updating font cache..."
