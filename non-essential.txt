@@ -4,7 +4,7 @@ jq
 ncdu
 tmux
 keyd
-hyprshader
+hyprshade
 youtube-local
 tor
 sshfs

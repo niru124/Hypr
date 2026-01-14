@@ -30,4 +30,7 @@ hyprpm update
 echo "Adding hyprscroller plugin..."
 hyprpm -v add https://github.com/cpiber/hyprscroller
 
+hyprpm enable hyprscroller
+
+echo "Enabled hyprscroller..."
 echo "Script finished. You may need to enable the plugin with 'hyprpm enable hyprscroller' and then 'hyprpm reload' or restart Hyprland."

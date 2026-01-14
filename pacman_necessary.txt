@@ -22,3 +22,4 @@ network-manager-applet
 polkit-gnome
 zsh
 rsync
+unzip
