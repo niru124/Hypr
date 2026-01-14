@@ -111,4 +111,10 @@ echo "Installing zoxide..."
 	curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh || true
 echo "zoxide installation complete."
 
+# Enable and start bluetooth service
+echo "Enabling and starting bluetooth service..."
+sudo systemctl enable bluetooth || true
+sudo systemctl start bluetooth || true
+echo "Bluetooth service enabled and started."
+
 echo "--- Core Packages and Configuration Installation Complete ---"
