@@ -57,6 +57,7 @@ install_custom_font() {
 install_nerd_font "CaskaydiaCove"
 install_nerd_font "0xProto"
 install_nerd_font "JetBrainsMono"
+install_nerd_font "GeistMono"
 
 # Install custom fonts
 install_custom_font "Abocat" "https://font.download/dl/font/abocat.zip"
