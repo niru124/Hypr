@@ -33,6 +33,17 @@ if confirm_action "Core Packages (pacman/yay packages, config files, scripts, zo
 	echo
 fi
 
+# Oh My Zsh
+if confirm_action "Oh My Zsh (theme, plugins, .zshrc)"; then
+	if [ -f "./install_zsh.sh" ]; then
+		chmod +x ./install_zsh.sh
+		./install_zsh.sh
+	else
+		echo "install_zsh.sh not found."
+	fi
+	echo
+fi
+
 # Wallpapers
 if confirm_action "Wallpapers (themes repository)"; then
 	if [ -f "./install_wallpapers.sh" ]; then
