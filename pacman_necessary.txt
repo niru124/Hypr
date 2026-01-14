@@ -21,3 +21,4 @@ sound-theme-freedesktop
 network-manager-applet
 polkit-gnome
 zsh
+rsync
