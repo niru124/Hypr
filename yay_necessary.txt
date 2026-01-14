@@ -1,4 +1,6 @@
+librewolf
 nwg-look
+grimblast
 trashy
 swappy
 caligula

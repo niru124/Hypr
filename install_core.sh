@@ -6,6 +6,20 @@ set -e
 # first install fzf here as it is later req in the script
 sudo pacman -S fzf
 
+# Install yay AUR helper
+echo "Installing yay AUR helper..."
+if ! command -v yay &> /dev/null; then
+    YAY_DIR=$(mktemp -d)
+    git clone https://aur.archlinux.org/yay.git "$YAY_DIR"
+    cd "$YAY_DIR"
+    makepkg -si --noconfirm
+    cd "$CURRENT_DIR"
+    rm -rf "$YAY_DIR"
+    echo "yay installation complete."
+else
+    echo "yay is already installed."
+fi
+
 # Set up fzf key bindings and fuzzy completion
 # Properly append fzf initialization to .zshrc if not already present
 if ! grep -q 'eval "$(fzf --zsh)"' ~/.zshrc 2>/dev/null; then

@@ -33,6 +33,17 @@ if confirm_action "Core Packages (pacman/yay packages, config files, scripts, zo
 	echo
 fi
 
+# Wallpapers
+if confirm_action "Wallpapers (themes repository)"; then
+	if [ -f "./install_wallpapers.sh" ]; then
+		chmod +x ./install_wallpapers.sh
+		./install_wallpapers.sh
+	else
+		echo "install_wallpapers.sh not found."
+	fi
+	echo
+fi
+
 # GPU Drivers
 if confirm_action "GPU Drivers (NVIDIA/AMD/Intel)"; then
 	if [ -f "./install_gpu_drivers.sh" ]; then

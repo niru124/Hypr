@@ -1,13 +1,10 @@
 neovim
 hyprsunset
 dunst
-yay
 kitty
 btop
 rofi-wayland
-librewolf
 cava
-grimblast
 yazi
 mpv
 swww
