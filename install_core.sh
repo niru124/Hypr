@@ -6,11 +6,14 @@ set -e
 # first install fzf here as it is later req in the script
 sudo pacman -S fzf
 
+# Install build dependencies for yay
+sudo pacman -S --needed --noconfirm fakeroot binutils debugedit base-devel
+
 # Install yay AUR helper
 echo "Installing yay AUR helper..."
 if ! command -v yay &> /dev/null; then
     YAY_DIR=$(mktemp -d)
-    git clone https://aur.archlinux.org/yay.git "$YAY_DIR"
+    git clone --depth 1 https://aur.archlinux.org/yay.git "$YAY_DIR"
     cd "$YAY_DIR"
     makepkg -si --noconfirm
     cd "$CURRENT_DIR"
@@ -42,13 +45,13 @@ PACKAGE_FILE2="$CURRENT_DIR/yay_necessary.txt"
 
 # Check if package files exist
 if [ ! -f "$PACKAGE_FILE" ]; then
-	echo "Error: File '$PACKAGE_FILE' not found! Skipping core package installation."
-	return 1
+	echo "Error: File '$PACKAGE_FILE' not found! Skipping pacman package installation."
+	PACKAGE_FILE=""
 fi
 
 if [ ! -f "$PACKAGE_FILE2" ]; then
-	echo "Error: File '$PACKAGE_FILE2' not found! Skipping core package installation."
-	return 1
+	echo "Error: File '$PACKAGE_FILE2' not found! Skipping AUR package installation."
+	PACKAGE_FILE2=""
 fi
 
 # System update
@@ -56,18 +59,22 @@ echo "Updating system with pacman..."
 sudo pacman -Syu --noconfirm
 
 # Install packages via pacman
-echo "Installing packages from '$PACKAGE_FILE' using pacman..."
-xargs -a "$PACKAGE_FILE" sudo pacman -S --noconfirm --needed
+if [ -n "$PACKAGE_FILE" ]; then
+	echo "Installing packages from '$PACKAGE_FILE' using pacman..."
+	xargs -a "$PACKAGE_FILE" sudo pacman -S --noconfirm --needed
+fi
 
 # Select and install packages via yay using fzf
-echo "Loading AUR packages from $PACKAGE_FILE2..."
-selected=$(cat "$PACKAGE_FILE2" | fzf -m --prompt="Select AUR packages to install (Tab to select, Enter to confirm): ")
+if [ -n "$PACKAGE_FILE2" ]; then
+	echo "Loading AUR packages from $PACKAGE_FILE2..."
+	selected=$(cat "$PACKAGE_FILE2" | fzf -m --prompt="Select AUR packages to install (Tab to select, Enter to confirm): ")
 
-if [ -z "$selected" ]; then
-	echo "No AUR packages selected."
-else
-	echo "Installing selected AUR packages..."
-	echo "$selected" | xargs yay -S --noconfirm --needed
+	if [ -z "$selected" ]; then
+		echo "No AUR packages selected."
+	else
+		echo "Installing selected AUR packages..."
+		echo "$selected" | xargs yay -S --noconfirm --needed
+	fi
 fi
 
 echo "All core packages processed."
