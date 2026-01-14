@@ -56,24 +56,24 @@ fi
 
 # System update
 echo "Updating system with pacman..."
-sudo pacman -Syu --noconfirm
+sudo pacman -Syu --noconfirm || true
 
 # Install packages via pacman
 if [ -n "$PACKAGE_FILE" ]; then
 	echo "Installing packages from '$PACKAGE_FILE' using pacman..."
-	xargs -a "$PACKAGE_FILE" sudo pacman -S --noconfirm --needed
+	xargs -a "$PACKAGE_FILE" sudo pacman -S --noconfirm --needed || true
 fi
 
 # Select and install packages via yay using fzf
 if [ -n "$PACKAGE_FILE2" ]; then
 	echo "Loading AUR packages from $PACKAGE_FILE2..."
-	selected=$(cat "$PACKAGE_FILE2" | fzf -m --prompt="Select AUR packages to install (Tab to select, Enter to confirm): ")
+	selected=$(cat "$PACKAGE_FILE2" | fzf -m --prompt="Select AUR packages to install (Tab to select, Enter to confirm): ") || true
 
 	if [ -z "$selected" ]; then
 		echo "No AUR packages selected."
 	else
 		echo "Installing selected AUR packages..."
-		echo "$selected" | xargs yay -S --noconfirm --needed
+		echo "$selected" | xargs yay -S --noconfirm --needed || true
 	fi
 fi
 
@@ -84,7 +84,7 @@ CONFIG_DIR="$CURRENT_DIR/Config/.config"
 if [ -d "$CONFIG_DIR" ] && [ "$(ls -A "$CONFIG_DIR")" ]; then
 	echo "Copying configuration files from .config to ~/.config..."
 	mkdir -p "$HOME/.config"
-	rsync -avv --exclude='.*' "$CONFIG_DIR/" "$HOME/.config/" >/dev/null 2>&1 # Suppress verbose output
+	rsync -avv --exclude='.*' "$CONFIG_DIR/" "$HOME/.config/" >/dev/null 2>&1 || true
 	echo "Configuration files copied."
 else
 	echo "Warning: '$CONFIG_DIR' does not exist or is empty. Skipping configuration copy."
@@ -95,7 +95,7 @@ BIN_DIR="$CURRENT_DIR/bin2"
 if [ -d "$BIN_DIR" ] && [ "$(ls -A "$BIN_DIR")" ]; then
 	echo "Copying scripts to ~/.local/share/bin..."
 	mkdir -p ~/.local/share/bin
-	rsync -av --exclude='.*' "$BIN_DIR/" ~/.local/share/bin/ >/dev/null 2>&1 # Suppress verbose output
+	rsync -av --exclude='.*' "$BIN_DIR/" ~/.local/share/bin/ >/dev/null 2>&1 || true
 	echo "Scripts copied to ~/.local/share/bin."
 else
 	echo "Warning: '$BIN_DIR' does not exist or is empty. Skipping script copy."
@@ -108,7 +108,7 @@ echo "Scripts made executable."
 
 # Install zoxide using the official install script
 echo "Installing zoxide..."
-curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
+	curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh || true
 echo "zoxide installation complete."
 
 echo "--- Core Packages and Configuration Installation Complete ---"

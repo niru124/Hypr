@@ -1,7 +1,7 @@
 python-pywal16
 power-profiles-daemon
 wttrbar
-wl-logout
+wlogout
 wl-clipboard
 carapace-bin
 grimblast
