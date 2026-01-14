@@ -23,3 +23,9 @@ polkit-gnome
 zsh
 rsync
 unzip
+meson
+cpio
+cmake
+pavucontrol
+bluez-utils 
+bluez
