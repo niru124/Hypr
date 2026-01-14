@@ -33,6 +33,17 @@ if confirm_action "Core Packages (pacman/yay packages, config files, scripts, zo
 	echo
 fi
 
+# GPU Drivers
+if confirm_action "GPU Drivers (NVIDIA/AMD/Intel)"; then
+	if [ -f "./install_gpu_drivers.sh" ]; then
+		chmod +x ./install_gpu_drivers.sh
+		./install_gpu_drivers.sh
+	else
+		echo "install_gpu_drivers.sh not found."
+	fi
+	echo
+fi
+
 # Non-Essential Packages
 if confirm_action "Non-Essential Packages (from non-essential.txt)"; then
 	if [ -f "./install_non_essential.sh" ]; then
@@ -51,17 +62,6 @@ if confirm_action "Nerd Fonts (CaskaydiaCove, 0xProto, JetBrainsMono) and Custom
 		./install_fonts.sh
 	else
 		echo "install_fonts.sh not found."
-	fi
-	echo
-fi
-
-# GTK Theme
-if confirm_action "Catppuccin GTK Theme and Flatpak access"; then
-	if [ -f "./install_gtk_theme.sh" ]; then
-		chmod +x ./install_gtk_theme.sh
-		./install_gtk_theme.sh
-	else
-		echo "install_gtk_theme.sh not found."
 	fi
 	echo
 fi
@@ -95,17 +95,6 @@ if confirm_action "AstroNvim (Neovim configuration)"; then
 		./install_astronvim.sh
 	else
 		echo "install_astronvim.sh not found."
-	fi
-	echo
-fi
-
-# Cursor Theme
-if confirm_action "Bibata Cursor Theme Installation and Configuration"; then
-	if [ -f "./install_cursor_theme.sh" ]; then
-		chmod +x ./install_cursor_theme.sh
-		./install_cursor_theme.sh
-	else
-		echo "install_cursor_theme.sh not found."
 	fi
 	echo
 fi

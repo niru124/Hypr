@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Check if yay is installed
+if ! command -v yay &>/dev/null; then
+    echo "Error: 'yay' is not installed. Please install yay (AUR helper) first."
+    exit 1
+fi
+
 # Correct way to get current directory
 CURRENT_DIR=$(pwd)
 

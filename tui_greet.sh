@@ -9,9 +9,15 @@ if [ "$(id -u)" -ne 0 ]; then
   exit 1
 fi
 
+# Check if tuigreet is installed
+if ! command -v tuigreet &>/dev/null; then
+  echo "Error: 'tuigreet' is not installed. Please install tuigreet first."
+  exit 1
+fi
+
 # Check if the config file exists
 if [ ! -f "$CONFIG_FILE" ]; then
-  echo "Config file not found: $CONFIG_FILE"
+  echo "Error: Config file not found: $CONFIG_FILE"
   exit 1
 fi
 
@@ -22,3 +28,6 @@ echo "Updated 'command =' in $CONFIG_FILE"
 
 systemctl enable greetd
 echo "Enabled greetd service."
+
+systemctl start greetd
+echo "Started greetd service."

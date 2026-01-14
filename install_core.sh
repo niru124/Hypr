@@ -3,6 +3,21 @@
 # Exit immediately if a command exits with a non-zero status.
 set -e
 
+# first install fzf here as it is later req in the script
+sudo pacman -S fzf
+
+# Set up fzf key bindings and fuzzy completion
+# Properly append fzf initialization to .zshrc if not already present
+if ! grep -q 'eval "$(fzf --zsh)"' ~/.zshrc 2>/dev/null; then
+    echo 'eval "$(fzf --zsh)"' >> ~/.zshrc
+fi
+# Also add fzf initialization to .bashrc for bash shells
+if [ -f ~/.bashrc ] && ! grep -q 'eval "$(fzf --bash)"' ~/.bashrc 2>/dev/null; then
+    echo 'eval "$(fzf --bash)"' >> ~/.bashrc
+    # Source bashrc to apply fzf bindings in current session
+    source ~/.bashrc 2>/dev/null || true
+fi
+
 # Correct way to get current directory of the script
 CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -13,13 +28,13 @@ PACKAGE_FILE2="$CURRENT_DIR/yay_necessary.txt"
 
 # Check if package files exist
 if [ ! -f "$PACKAGE_FILE" ]; then
-    echo "Error: File '$PACKAGE_FILE' not found! Skipping core package installation."
-    return 1
+	echo "Error: File '$PACKAGE_FILE' not found! Skipping core package installation."
+	return 1
 fi
 
 if [ ! -f "$PACKAGE_FILE2" ]; then
-    echo "Error: File '$PACKAGE_FILE2' not found! Skipping core package installation."
-    return 1
+	echo "Error: File '$PACKAGE_FILE2' not found! Skipping core package installation."
+	return 1
 fi
 
 # System update
@@ -35,10 +50,10 @@ echo "Loading AUR packages from $PACKAGE_FILE2..."
 selected=$(cat "$PACKAGE_FILE2" | fzf -m --prompt="Select AUR packages to install (Tab to select, Enter to confirm): ")
 
 if [ -z "$selected" ]; then
-    echo "No AUR packages selected."
+	echo "No AUR packages selected."
 else
-    echo "Installing selected AUR packages..."
-    echo "$selected" | xargs yay -S --noconfirm --needed
+	echo "Installing selected AUR packages..."
+	echo "$selected" | xargs yay -S --noconfirm --needed
 fi
 
 echo "All core packages processed."
@@ -46,23 +61,23 @@ echo "All core packages processed."
 # Copy configuration files to ~/.config using rsync
 CONFIG_DIR="$CURRENT_DIR/Config/.config"
 if [ -d "$CONFIG_DIR" ] && [ "$(ls -A "$CONFIG_DIR")" ]; then
-    echo "Copying configuration files from .config to ~/.config..."
-    mkdir -p "$HOME/.config"
-    rsync -avv --exclude='.*' "$CONFIG_DIR/" "$HOME/.config/" >/dev/null 2>&1 # Suppress verbose output
-    echo "Configuration files copied."
+	echo "Copying configuration files from .config to ~/.config..."
+	mkdir -p "$HOME/.config"
+	rsync -avv --exclude='.*' "$CONFIG_DIR/" "$HOME/.config/" >/dev/null 2>&1 # Suppress verbose output
+	echo "Configuration files copied."
 else
-    echo "Warning: '$CONFIG_DIR' does not exist or is empty. Skipping configuration copy."
+	echo "Warning: '$CONFIG_DIR' does not exist or is empty. Skipping configuration copy."
 fi
 
 # Copy scripts to ~/.local/share/bin using rsync
 BIN_DIR="$CURRENT_DIR/bin2"
 if [ -d "$BIN_DIR" ] && [ "$(ls -A "$BIN_DIR")" ]; then
-    echo "Copying scripts to ~/.local/share/bin..."
-    mkdir -p ~/.local/share/bin
-    rsync -av --exclude='.*' "$BIN_DIR/" ~/.local/share/bin/ >/dev/null 2>&1 # Suppress verbose output
-    echo "Scripts copied to ~/.local/share/bin."
+	echo "Copying scripts to ~/.local/share/bin..."
+	mkdir -p ~/.local/share/bin
+	rsync -av --exclude='.*' "$BIN_DIR/" ~/.local/share/bin/ >/dev/null 2>&1 # Suppress verbose output
+	echo "Scripts copied to ~/.local/share/bin."
 else
-    echo "Warning: '$BIN_DIR' does not exist or is empty. Skipping script copy."
+	echo "Warning: '$BIN_DIR' does not exist or is empty. Skipping script copy."
 fi
 
 # Make all .sh scripts executable in ~/.local/share/bin

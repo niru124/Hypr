@@ -5,7 +5,13 @@ set -e
 
 echo "--- Starting AstroNvim Installation ---"
 
-echo "Prerequisites: Please ensure Neovim (v0.7+) and Nerd Fonts are installed and configured."
+# Check if neovim is installed
+if ! command -v nvim &>/dev/null; then
+    echo "Error: 'nvim' (Neovim) is not installed. Please install Neovim v0.7+ first."
+    exit 1
+fi
+
+echo "Prerequisites: Please ensure Nerd Fonts are installed and configured."
 
 # Backup existing Neovim configuration (optional but recommended)
 if [ -d "$HOME/.config/nvim" ]; then
