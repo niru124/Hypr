@@ -14,7 +14,7 @@ fi
 
 scrDir=`dirname "$(realpath "$0")"`
 source $scrDir/globalcontrol.sh
-[ -z "${1}" ] || wlogoutStyle="${1}"
+wlogoutStyle="${1:-1}"
 wLayout="${confDir}/wlogout/layout_${wlogoutStyle}"
 wlTmplt="${confDir}/wlogout/style_${wlogoutStyle}.css"
 

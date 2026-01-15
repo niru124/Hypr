@@ -59,6 +59,10 @@ install_nerd_font "0xProto"
 install_nerd_font "JetBrainsMono"
 install_nerd_font "GeistMono"
 
+# Install Noto Color Emoji for emoji support
+echo "Installing Noto Color Emoji..."
+sudo pacman -S --needed --noconfirm noto-fonts-emoji
+
 # Install custom fonts
 install_custom_font "Abocat" "https://font.download/dl/font/abocat.zip"
 install_custom_font "Steelfish" "https://dl.dafont.com/dl/?f=steelfish"
@@ -67,5 +71,9 @@ install_custom_font "Mexcellent" "https://dl.dafont.com/dl/?f=mexcellent"
 # Update font cache once after all installations
 echo "Updating font cache..."
 fc-cache -fv
+
+# Set zsh as default shell
+echo "Setting zsh as default shell..."
+chsh -s $(which zsh) || true
 
 echo "--- Font Installation Complete ---"

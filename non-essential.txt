@@ -22,3 +22,7 @@ evince
 sushi
 nautilus
 thunar
+nsxiv
+ranger
+python-pillow
+pdftoppm

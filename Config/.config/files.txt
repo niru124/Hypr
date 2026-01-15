@@ -7,7 +7,8 @@
 ~/.config/rofi/:~/Downloads/mar/HyDE/Config/.config/rofi
 ~/.config/nvim/:~/Downloads/mar/HyDE/Config/.config/nvim,lazy-lock.json,todo.md
 ~/.config/kitty/:~/Downloads/mar/HyDE/Config/.config/kitty,kitty.conf.bak,1.sh
-~/.config/hyde/:~/Downloads/mar/HyDE/Config/.config/hyde/,themes/JINX_WALLPAPERS/
+~/.config/hyde/:~/Downloads/mar/HyDE/Config/.config/hyde/,themes/
+~/.config/ranger/:~/Downloads/mar/HyDE/Config/.config/ranger/
 ~/.config/hypr/:~/Downloads/mar/HyDE/Config/.config/hypr
 ~/.config/fuzzel/:~/Downloads/mar/HyDE/Config/.config/fuzzel
 ~/.config/dunst/:~/Downloads/mar/HyDE/Config/.config/dunst

@@ -29,3 +29,5 @@ cmake
 pavucontrol
 bluez-utils 
 bluez
+parallel
+hyprlock

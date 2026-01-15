@@ -2,9 +2,8 @@
 [mgr]
 show_hidden = true
 ratio = [2,3,4]
-# sort_by = "created"
 sort_reverse = true
-mouse_events = ["click","scroll","touch","move","drag"]
+mouse_events = ["click", "scroll", "touch", "move", "drag"]
 
 [opener]
 edit = [
@@ -13,13 +12,11 @@ edit = [
 play = [
 	{ run = 'mpv "$@"', block = true, for = "linux" },
 ]
-
-[plugin.custom-actions]
-block = false  # Run commands in a non-blocking shell by default
-commands = [
-    { name = "Open with nano", cmd = "/usr/bin/nano", block = true },
-    { name = "Open with zathura", cmd = "zathura" },
+open = [
+	{ run = 'nsxiv "$@"', block = true, for = "image/jpeg" },
+	{ run = 'nsxiv "$@"', block = true, for = "image/png" },
+	{ run = 'nsxiv "$@"', block = true, for = "image/gif" },
+	{ run = 'nsxiv "$@"', block = true, for = "image/webp" },
+	{ run = 'nsxiv "$@"', block = true, for = "image/bmp" },
+	{ run = 'nsxiv "$@"', block = true, for = "image/tiff" },
 ]
-
-[plugin.file-actions]
-block = false  # Run commands in a non-blocking shell by default
