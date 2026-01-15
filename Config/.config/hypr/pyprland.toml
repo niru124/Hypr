@@ -19,10 +19,10 @@ class = "main-nvim"
 size = "95% 60%"
 max_size = "1920px 100%"
 
-[scratchpads.yazi]
+[scratchpads.ranger]
 animation = "fromTop"
-command = "kitty --class main-yazi -e yazi"
-class = "main-yazi"
+command = "kitty --class main-ranger -e ranger"
+class = "main-ranger"
 size = "90% 80%"
 max_size = "1920px 100%"
 

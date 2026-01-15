@@ -47,13 +47,11 @@ The main script `install_all.sh` orchestrates the setup by calling modular scrip
 1. **Core Packages** (`install_core.sh`): Installs essential pacman packages (all), optional AUR packages (fzf selection), copies dotfiles, scripts, installs zoxide.
 2. **Non-Essential Packages** (`install_non_essential.sh`): Interactive fzf selection from non-essential.txt for additional AUR packages.
 3. **Fonts** (`install_fonts.sh`): Installs Nerd Fonts (CaskaydiaCove, 0xProto, JetBrainsMono) and custom fonts (Abocat, Steelfish Outline, Mexcellent).
-4. **GTK Theme** (`install_gtk_theme.sh`): Installs Catppuccin GTK theme and grants Flatpak access.
-5. **Pyprland** (`pyprland.sh`): Installs Pyprland from AUR.
-6. **TUI Greet Configuration** (`tui_greet.sh`): Configures greetd with tuigreet for Hyprland login.
-7. **AstroNvim** (`install_astronvim.sh`): Sets up Neovim with AstroNvim configuration.
-8. **Cursor Theme** (`install_cursor_theme.sh`): Installs and configures Bibata cursor theme.
-9. **Non-Essential Packages** (optional rerun of `install_non_essential.sh`).
-10. **Hyprpm Plugins** (optional `install_hyprpm_plugins.sh`).
+4. **Pyprland** (`pyprland.sh`): Installs Pyprland from AUR.
+5. **TUI Greet Configuration** (`tui_greet.sh`): Configures greetd with tuigreet for Hyprland login.
+6. **AstroNvim** (`install_astronvim.sh`): Sets up Neovim with AstroNvim configuration.
+7. **Non-Essential Packages** (optional rerun of `install_non_essential.sh`).
+8. **Hyprpm Plugins** (optional `install_hyprpm_plugins.sh`).
 
 ## Individual Scripts
 
@@ -62,11 +60,9 @@ Run specific scripts directly for partial setups:
 - `./install_core.sh`: Core setup with package installation and dotfiles.
 - `./install_non_essential.sh`: Additional packages with selection.
 - `./install_fonts.sh`: Font installation.
-- `./install_gtk_theme.sh`: GTK theme setup.
 - `./pyprland.sh`: Pyprland installation.
 - `./tui_greet.sh`: Greetd configuration (requires sudo).
 - `./install_astronvim.sh`: AstroNvim setup.
-- `./install_cursor_theme.sh`: Cursor theme.
 - `./pacman_necessary.sh`: Install all pacman packages from pacman_necessary.txt.
 - `./yay_necessary.sh`: Select and install AUR packages from yay_necessary.txt with fzf.
 
