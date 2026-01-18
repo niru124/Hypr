@@ -28,11 +28,17 @@ HyDE is a comprehensive setup for a beautiful and functional Hyprland desktop en
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/niru124/Hypr.git
+   sudo pacman -S git
+   ```
+
+1. Clone the repository:
+
+   ```bash
+   git clone --depth 1 https://github.com/niru124/Hypr.git
    cd HyDE
    ```
 
-2. Run the main installer:
+1. Run the main installer:
 
    ```bash
    ./install_all.sh

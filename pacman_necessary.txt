@@ -31,3 +31,4 @@ bluez-utils
 bluez
 parallel
 hyprlock
+libnotify
