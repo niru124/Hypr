@@ -173,3 +173,5 @@ export PATH=/home/nirantar/.opencode/bin:$PATH
 autoload -Uz edit-command-line
 zle -N edit-command-line
 bindkey '^x^e' edit-command-line
+fpath=(~/.zsh/completion $fpath)
+autoload -U compinit && compinit
