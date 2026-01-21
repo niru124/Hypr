@@ -40,6 +40,11 @@ return {
         desc = "Add Read-Only",
       },
       {
+        "<leader>aR",
+        "<cmd>Aider reset<cr>",
+        desc = "Reset Session",
+      },
+      {
         "<leader>a+",
         "<cmd>AiderTreeAddFile<cr>",
         desc = "Add File from Tree to Aider",
@@ -53,7 +58,7 @@ return {
       },
     },
     dependencies = {
-      "folke/snacks.nvim",
+      { "folke/snacks.nvim", version = ">=2.24.0" },
       "catppuccin/nvim",
       "nvim-tree/nvim-tree.lua",
       {
