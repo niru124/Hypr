@@ -1,5 +1,5 @@
 {
-    "version": "2.0.1",
+    "version": "2.2.0",
     "autoload": {
         "AT Translated Set 2 keyboard": "new preset",
         "Logitech USB Optical Mouse": "REVERSE_X",
