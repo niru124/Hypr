@@ -39,3 +39,14 @@ class fzf_E(Command):
                 self.fm.cd(selected)
             else:
                 self.fm.select_file(path)
+
+class wormhole_send(Command):
+    def execute(self):
+        import os
+        selected_files = [f.path for f in self.fm.thistab.get_selection()]
+        if not selected_files:
+            self.fm.notify("No files selected!", bad=True)
+            return
+
+        wrapper = os.path.expanduser("~/.config/ranger/wormhole_wrapper.sh")
+        self.fm.run([wrapper] + selected_files)

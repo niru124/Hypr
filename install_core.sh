@@ -11,28 +11,28 @@ sudo pacman -S --needed --noconfirm fakeroot binutils debugedit base-devel
 
 # Install yay AUR helper
 echo "Installing yay AUR helper..."
-if ! command -v yay &> /dev/null; then
-    YAY_DIR=$(mktemp -d)
-    git clone --depth 1 https://aur.archlinux.org/yay.git "$YAY_DIR"
-    cd "$YAY_DIR"
-    makepkg -si --noconfirm
-    cd "$CURRENT_DIR"
-    rm -rf "$YAY_DIR"
-    echo "yay installation complete."
+if ! command -v yay &>/dev/null; then
+	YAY_DIR=$(mktemp -d)
+	git clone --depth 1 https://aur.archlinux.org/yay.git "$YAY_DIR"
+	cd "$YAY_DIR"
+	makepkg -si --noconfirm
+	cd "$CURRENT_DIR"
+	rm -rf "$YAY_DIR"
+	echo "yay installation complete."
 else
-    echo "yay is already installed."
+	echo "yay is already installed."
 fi
 
 # Set up fzf key bindings and fuzzy completion
 # Properly append fzf initialization to .zshrc if not already present
 if ! grep -q 'eval "$(fzf --zsh)"' ~/.zshrc 2>/dev/null; then
-    echo 'eval "$(fzf --zsh)"' >> ~/.zshrc
+	echo 'eval "$(fzf --zsh)"' >>~/.zshrc
 fi
 # Also add fzf initialization to .bashrc for bash shells
 if [ -f ~/.bashrc ] && ! grep -q 'eval "$(fzf --bash)"' ~/.bashrc 2>/dev/null; then
-    echo 'eval "$(fzf --bash)"' >> ~/.bashrc
-    # Source bashrc to apply fzf bindings in current session
-    source ~/.bashrc 2>/dev/null || true
+	echo 'eval "$(fzf --bash)"' >>~/.bashrc
+	# Source bashrc to apply fzf bindings in current session
+	source ~/.bashrc 2>/dev/null || true
 fi
 
 # Correct way to get current directory of the script
@@ -105,11 +105,6 @@ fi
 echo "Making scripts executable in ~/.local/share/bin..."
 chmod +x ~/.local/share/bin/*.sh || true # Use true to prevent script from exiting if no .sh files are found
 echo "Scripts made executable."
-
-# Install zoxide using the official install script
-echo "Installing zoxide..."
-	curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh || true
-echo "zoxide installation complete."
 
 # Enable and start bluetooth service
 echo "Enabling and starting bluetooth service..."
