@@ -23,7 +23,7 @@ echo "This script will guide you through installing various components for your 
 echo
 
 # Core Packages
-if confirm_action "Core Packages (pacman/yay packages, config files, scripts, zoxide)"; then
+if confirm_action "Core Packages (pacman/yay packages, config files, scripts)"; then
 	if [ -f "./install_core.sh" ]; then
 		chmod +x ./install_core.sh
 		./install_core.sh
@@ -103,7 +103,7 @@ fi
 if confirm_action "TUI Greet Display Manager Configuration (requires sudo)"; then
 	if [ -f "./tui_greet.sh" ]; then
 		chmod +x ./tui_greet.sh
-		./tui_greet.sh
+		sudo ./tui_greet.sh
 	else
 		echo "tui_greet.sh not found."
 	fi

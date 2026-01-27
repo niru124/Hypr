@@ -26,8 +26,8 @@ sed -i "s|^command = .*|$NEW_COMMAND|" "$CONFIG_FILE"
 
 echo "Updated 'command =' in $CONFIG_FILE"
 
-systemctl enable greetd
+sudo systemctl enable greetd
 echo "Enabled greetd service."
 
-systemctl start greetd
+sudo systemctl start greetd
 echo "Started greetd service."

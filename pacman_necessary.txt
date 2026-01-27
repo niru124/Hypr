@@ -10,7 +10,7 @@ mpv
 swww
 waybar
 hyprlock
-greetd
+greetd-tuigreet
 rofi-calc
 picom
 xdg-desktop-portal 
@@ -32,3 +32,4 @@ bluez
 parallel
 hyprlock
 libnotify
+zoxide

@@ -52,68 +52,68 @@ handle_extension() {
         ## Archive
         a|ace|alz|arc|arj|bz|bz2|cab|cpio|deb|gz|jar|lha|lz|lzh|lzma|lzo|\
         rpm|rz|t7z|tar|tbz|tbz2|tgz|tlz|txz|tZ|tzo|war|xpi|xz|Z|zip)
-            atool --list -- "${FILE_PATH}" && exit 5
-            bsdtar --list --file "${FILE_PATH}" && exit 5
+            atool --list -- "${FILE_PATH}" | head -50 && exit 5
+            bsdtar --list --file "${FILE_PATH}" | head -50 && exit 5
             exit 1;;
         rar)
             ## Avoid password prompt by providing empty password
-            unrar lt -p- -- "${FILE_PATH}" && exit 5
+            unrar lt -p- -- "${FILE_PATH}" | head -50 && exit 5
             exit 1;;
         7z)
             ## Avoid password prompt by providing empty password
-            7z l -p -- "${FILE_PATH}" && exit 5
+            7z l -p -- "${FILE_PATH}" | head -50 && exit 5
             exit 1;;
 
         ## PDF
         pdf)
             ## Preview as text conversion
             pdftotext -l 10 -nopgbrk -q -- "${FILE_PATH}" - | \
-              fmt -w "${PV_WIDTH}" && exit 5
+              fmt -w "${PV_WIDTH}" | head -50 && exit 5
             mutool draw -F txt -i -- "${FILE_PATH}" 1-10 | \
-              fmt -w "${PV_WIDTH}" && exit 5
-            exiftool "${FILE_PATH}" && exit 5
+              fmt -w "${PV_WIDTH}" | head -50 && exit 5
+            exiftool "${FILE_PATH}" | head -50 && exit 5
             exit 1;;
 
         ## BitTorrent
         torrent)
-            transmission-show -- "${FILE_PATH}" && exit 5
+            transmission-show -- "${FILE_PATH}" | head -50 && exit 5
             exit 1;;
 
         ## OpenDocument
         odt|ods|odp|sxw)
             ## Preview as text conversion
-            odt2txt "${FILE_PATH}" && exit 5
+            odt2txt "${FILE_PATH}" | head -50 && exit 5
             ## Preview as markdown conversion
-            pandoc -s -t markdown -- "${FILE_PATH}" && exit 5
+            pandoc -s -t markdown -- "${FILE_PATH}" | head -50 && exit 5
             exit 1;;
 
         ## XLSX
         xlsx)
             ## Preview as csv conversion
             ## Uses: https://github.com/dilshod/xlsx2csv
-            xlsx2csv -- "${FILE_PATH}" && exit 5
+            xlsx2csv -- "${FILE_PATH}" | head -50 && exit 5
             exit 1;;
 
         ## HTML
         htm|html|xhtml)
             ## Preview as text conversion
-            w3m -dump "${FILE_PATH}" && exit 5
-            lynx -dump -- "${FILE_PATH}" && exit 5
-            elinks -dump "${FILE_PATH}" && exit 5
-            pandoc -s -t markdown -- "${FILE_PATH}" && exit 5
+            w3m -dump "${FILE_PATH}" | head -50 && exit 5
+            lynx -dump -- "${FILE_PATH}" | head -50 && exit 5
+            elinks -dump "${FILE_PATH}" | head -50 && exit 5
+            pandoc -s -t markdown -- "${FILE_PATH}" | head -50 && exit 5
             ;;
 
         ## JSON
         json)
-            jq --color-output . "${FILE_PATH}" && exit 5
-            python -m json.tool -- "${FILE_PATH}" && exit 5
+            jq --color-output . "${FILE_PATH}" | head -50 && exit 5
+            python -m json.tool -- "${FILE_PATH}" | head -50 && exit 5
             ;;
 
         ## Direct Stream Digital/Transfer (DSDIFF) and wavpack aren't detected
         ## by file(1).
         dff|dsf|wv|wvc)
-            mediainfo "${FILE_PATH}" && exit 5
-            exiftool "${FILE_PATH}" && exit 5
+            mediainfo "${FILE_PATH}" | head -50 && exit 5
+            exiftool "${FILE_PATH}" | head -50 && exit 5
             ;; # Continue with next handler on failure
     esac
 }
