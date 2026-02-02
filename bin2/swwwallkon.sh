@@ -52,7 +52,7 @@ if [ ! -z "${setTheme}" ] && [ ! -z "${setWall}" ] ; then
     inwallHash="$(set_hash "${setWall}")"
     get_hashmap "${tgtPath}/${setTheme}"
     if [[ "${wallHash[@]}" == *"${inwallHash}"* ]] ; then
-        notify-send -a "t2" -i "${thmbDir}/${inwallHash}.sqre" "Error" "Hash matched in ${setTheme}"
+        notify --app-name "t2" --icon "${thmbDir}/${inwallHash}.sqre" "Error" "Hash matched in ${setTheme}"
         exit 0
     fi
 
@@ -60,7 +60,7 @@ if [ ! -z "${setTheme}" ] && [ ! -z "${setWall}" ] ; then
     ln -fs "${tgtPath}/${setTheme}/wallpapers/$(basename "${setWall}")" "${tgtPath}/${setTheme}/wall.set"
 
     "${scrDir}/themeswitch.sh" -s "${setTheme}"
-    notify-send -a "t1" -i "${thmbDir}/${inwallHash}.sqre" "Wallpaper set in ${setTheme}"
+    notify --app-name "t1" --icon "${thmbDir}/${inwallHash}.sqre" "Wallpaper set in ${setTheme}"
 
 else
 

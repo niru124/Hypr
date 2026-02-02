@@ -9,28 +9,16 @@ return {
   "AstroNvim/astrocommunity",
   { import = "astrocommunity.pack.lua" },
   { import = "astrocommunity.pack.cpp" },
-  { import = "astrocommunity.pack.typescript" },
+  { import = "astrocommunity.pack.python" },
+  { import = "astrocommunity.pack.sql" },
   {
     import = "astrocommunity.colorscheme.catppuccin",
   },
-  -- { import = "astrocommunity.media.image-nvim" },
-  -- { import = "astrocommunity.note-taking.neorg" },
-  -- has problem will blurring(neo-tree)
-  -- {
-  -- import = "astrocommunity.scrolling.mini-animate",
-  -- },
-  -- {
-  --   import = "astrocommunity.media.codesnap-nvim",
-  -- },
   { import = "astrocommunity.motion.leap-nvim" },
-  -- { import = "astrocommunity.pack.java" },
   {
     import = "astrocommunity.motion.nvim-surround",
   },
   {
     import = "astrocommunity.markdown-and-latex.markview-nvim",
   },
-  -- {
-  --   import = "astrocommunity.pack.sql",
-  -- },
 }

@@ -23,3 +23,4 @@
 ~/.config/input-remapper-2/:~/Downloads/mar/HyDE/Config/.config/input-remapper-2
 ~/.config/hyprdynamicmonitors/:~/Downloads/mar/HyDE/Config/.config/hyprdynamicmonitors
 ~/.config/mimeapps.list:~/Downloads/mar/HyDE/Config/.config/mimeapps.list
+~/.p10k.zsh:~/Downloads/mar/HyDE/
