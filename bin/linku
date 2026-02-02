@@ -1,0 +1,161 @@
+#!/usr/bin/env bash
+
+# Colors for output
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+backup_dir=~/backups/config_backup
+
+mkdir -p "$backup_dir"
+
+# Sync function with backups and delete excluded files
+sync_config() {
+    local src="$1"
+    local dst="$2"
+    shift 2
+    local excludes=("$@")
+
+    mkdir -p "$backup_dir"
+
+    local rsync_opts=(-avh --backup --backup-dir="$backup_dir")
+
+    # Add delete flags to remove excluded files/dirs from destination
+    rsync_opts+=(--delete --delete-excluded)
+
+    for ex in "${excludes[@]}"; do
+        rsync_opts+=(--exclude="$ex")
+    done
+
+    if [[ -d "$src" ]]; then
+        mkdir -p "$dst"
+        echo "🔄 Syncing directory: $src → $dst"
+        rsync "${rsync_opts[@]}" "$src"/ "$dst"/
+    elif [[ -f "$src" ]]; then
+        if [[ -d "$dst" ]]; then
+            mkdir -p "$dst"
+            echo "🔄 Syncing file: $src → $dst/$(basename "$src")"
+            rsync "${rsync_opts[@]}" "$src" "$dst"/
+        else
+            mkdir -p "$(dirname "$dst")"
+            echo "🔄 Syncing file: $src → $dst"
+            rsync "${rsync_opts[@]}" "$src" "$dst"
+        fi
+    else
+        echo "⚠️ Source does not exist: $src"
+        # Create destination if possible
+        if [[ "$dst" == */ ]]; then
+            mkdir -p "$dst"
+            echo "➕ Created destination directory: $dst"
+        else
+            mkdir -p "$(dirname "$dst")"
+            touch "$dst"
+            echo "➕ Created empty destination file: $dst"
+        fi
+    fi
+}
+
+# Show diff of what would change (dry-run), color-coded
+diff_config() {
+    local src="$1"
+    local dst="$2"
+    shift 2
+    local excludes=("$@")
+
+    local rsync_opts=(-aq --dry-run --out-format="%n" --delete --delete-excluded)
+
+    for ex in "${excludes[@]}"; do
+        rsync_opts+=(--exclude="$ex")
+    done
+
+    if [[ -d "$src" ]]; then
+        rsync_output=$(rsync "${rsync_opts[@]}" "$src"/ "$dst"/)
+    elif [[ -f "$src" ]]; then
+        rsync_output=$(rsync "${rsync_opts[@]}" "$src" "$dst")
+    else
+        echo "⚠️ Source does not exist: $src"
+        return
+    fi
+
+    while IFS= read -r line; do
+        if [[ "$line" == */ ]]; then
+            echo -e "${BLUE}${line}${NC}"
+        else
+            echo -e "${GREEN}${line}${NC}"
+        fi
+    done <<< "$rsync_output"
+}
+
+process_txt_file() {
+    local file="$1"
+
+    entries=$(tr '\n' ' ' < "$file" | tr -s ' ')
+
+    for pair in $entries; do
+        # Separate source+dest and excludes by first comma
+        local path_part="${pair%%,*}"
+        local excludes_part="${pair#*,}"
+
+        # If no comma, excludes_part == pair, so check that
+        if [[ "$path_part" == "$pair" ]]; then
+            excludes_part=""
+        fi
+
+        # Now split source and dest by first colon
+        local src="${path_part%%:*}"
+        local dst="${path_part#*:}"
+
+        if [[ -z "$src" || -z "$dst" ]]; then
+            echo "⚠️ Invalid pair: $pair"
+            continue
+        fi
+
+        # Expand tilde (~) in paths
+        src="${src/#\~/$HOME}"
+        dst="${dst/#\~/$HOME}"
+
+        # Split excludes by comma into array (if any)
+        IFS=',' read -r -a excludes <<< "$excludes_part"
+
+        # Trim spaces (optional)
+        for i in "${!excludes[@]}"; do
+            excludes[$i]=$(echo "${excludes[$i]}" | xargs)
+        done
+
+        # Call sync or diff depending on global mode
+        if [[ "$MODE" == "diff" ]]; then
+            diff_config "$src" "$dst" "${excludes[@]}"
+        else
+            sync_config "$src" "$dst" "${excludes[@]}"
+        fi
+    done
+}
+
+main() {
+    if [[ $# -eq 1 && "$1" == "diff" ]]; then
+        MODE="diff"
+        # Assume input file is files.txt by default
+        if [[ ! -f files.txt ]]; then
+            echo "❌ files.txt not found"
+            exit 1
+        fi
+        process_txt_file files.txt
+    elif [[ $# -eq 1 && "$1" == *.txt ]]; then
+        MODE="sync"
+        process_txt_file "$1"
+    elif [[ $# -eq 2 ]]; then
+        MODE="sync"
+        local src="${1/#\~/$HOME}"
+        local dst="${2/#\~/$HOME}"
+        sync_config "$src" "$dst"
+    else
+        echo "❌ Usage:"
+        echo "  $0 source_path destination_path"
+        echo "  $0 links.txt   # with src:dst,exclude1,exclude2 ..."
+        echo "  $0 diff        # run diff on files.txt"
+        exit 1
+    fi
+}
+
+main "$@"
+

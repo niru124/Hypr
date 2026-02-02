@@ -45,17 +45,21 @@ EOF
 
 case $1 in
 p) # print all outputs
-	notify "" -screen-capture 
-	grimblast copysave screen $temp_screenshot && restore_shader && swappy -f $temp_screenshot;; 
+	~/.local/share/bin/notify "" -screen-capture
+	grim $temp_screenshot && restore_shader && swappy -f $temp_screenshot
+	;;
 s) # drag to manually snip an area / click on a window to print it
-	notify "" -screen-capture
-	grimblast copysave area $temp_screenshot && restore_shader && swappy -f $temp_screenshot;;
+	~/.local/share/bin/notify "" -screen-capture
+	grim -g "$(slurp)" $temp_screenshot && restore_shader && swappy -f $temp_screenshot
+	;;
 sf) # frozen screen, drag to manually snip an area / click on a window to print it
-	notify "" -screen-capture 
-	grimblast --freeze copysave area $temp_screenshot && restore_shader && swappy -f $temp_screenshot;;
+	~/.local/share/bin/notify "" -screen-capture
+	grim -g "$(slurp)" $temp_screenshot && restore_shader && swappy -f $temp_screenshot
+	;;
 m) # print focused monitor
-	notify "" -screen-capture 
-	grimblast copysave output $temp_screenshot && restore_shader && swappy -f $temp_screenshot;;
+	~/.local/share/bin/notify "" -screen-capture
+	grim -o "$(hyprctl activewindow -j | jq -r '.monitor')" $temp_screenshot && restore_shader && swappy -f $temp_screenshot
+	;;
 *) # invalid option
 	print_error ;;
 esac
@@ -63,5 +67,5 @@ esac
 rm "$temp_screenshot"
 
 if [ -f "${save_dir}/${save_file}" ]; then
-	notify-send -a "t1" -i "${save_dir}/${save_file}" "saved in ${save_dir}" 
+	notify-send -a "t1" -i "${save_dir}/${save_file}" "saved in ${save_dir}"
 fi

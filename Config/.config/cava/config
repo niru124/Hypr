@@ -69,7 +69,9 @@
 # 'raw' is an 8 or 16 bit (configurable via the 'bit_format' option) data
 # stream of the bar heights that can be used to send to other applications.
 # 'raw' defaults to 200 bars, which can be adjusted in the 'bars' option above.
-; method = ncurses
+ method = ncurses
+
+
 
 # Visual channels. Can be 'stereo' or 'mono'.
 # 'stereo' mirrors both channels with low frequencies in center.
@@ -147,11 +149,11 @@
 
  gradient = 1
  gradient_count = 8
- gradient_color_1 = '#293D52'
- gradient_color_2 = '#3A526B'
- gradient_color_3 = '#4B4B7D'
- gradient_color_4 = '#57578F'
- gradient_color_5 = '#A38F65'
- gradient_color_6 = '#C2AB7A'
- gradient_color_7 = '#E6D39A'
- gradient_color_8 = '#F0DEAA'
+ gradient_color_1 = '#522952'
+ gradient_color_2 = '#6B3A6B'
+ gradient_color_3 = '#4B5D7D'
+ gradient_color_4 = '#576B8F'
+ gradient_color_5 = '#A36B65'
+ gradient_color_6 = '#C2817A'
+ gradient_color_7 = '#E6B49A'
+ gradient_color_8 = '#F0C2AA'

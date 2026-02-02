@@ -1,8 +1,5 @@
 ---@type LazySpec
 return {
-  -----------------------------------------------------------------------------
-  -- Core Mason Plugin
-  -----------------------------------------------------------------------------
   {
     "williamboman/mason.nvim",
     cmd = "Mason",
@@ -17,26 +14,14 @@ return {
       },
     },
   },
-
-  -----------------------------------------------------------------------------
-  -- Core LSP client
-  -----------------------------------------------------------------------------
   {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },
   },
-
-  -----------------------------------------------------------------------------
-  -- nvim-cmp LSP capabilities
-  -----------------------------------------------------------------------------
   {
     "hrsh7th/cmp-nvim-lsp",
     lazy = true,
   },
-
-  -----------------------------------------------------------------------------
-  -- Mason ↔ LSP bridge
-  -----------------------------------------------------------------------------
   {
     "williamboman/mason-lspconfig.nvim",
     dependencies = {
@@ -46,10 +31,12 @@ return {
     opts = {
       ensure_installed = {
         "lua_ls",
+        "clangd",
+        "jedi_language_server",
+        "sqlls",
       },
       automatic_installation = true,
       handlers = {
-        -- Default handler
         function(server_name)
           local capabilities = vim.lsp.protocol.make_client_capabilities()
           local ok, cmp = pcall(require, "cmp_nvim_lsp")
@@ -62,7 +49,6 @@ return {
           }
         end,
 
-        -- Lua (Neovim) specific config
         lua_ls = function()
           local capabilities = vim.lsp.protocol.make_client_capabilities()
           local ok, cmp = pcall(require, "cmp_nvim_lsp")
@@ -85,13 +71,46 @@ return {
             },
           }
         end,
+
+        clangd = function()
+          local capabilities = vim.lsp.protocol.make_client_capabilities()
+          local ok, cmp = pcall(require, "cmp_nvim_lsp")
+          if ok then
+            capabilities = cmp.default_capabilities(capabilities)
+          end
+
+          require("lspconfig").clangd.setup {
+            capabilities = capabilities,
+            cmd = { "clangd", "--background-index" },
+          }
+        end,
+
+        jedi_language_server = function()
+          local capabilities = vim.lsp.protocol.make_client_capabilities()
+          local ok, cmp = pcall(require, "cmp_nvim_lsp")
+          if ok then
+            capabilities = cmp.default_capabilities(capabilities)
+          end
+
+          require("lspconfig").jedi_language_server.setup {
+            capabilities = capabilities,
+          }
+        end,
+
+        sqlls = function()
+          local capabilities = vim.lsp.protocol.make_client_capabilities()
+          local ok, cmp = pcall(require, "cmp_nvim_lsp")
+          if ok then
+            capabilities = cmp.default_capabilities(capabilities)
+          end
+
+          require("lspconfig").sqlls.setup {
+            capabilities = capabilities,
+          }
+        end,
       },
     },
   },
-
-  -----------------------------------------------------------------------------
-  -- Mason ↔ none-ls (formatters / linters)
-  -----------------------------------------------------------------------------
   {
     "jay-babu/mason-null-ls.nvim",
     dependencies = {
@@ -100,15 +119,14 @@ return {
     },
     opts = {
       ensure_installed = {
-        -- "stylua",
+        "stylua",
+        "clang-format",
+        "black",
+        "sqlfmt",
       },
       automatic_installation = true,
     },
   },
-
-  -----------------------------------------------------------------------------
-  -- none-ls core
-  -----------------------------------------------------------------------------
   {
     "nvimtools/none-ls.nvim",
     opts = function(_, opts)
@@ -116,15 +134,14 @@ return {
 
       opts.sources = vim.list_extend(opts.sources or {}, {
         nls.builtins.formatting.stylua,
+        nls.builtins.formatting.clang_format,
+        nls.builtins.formatting.black,
+        nls.builtins.formatting.sqlfmt,
       })
 
       return opts
     end,
   },
-
-  -----------------------------------------------------------------------------
-  -- Mason ↔ DAP bridge
-  -----------------------------------------------------------------------------
   {
     "jay-babu/mason-nvim-dap.nvim",
     dependencies = {
@@ -133,36 +150,23 @@ return {
     },
     opts = {
       ensure_installed = {
-        -- "python",
-        -- "codelldb",
+        "codelldb",
+        "debugpy",
       },
       automatic_installation = true,
       handlers = {
-        function() end, -- use default behavior
+        function() end,
       },
     },
   },
-
-  -----------------------------------------------------------------------------
-  -- nvim-dap core
-  -----------------------------------------------------------------------------
   {
     "mfussenegger/nvim-dap",
     config = function()
       local dap = require("dap")
 
-      -- Load VS Code style launch.json if present
       pcall(function()
         require("dap.ext.vscode").load_launchjs()
       end)
-
-      -- Example keymaps (optional)
-      -- vim.keymap.set("n", "<F5>", dap.continue)
-      -- vim.keymap.set("n", "<F10>", dap.step_over)
-      -- vim.keymap.set("n", "<F11>", dap.step_into)
-      -- vim.keymap.set("n", "<F12>", dap.step_out)
-      -- vim.keymap.set("n", "<leader>b", dap.toggle_breakpoint)
     end,
   },
 }
-

@@ -1,0 +1,361 @@
+#!/bin/bash
+
+DB_PATH="$HOME/.todo/todo.db"
+
+get_todos() {
+    sqlite3 -header -column "$DB_PATH" "
+        SELECT id, 
+               CASE 
+                   WHEN status = 'completed' THEN '🟢'
+                   WHEN priority = 'high' THEN '🔴'
+                   WHEN priority = 'medium' THEN '🟡' 
+                   ELSE '🟢'
+               END as P,
+               title,
+               status,
+               due_date,
+               category
+        FROM todos
+        WHERE status != 'completed'
+        ORDER BY 
+            CASE priority 
+                WHEN 'high' THEN 1 
+                WHEN 'medium' THEN 2 
+                WHEN 'low' THEN 3 
+            END,
+            due_date ASC,
+            created_at DESC
+    "
+}
+
+select_todo() {
+    local todos
+    todos=$(sqlite3 -header -column "$DB_PATH" "
+        SELECT id, 
+               CASE 
+                   WHEN status = 'completed' THEN '🟢'
+                   WHEN priority = 'high' THEN '🔴'
+                   WHEN priority = 'medium' THEN '🟡' 
+                   ELSE '🟢'
+               END as P,
+               title,
+               status,
+               due_date,
+               category
+        FROM todos
+        ORDER BY 
+            CASE priority 
+                WHEN 'high' THEN 1 
+                WHEN 'medium' THEN 2 
+                WHEN 'low' THEN 3 
+            END,
+            due_date ASC,
+            created_at DESC
+    ")
+    
+    echo "$todos" | fzf --header-lines=1 --with-nth=1,3.. --layout=reverse --height=15 --border \
+        --header "Select a todo (id | P | title | status | due | category)" \
+        | awk '{print $1}'
+}
+
+usage() {
+    cat <<EOF
+Usage: todo <command> [options]
+
+Commands:
+    add [options]               Add a new todo (opens interactive prompt)
+    list [options]              List todos
+    show                        Select and show todo details
+    edit [options]              Select and edit a todo
+    complete                    Select and mark as completed
+    delete                      Select and delete a todo
+    done                        Select and mark as completed (shortcut)
+    categories                  List all categories
+    find <query>                Find todo by description using AI
+    stats                       Show statistics
+    init                        Initialize the database
+
+Options:
+    -p, --priority PRIO         Priority: high, medium, low
+    -c, --category CAT          Category
+    -D, --due DATE              Due date (YYYY-MM-DD or YYYY-MM-DD HH:MM)
+    -d, --desc TEXT             Description
+    -r, --recurring FREQ        Recurring: daily, weekly, monthly
+    -s, --status STATUS         Status: pending, in_progress, completed
+    -t, --title TEXT            Title
+
+Interactive Mode:
+    Run without arguments to start interactive mode with fzf
+
+EOF
+    exit 1
+}
+
+interactive_mode() {
+    local choices=$(cat <<EOF
+add
+list
+show
+edit
+complete
+delete
+done
+categories
+find
+stats
+EOF
+    )
+    
+    local cmd
+    cmd=$(echo "$choices" | fzf --header "Select command (or type 'add' for new todo)" --layout=reverse --height=12 --border)
+    
+    case "$cmd" in
+        add) interactive_add ;;
+        list) list_todos ;;
+        show) 
+            local id
+            id=$(select_todo)
+            [[ -n "$id" ]] && show_todo "$id"
+            ;;
+        edit|complete|done|delete)
+            local id
+            id=$(select_todo)
+            [[ -n "$id" ]] && todo "$cmd" "$id"
+            ;;
+        categories) list_categories ;;
+        find)
+            local query
+            query=$(echo "" | fzf --header "Enter search query" --layout=reverse --height=5 --border)
+            [[ -n "$query" ]] && find_todos "$query"
+            ;;
+        stats) show_stats ;;
+    esac
+}
+
+interactive_add() {
+    local title priority category due_date desc recurring
+    
+    title=$(echo "" | fzf --header "Enter todo title" --layout=reverse --height=5 --border)
+    [[ -z "$title" ]] && echo "Cancelled" && exit 0
+    
+    priority=$(echo -e "high\nmedium\nlow" | fzf --header "Select priority" --layout=reverse --height=8 --border)
+    [[ -z "$priority" ]] && priority="medium"
+    
+    category=$(echo "" | fzf --header "Enter category (optional, press enter to skip)" --layout=reverse --height=5 --border)
+    
+    due_date=$(echo "" | fzf --header "Enter due date YYYY-MM-DD (optional)" --layout=reverse --height=5 --border)
+    
+    desc=$(echo "" | fzf --header "Enter description (optional)" --layout=reverse --height=5 --border)
+    
+    recurring=$(echo -e "none\ndaily\nweekly\nmonthly" | fzf --header "Recurring?" --layout=reverse --height=10 --border)
+    [[ "$recurring" == "none" ]] && recurring=""
+    
+    add_todo "$title" -p "$priority" -c "$category" -D "$due_date" -d "$desc" -r "$recurring"
+}
+
+add_todo() {
+    local title="$1"
+    shift
+    local desc="" priority="medium" category="" due_date="" recurring=""
+    
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -d|--desc) desc="$2"; shift 2 ;;
+            -p|--priority) priority="$2"; shift 2 ;;
+            -c|--category) category="$2"; shift 2 ;;
+            -D|--due) due_date="$2"; shift 2 ;;
+            -r|--recurring) recurring="$2"; shift 2 ;;
+            *) shift ;;
+        esac
+    done
+    
+    sqlite3 "$DB_PATH" "
+        INSERT INTO todos (title, description, priority, category, due_date, recurring)
+        VALUES ('$title', '$desc', '$priority', '$category', '$due_date', '$recurring');
+    "
+    echo "Todo added successfully"
+}
+
+list_todos() {
+    sqlite3 -header -column "$DB_PATH" "
+        SELECT id, 
+               CASE 
+                   WHEN status = 'completed' THEN '🟢'
+                   WHEN priority = 'high' THEN '🔴'
+                   WHEN priority = 'medium' THEN '🟡' 
+                   ELSE '🟢'
+               END as P,
+               title,
+               status,
+               due_date,
+               category
+        FROM todos
+        ORDER BY 
+            CASE status 
+                WHEN 'completed' THEN 1 
+                ELSE 0 
+            END,
+            CASE priority 
+                WHEN 'high' THEN 1 
+                WHEN 'medium' THEN 2 
+                WHEN 'low' THEN 3 
+            END,
+            due_date ASC,
+            created_at DESC
+    "
+}
+
+show_todo() {
+    sqlite3 -header -column "$DB_PATH" "
+        SELECT id, title, description, priority, status, category, 
+               due_date, created_at, updated_at, completed_at, recurring
+        FROM todos WHERE id = $1
+    "
+}
+
+edit_todo() {
+    local id="$1"
+    shift
+    local updates=()
+    
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -t|--title) updates+=("title = '$2'"); shift 2 ;;
+            -d|--desc) updates+=("description = '$2'"); shift 2 ;;
+            -p|--priority) updates+=("priority = '$2'"); shift 2 ;;
+            -s|--status) updates+=("status = '$2'"); shift 2 ;;
+            -c|--category) updates+=("category = '$2'"); shift 2 ;;
+            -D|--due) updates+=("due_date = '$2'"); shift 2 ;;
+            *) shift ;;
+        esac
+    done
+    
+    if [[ ${#updates[@]} -gt 0 ]]; then
+        updates+=("updated_at = datetime('now')")
+        local set_clause=$(IFS=,; echo "${updates[*]}")
+        sqlite3 "$DB_PATH" "UPDATE todos SET $set_clause WHERE id = $id"
+        echo "Todo $id updated"
+    else
+        echo "No updates provided"
+    fi
+}
+
+complete_todo() {
+    sqlite3 "$DB_PATH" "
+        UPDATE todos 
+        SET status = 'completed', 
+            completed_at = datetime('now'),
+            updated_at = datetime('now')
+        WHERE id = $1
+    "
+    echo "Todo $1 marked as completed"
+}
+
+delete_todo() {
+    sqlite3 "$DB_PATH" "DELETE FROM todos WHERE id = $1"
+    echo "Todo $1 deleted"
+}
+
+list_categories() {
+    sqlite3 -header "$DB_PATH" "
+        SELECT name, color, 
+               (SELECT COUNT(*) FROM todos WHERE category = categories.name) as count
+        FROM categories
+    "
+}
+
+show_stats() {
+    echo "=== Todo Statistics ==="
+    echo ""
+    echo "By Status:"
+    sqlite3 "$DB_PATH" "
+        SELECT status, COUNT(*) as count 
+        FROM todos 
+        GROUP BY status
+    "
+    echo ""
+    echo "By Priority:"
+    sqlite3 "$DB_PATH" "
+        SELECT priority, COUNT(*) as count 
+        FROM todos 
+        WHERE status != 'completed'
+        GROUP BY priority
+    "
+    echo ""
+    echo "Overdue:"
+    sqlite3 "$DB_PATH" "SELECT COUNT(*) as overdue FROM todos WHERE status != 'completed' AND due_date < date('now')"
+    echo ""
+    echo "Due Today:"
+    sqlite3 "$DB_PATH" "SELECT COUNT(*) as due_today FROM todos WHERE status != 'completed' AND date(due_date) = date('now')"
+    echo ""
+    echo "Total Todos:"
+    sqlite3 "$DB_PATH" "SELECT COUNT(*) as total FROM todos"
+}
+
+find_todos() {
+    local query="$1"
+    [[ -z "$query" ]] && echo "Provide a search query" && exit 1
+    
+    local todos
+    todos=$(sqlite3 "$DB_PATH" "SELECT id, title, status, priority FROM todos")
+    
+    [[ -z "$todos" ]] && echo "No todos found" && exit 0
+    
+    local prompt="Given this query: \"$query\"
+
+And these todos (format: id|title|status|priority):
+$todos
+
+Find the todo ID that best matches the query. Return ONLY the ID number, nothing else. If no todo matches, return 'NONE'."
+
+    local result
+    result=$(echo "$prompt" | ollama run mistral 2>/dev/null)
+    result=$(echo "$result" | tr -d '[:space:]' | grep -oE '[0-9]+' || echo "")
+    
+    if [[ -n "$result" && "$result" != "NONE" ]]; then
+        show_todo "$result"
+    else
+        echo "No matching todo found"
+        echo ""
+        echo "Did you mean:"
+        sqlite3 -column "$DB_PATH" "
+            SELECT id, title, status, priority
+            FROM todos
+            WHERE title LIKE '%$query%'
+            LIMIT 5
+        "
+    fi
+}
+
+init_db() {
+    mkdir -p "$HOME/.todo"
+    bash "$(dirname "$0")/setup.sh"
+}
+
+todo() {
+    local cmd="$1"
+    shift
+    
+    case "$cmd" in
+        add) add_todo "$@" ;;
+        list) list_todos ;;
+        show) show_todo "$1" ;;
+        edit) shift; edit_todo "$@" ;;
+        complete|done) complete_todo "$1" ;;
+        delete) delete_todo "$1" ;;
+        categories) list_categories ;;
+        find) find_todos "$1" ;;
+        stats) show_stats ;;
+        init) init_db ;;
+        -h|--help|help) usage ;;
+        *) 
+            if [[ -z "$cmd" ]]; then
+                interactive_mode
+            else
+                usage
+            fi
+            ;;
+    esac
+}
+
+todo "$@"

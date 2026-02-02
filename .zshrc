@@ -175,3 +175,7 @@ zle -N edit-command-line
 bindkey '^x^e' edit-command-line
 fpath=(~/.zsh/completion $fpath)
 autoload -U compinit && compinit
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+[[ -d $PYENV_ROOT/shims ]] && export PATH="$PYENV_ROOT/shims:$PATH"
+eval "$(pyenv init -)"

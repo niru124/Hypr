@@ -44,6 +44,6 @@ if [ ! -z "${rofiSel}" ] ; then
 
     if [ -n "${setWall}" ]; then
         "${scrDir}/swwwallpaper.sh" -s "${setWall}"
-        notify-send -a "t1" -i "${thmbDir}/$(set_hash "${setWall}").sqre" " ${rofiSel}"
+        notify --app-name "t1" --icon "${thmbDir}/$(set_hash "${setWall}").sqre" " ${rofiSel}"
     fi
 fi
