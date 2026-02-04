@@ -1,0 +1,156 @@
+{
+  "Revision": "0.6.6.2",
+  "Profiles": [
+    {
+      "Tablet": "Huion HS64",
+      "OutputMode": {
+        "Path": "OpenTabletDriver.Desktop.Output.RelativeMode",
+        "Settings": [],
+        "Enable": true
+      },
+      "Filters": [
+        {
+          "Path": "VoiDPlugins.Filter.PrecisionControl",
+          "Settings": [
+            {
+              "Property": "Scale",
+              "Value": 0.6
+            }
+          ],
+          "Enable": true
+        },
+        {
+          "Path": "erase_button.erase_button",
+          "Settings": [],
+          "Enable": true
+        }
+      ],
+      "AbsoluteModeSettings": {
+        "Display": {
+          "Width": 1920.0,
+          "Height": 1080.0,
+          "X": 960.0,
+          "Y": 540.0,
+          "Rotation": 0.0
+        },
+        "Tablet": {
+          "Width": 160.0,
+          "Height": 102.0,
+          "X": 80.0,
+          "Y": 51.0,
+          "Rotation": 0.0
+        },
+        "EnableClipping": true,
+        "EnableAreaLimiting": false,
+        "LockAspectRatio": false
+      },
+      "RelativeModeSettings": {
+        "XSensitivity": 25.0,
+        "YSensitivity": 15.0,
+        "RelativeRotation": 0.0,
+        "RelativeResetDelay": "00:00:00.1000000"
+      },
+      "Bindings": {
+        "TipActivationThreshold": 1.0,
+        "TipButton": {
+          "Path": "OpenTabletDriver.Desktop.Binding.AdaptiveBinding",
+          "Settings": [
+            {
+              "Property": "Binding",
+              "Value": "Tip"
+            }
+          ],
+          "Enable": true
+        },
+        "EraserActivationThreshold": 1.0,
+        "EraserButton": {
+          "Path": "erase_button.erase_button",
+          "Settings": [],
+          "Enable": true
+        },
+        "PenButtons": [
+          {
+            "Path": "OpenTabletDriver.Desktop.Binding.MultiKeyBinding",
+            "Settings": [
+              {
+                "Property": "Keys",
+                "Value": "LeftControl+Z"
+              }
+            ],
+            "Enable": true
+          },
+          {
+            "Path": "OpenTabletDriver.Desktop.Binding.AdaptiveBinding",
+            "Settings": [
+              {
+                "Property": "Binding",
+                "Value": "Button 2"
+              }
+            ],
+            "Enable": true
+          }
+        ],
+        "AuxButtons": [
+          {
+            "Path": "OpenTabletDriver.Desktop.Binding.AdaptiveBinding",
+            "Settings": [
+              {
+                "Property": "Binding",
+                "Value": "Button 2"
+              }
+            ],
+            "Enable": true
+          },
+          null,
+          null,
+          null
+        ],
+        "MouseButtons": [],
+        "MouseScrollUp": null,
+        "MouseScrollDown": null,
+        "DisablePressure": false,
+        "DisableTilt": false
+      }
+    }
+  ],
+  "LockUsableAreaDisplay": true,
+  "LockUsableAreaTablet": true,
+  "Tools": [
+    {
+      "Path": "TouchGestures.Installer.TouchGesturesInstaller",
+      "Settings": [
+        {
+          "Property": "ForceInstall",
+          "Value": false
+        }
+      ],
+      "Enable": true
+    },
+    {
+      "Path": "ScrollBinding.ScrollBindingSettings",
+      "Settings": [
+        {
+          "Property": "ScrollDelay",
+          "Value": 15
+        },
+        {
+          "Property": "ForwardScroll",
+          "Value": 10
+        },
+        {
+          "Property": "BackwardScroll",
+          "Value": 10
+        },
+        {
+          "Property": "LeftScroll",
+          "Value": 10
+        },
+        {
+          "Property": "RightScroll",
+          "Value": 10
+        }
+      ],
+      "Enable": true
+    }
+  ]
+}
