@@ -78,6 +78,7 @@ class fzf_open_with(Command):
             ext = os.path.splitext(selected_file.path)[1].lower()
             
             image_extensions = {'.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.svg', '.tiff', '.tif'}
+            pdf_extensions = {'.pdf','odf','.pub'}
             video_extensions = {'.mp4', '.mkv', '.avi', '.mov', '.webm', '.flv', '.wmv', '.m4v'}
             audio_extensions = {'.mp3', '.flac', '.wav', '.ogg', '.m4a', '.aac', '.wma'}
             text_extensions = {'.txt', '.md', '.py', '.js', '.ts', '.json', '.yaml', '.yml', '.xml', '.html', '.css', '.sh', '.c', '.cpp', '.h', '.hpp', '.rs', '.go', '.java'}
@@ -89,7 +90,7 @@ class fzf_open_with(Command):
                 preconfigured_commands = {
                     'nsxiv': 'nsxiv {}',
                     'feh': 'feh {}',
-                    'swappy': f'swappy -f {{}} -o "{base_name}-edited.png"',
+                    'satty': f'satty -f {{}} -o "{base_name}-edited.png"',
                     'xdg-open': 'xdg-open {}',
                     'fotokilof': 'fotokilof {}',
                 }
@@ -98,6 +99,12 @@ class fzf_open_with(Command):
                     'mpv': 'mpv {}',
                     'vlc': 'vlc {}',
                     'xdg-open': 'xdg-open {}',
+                }
+
+            elif ext in pdf_extensions:
+                preconfigured_commands = {
+                    'evince': 'evince {}',
+                    'zathura': 'zathura {}',
                 }
             elif ext in audio_extensions:
                 preconfigured_commands = {

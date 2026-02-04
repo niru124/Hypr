@@ -24,3 +24,4 @@
 ~/.config/hyprdynamicmonitors/:~/Downloads/mar/HyDE/Config/.config/hyprdynamicmonitors
 ~/.config/mimeapps.list:~/Downloads/mar/HyDE/Config/.config/mimeapps.list
 ~/.p10k.zsh:~/Downloads/mar/HyDE/
+~/.config/xournalpp/:~/Downloads/mar/HyDE/Config/.config/xournalpp/

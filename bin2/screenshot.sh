@@ -22,7 +22,7 @@ fi
 
 scrDir=$(dirname "$(realpath "$0")")
 source $scrDir/globalcontrol.sh
-swpy_dir="${confDir}/swappy"
+swpy_dir="${confDir}/satty"
 save_dir="${2:-$XDG_PICTURES_DIR/Screenshots}"
 save_file=$(date +'%y%m%d_%Hh%Mm%Ss_screenshot.png')
 temp_screenshot="/tmp/screenshot.png"
@@ -46,19 +46,19 @@ EOF
 case $1 in
 p) # print all outputs
 	~/.local/share/bin/notify "" -screen-capture
-	grim $temp_screenshot && restore_shader && swappy -f $temp_screenshot
+	grim $temp_screenshot && restore_shader && satty --filename $temp_screenshot --output-filename $save_dir/$save_file
 	;;
 s) # drag to manually snip an area / click on a window to print it
 	~/.local/share/bin/notify "" -screen-capture
-	grim -g "$(slurp)" $temp_screenshot && restore_shader && swappy -f $temp_screenshot
+	grim -g "$(slurp)" $temp_screenshot && restore_shader && satty --filename $temp_screenshot --output-filename $save_dir/$save_file
 	;;
 sf) # frozen screen, drag to manually snip an area / click on a window to print it
 	~/.local/share/bin/notify "" -screen-capture
-	grim -g "$(slurp)" $temp_screenshot && restore_shader && swappy -f $temp_screenshot
+	grim -g "$(slurp)" $temp_screenshot && restore_shader && satty --filename $temp_screenshot --output-filename $save_dir/$save_file
 	;;
 m) # print focused monitor
 	~/.local/share/bin/notify "" -screen-capture
-	grim -o "$(hyprctl activewindow -j | jq -r '.monitor')" $temp_screenshot && restore_shader && swappy -f $temp_screenshot
+	grim -o "$(hyprctl activewindow -j | jq -r '.monitor')" $temp_screenshot && restore_shader && satty --filename $temp_screenshot --output-filename $save_dir/$save_file
 	;;
 *) # invalid option
 	print_error ;;

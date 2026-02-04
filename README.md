@@ -13,7 +13,7 @@ HyDE is a comprehensive setup for a beautiful and functional Hyprland desktop en
 ## Screenshots
 
 ![Overall Desktop](assets/images/overall.png)
-![Hyprlock Preview](assets/images/hyprlock/preview_hyprlock.png)
+![Hyprlock Preview](assets/images/hyprlock/hyprlock.png)
 ![Waybar](assets/images/waybar/250727_21h25m02s_screenshot.png)
 ![Rofi App Launcher](assets/images/rofi/app_launcher.png)
 
