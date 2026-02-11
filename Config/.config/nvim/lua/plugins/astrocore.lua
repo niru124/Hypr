@@ -159,6 +159,18 @@ return {
           ":ToggleTerm direction=vertical<CR>",
           { noremap = true, silent = true }
         ),
+
+        -- Go to function implementation
+        vim.api.nvim_set_keymap(
+          "n",
+          "gi",
+          "<Cmd>lua vim.lsp.buf.implementation()<CR>",
+          {
+            noremap = true,
+            silent = true,
+            desc = "Go to implementation",
+          }
+        ),
       },
     },
   },

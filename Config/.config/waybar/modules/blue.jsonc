@@ -1,0 +1,7 @@
+"custom/blue": {
+  "interval": 5,
+  "exec": "~/.config/waybar/scripts/bluetooth-status.sh",
+  "return-type": "json",
+  "format": "{}",
+  "on-click": "blueman-manager",
+},

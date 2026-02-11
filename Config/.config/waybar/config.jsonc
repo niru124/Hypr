@@ -18,7 +18,7 @@
 
 	"modules-left": ["custom/padd","custom/l_end","cpu","memory","custom/cpuinfo","disk","custom/gpu","custom/fan","custom/memory_swap","custom/r_end","custom/l_end","idle_inhibitor","clock","custom/weather","custom/r_end","","custom/padd"],
 	"modules-center": ["custom/padd","","custom/l_end","hyprland/workspaces","custom/r_end","custom/padd"],
-	"modules-right": ["custom/padd","custom/l_end","","custom/tor","network","custom/net_usage","pulseaudio","pulseaudio#microphone","custom/powerprofile","custom/r_end","custom/l_end","privacy","bluetooth","tray","battery","custom/r_end","custom/l_end","custom/mount","custom/notifications","custom/power","custom/r_end","custom/padd"],
+	"modules-right": ["custom/padd","custom/l_end","","custom/tor","network","custom/net_usage","pulseaudio","pulseaudio#microphone","custom/powerprofile","custom/r_end","custom/l_end","privacy","bluetooth","custom/blue","custom/networki","battery","custom/r_end","custom/l_end","custom/mount","custom/notifications","custom/power","custom/r_end","custom/padd"],
 
 
 // sourced from modules based on config.ctl //
@@ -243,12 +243,23 @@
         "tooltip-format-enumerate-connected-battery": "{device_alias}\t{icon} {device_battery_percentage}%"
     },
 
-    "tray": {
-        "icon-size": 16,
-        "rotate": 0,
-        "spacing": 5
-    },
 
+"custom/blue": {
+  "interval": 5,
+  "exec": "~/.config/waybar/scripts/bluetooth-status.sh",
+  "return-type": "json",
+  "format": "{}",
+  "on-click": "blueman-manager",
+},
+"custom/networki": {
+    "interval": 5,
+    "exec": "~/.config/waybar/scripts/wifi-signal.sh",
+    "return-type": "json",
+    "format": "{}",
+    "tooltip": true,
+    "tooltip-format": "Click to manage Wi-Fi",
+    "on-click": "python3 ~/Downloads/nm-applet/wifi-gtk/wifi-manager.py",
+},
     "battery": {
         "states": {
             "good": 95,
@@ -260,9 +271,20 @@
         "format-charging": " {capacity}%",
         "format-plugged": " {capacity}%",
         "format-alt": "{time} {icon}",
-        "format-icons": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"]
+        "format-icons": [
+            "󰂎",
+            "󰁺",
+            "󰁻",
+            "󰁼",
+            "󰁽",
+            "󰁾",
+            "󰁿",
+            "󰂀",
+            "󰂁",
+            "󰂂",
+            "󰁹"
+        ]
     },
-
 "custom/mount": {
   "format-json": "{text}", // Waybar will use the "text" field from your JSON output
   "tooltip-format": "{tooltip}", // Waybar will use the "tooltip" field

@@ -1,5 +1,5 @@
 [Default Applications]
-application/pdf=org.gnome.Evince.desktop
+application/pdf=sioyek.desktop
 image/jpeg=nsxiv.desktop
 image/png=nsxiv.desktop
 x-scheme-handler/msteams=teams.desktop
@@ -31,7 +31,7 @@ audio/x-wav=mpv.desktop
 audio/flac=mpv.desktop
 
 [Added Associations]
-application/pdf=org.pwmt.zathura-pdf-poppler.desktop;org.gnome.Evince.desktop;sioyek.desktop;
+application/pdf=scrivano.desktop;org.pwmt.zathura-pdf-poppler.desktop;org.gnome.Evince.desktop;sioyek.desktop;
 image/jpeg=feh.desktop;org.gnome.Loupe.desktop;nsxiv.desktop;
 image/png=org.gnome.Loupe.desktop;nsxiv.desktop;feh.desktop;
 x-scheme-handler/sms=org.gnome.Shell.Extensions.GSConnect.desktop;

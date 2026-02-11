@@ -1,3 +1,4 @@
 .zsh_history
 LOCAL_APPDATA_FONTCONFIG_CACHE/
 assets/videos/LOCAL_APPDATA_FONTCONFIG_CACHE/
+*.db

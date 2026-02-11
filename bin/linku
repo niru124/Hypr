@@ -5,9 +5,27 @@ GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-backup_dir=~/backups/config_backup
+use_backup=true
 
-mkdir -p "$backup_dir"
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --no-backup)
+            use_backup=false
+            shift
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
+if [[ "$use_backup" == true ]]; then
+    backup_dir=~/backups/config_backup
+else
+    backup_dir=""
+fi
+
+global_excludes=()
 
 # Sync function with backups and delete excluded files
 sync_config() {
@@ -16,9 +34,12 @@ sync_config() {
     shift 2
     local excludes=("$@")
 
-    mkdir -p "$backup_dir"
-
-    local rsync_opts=(-avh --backup --backup-dir="$backup_dir")
+    if [[ "$use_backup" == true ]]; then
+        mkdir -p "$backup_dir"
+        local rsync_opts=(-avh --backup --backup-dir="$backup_dir")
+    else
+        local rsync_opts=(-avh)
+    fi
 
     # Add delete flags to remove excluded files/dirs from destination
     rsync_opts+=(--delete --delete-excluded)
@@ -89,19 +110,28 @@ diff_config() {
 process_txt_file() {
     local file="$1"
 
-    entries=$(tr '\n' ' ' < "$file" | tr -s ' ')
+    global_excludes=()
 
-    for pair in $entries; do
-        # Separate source+dest and excludes by first comma
+    if IFS= read -r first_line < "$file"; then
+        if [[ "$first_line" =~ ^#(.+)$ ]]; then
+            local excludes_str="${BASH_REMATCH[1]}"
+            IFS=',' read -r -a global_excludes <<< "$excludes_str"
+            for i in "${!global_excludes[@]}"; do
+                global_excludes[$i]=$(echo "${global_excludes[$i]}" | xargs)
+            done
+        fi
+    fi
+
+    local content=$(sed '1d' "$file" | tr '\n' ' ' | tr -s ' ')
+
+    for pair in $content; do
         local path_part="${pair%%,*}"
         local excludes_part="${pair#*,}"
 
-        # If no comma, excludes_part == pair, so check that
         if [[ "$path_part" == "$pair" ]]; then
             excludes_part=""
         fi
 
-        # Now split source and dest by first colon
         local src="${path_part%%:*}"
         local dst="${path_part#*:}"
 
@@ -110,37 +140,34 @@ process_txt_file() {
             continue
         fi
 
-        # Expand tilde (~) in paths
         src="${src/#\~/$HOME}"
         dst="${dst/#\~/$HOME}"
 
-        # Split excludes by comma into array (if any)
         IFS=',' read -r -a excludes <<< "$excludes_part"
-
-        # Trim spaces (optional)
         for i in "${!excludes[@]}"; do
             excludes[$i]=$(echo "${excludes[$i]}" | xargs)
         done
 
-        # Call sync or diff depending on global mode
+        local all_excludes=("${global_excludes[@]}" "${excludes[@]}")
+
         if [[ "$MODE" == "diff" ]]; then
-            diff_config "$src" "$dst" "${excludes[@]}"
+            diff_config "$src" "$dst" "${all_excludes[@]}"
         else
-            sync_config "$src" "$dst" "${excludes[@]}"
+            sync_config "$src" "$dst" "${all_excludes[@]}"
         fi
     done
 }
 
 main() {
-    if [[ $# -eq 1 && "$1" == "diff" ]]; then
+    if [[ "$1" == "diff" ]]; then
+        shift
         MODE="diff"
-        # Assume input file is files.txt by default
         if [[ ! -f files.txt ]]; then
             echo "❌ files.txt not found"
             exit 1
         fi
         process_txt_file files.txt
-    elif [[ $# -eq 1 && "$1" == *.txt ]]; then
+    elif [[ "$1" == *.txt ]]; then
         MODE="sync"
         process_txt_file "$1"
     elif [[ $# -eq 2 ]]; then
@@ -150,9 +177,9 @@ main() {
         sync_config "$src" "$dst"
     else
         echo "❌ Usage:"
-        echo "  $0 source_path destination_path"
-        echo "  $0 links.txt   # with src:dst,exclude1,exclude2 ..."
-        echo "  $0 diff        # run diff on files.txt"
+        echo "  $0 [--no-backup] source_path destination_path"
+        echo "  $0 [--no-backup] links.txt   # with src:dst,exclude1,exclude2 ..."
+        echo "  $0 [--no-backup] diff        # run diff on files.txt"
         exit 1
     fi
 }

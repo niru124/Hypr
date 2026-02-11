@@ -3,7 +3,7 @@
 DB_FILE="$HOME/.local/share/bin/take/net_usage.db"
 LOG_FILE="$HOME/.local/share/bin/take/net_usage.log"
 # Auto-detect the active network interface
-IFACE=$(ip route | grep default | awk '{print $5}')
+IFACE=$(ip route | grep default | awk '{print $5}' | head -1)
 STATE_FILE="$HOME/.local/share/bin/take/net_usage_state"
 
 # Exit if no active interface found

@@ -15,7 +15,7 @@ return {
       -- transparency
       init = {
         Comment = {
-          fg = "#a6d189",
+          fg = "#9ca0b0",
           bg = "NONE",
           italic = true,
         },
@@ -35,7 +35,7 @@ return {
         -- LineNr = { bg = "NONE" },
         LineNr = { fg = "#949cbb", bg = "NONE" }, -- Muted foreground for non-current lines
         CursorLineNr = {
-          fg = "#a6d189",
+          fg = "#7287fd",
           bg = "NONE",
           bold = true,
         },
