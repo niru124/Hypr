@@ -8,7 +8,7 @@ DB_FILE="$HOME/.local/share/bin/take/net_usage.db"
 # 3. Calculates the total for the month.
 # 4. At the end, it prints the formatted, JSON-escaped tooltip on the first line,
 #    and the total usage in MB on the second line.
-output=$(sqlite3 -separator ' ' "$DB_FILE" "SELECT date, rx_bytes, tx_bytes FROM net_usage WHERE date LIKE '$(date +%Y-%m)%';" | awk -v current_month="$(date +%Y-%m)" \
+output=$(sqlite3 "$DB_FILE" "SELECT date, rx_bytes, tx_bytes FROM net_usage WHERE date LIKE '$(date +%Y-%m)%';" | awk -F'|' -v current_month="$(date +%Y-%m)" \
      -v current_date="$(date +%Y-%m-%d)" \
 '\
       BEGIN {

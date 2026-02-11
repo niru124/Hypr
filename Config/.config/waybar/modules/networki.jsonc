@@ -1,7 +1,9 @@
 "custom/networki": {
-    "format": "", // Just show the Wi-Fi icon
+    "interval": 5,
+    "exec": "~/.config/waybar/scripts/wifi-signal.sh",
+    "return-type": "json",
+    "format": "{}",
     "tooltip": true,
     "tooltip-format": "Click to manage Wi-Fi",
-    "on-click": "~/.local/share/bin/rofi-wifi-menu.sh",
-    "interval": 10
+    "on-click": "python3 ~/Downloads/nm-applet/wifi-gtk/wifi-manager.py",
 },
