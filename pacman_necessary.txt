@@ -34,3 +34,5 @@ hyprlock
 libnotify
 zoxide
 hyprshot
+blueman
+brightnessctl

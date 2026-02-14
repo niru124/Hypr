@@ -372,7 +372,7 @@
       local      clean='%76F'   # green foreground
       local   modified='%178F'  # yellow foreground
       local  untracked='%39F'   # blue foreground
-      local conflicted='%196F'  # red foreground
+      local conflicted='#ed8796'  # red foreground
     else
       local       meta='%244F'  # grey foreground
       local      clean='%244F'  # grey foreground

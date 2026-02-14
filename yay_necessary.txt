@@ -8,3 +8,4 @@ grimblast
 nwg-look
 trashy
 oh-my-zsh-git
+nwg-displays

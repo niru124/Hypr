@@ -18,12 +18,12 @@
   <property name="mainWndHeight" value="600"/>
   <property name="maximized" value="true"/>
   <property name="showToolbar" value="true"/>
-  <property name="showSidebar" value="true"/>
-  <property name="sidebarWidth" value="159"/>
+  <property name="showSidebar" value="false"/>
+  <property name="sidebarWidth" value="195"/>
   <property name="sidebarNumberingStyle" value="1"/>
   <property name="sidebarOnRight" value="false"/>
   <property name="scrollbarOnLeft" value="false"/>
-  <property name="menubarVisible" value="true"/>
+  <property name="menubarVisible" value="false"/>
   <property name="filepathShownInTitlebar" value="true"/>
   <property name="pageNumberShownInTitlebar" value="false"/>
   <property name="numColumns" value="1"/>
@@ -38,7 +38,7 @@
   <property name="emptyLastPageAppend" value="disabled"/>
   <property name="presentationMode" value="true"/>
   <!--Which GUI elements are shown in default view mode, separated by a colon (,)-->
-  <property name="defaultViewModeAttributes" value="showMenubar,showToolbar,showSidebar"/>
+  <property name="defaultViewModeAttributes" value="showMenubar,showToolbar"/>
   <!--Which GUI elements are shown in fullscreen view mode, separated by a colon (,)-->
   <property name="fullscreenViewModeAttributes" value="goFullscren,showToolbar,showSidebar"/>
   <!--Which GUI elements are shown in presentation view mode, separated by a colon (,)-->

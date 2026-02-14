@@ -1,14 +1,14 @@
 
 {
     "label" : "lock",
-    "action" : "systemctl suspend && hyprlock",
+    "action" : "systemctl suspend && swaylock",
     "text" : "suspend",
     "keybind" : "l"
 }
 
 {
     "label" : "logout",
-    "action" : "hyprctl dispatch exit && hyprlock",
+    "action" : "hyprctl dispatch exit && swaylock",
     "text" : "Logout",
     "keybind" : "e"
 }

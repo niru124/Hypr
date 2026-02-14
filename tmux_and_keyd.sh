@@ -19,6 +19,14 @@ else
     echo ".tmux.conf not found at $tmux_source"
 fi
 
+# Install TPM (tmux plugin manager) if not already installed
+if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
+    git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+    echo "Installed TPM"
+else
+    echo "TPM already installed"
+fi
+
 # Copy the keyd config to /etc/keyd (requires sudo)
 if [ -f "$keyd_source" ]; then
     # Check if keyd is installed
