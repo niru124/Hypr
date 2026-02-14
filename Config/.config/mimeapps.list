@@ -31,7 +31,7 @@ audio/x-wav=mpv.desktop
 audio/flac=mpv.desktop
 
 [Added Associations]
-application/pdf=scrivano.desktop;org.pwmt.zathura-pdf-poppler.desktop;org.gnome.Evince.desktop;sioyek.desktop;
+application/pdf=org.pwmt.zathura-pdf-poppler.desktop;scrivano.desktop;org.gnome.Evince.desktop;sioyek.desktop;
 image/jpeg=feh.desktop;org.gnome.Loupe.desktop;nsxiv.desktop;
 image/png=org.gnome.Loupe.desktop;nsxiv.desktop;feh.desktop;
 x-scheme-handler/sms=org.gnome.Shell.Extensions.GSConnect.desktop;

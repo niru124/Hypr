@@ -25,4 +25,4 @@ thunar
 nsxiv
 ranger
 python-pillow
-pdftoppm
+python-pdf2image

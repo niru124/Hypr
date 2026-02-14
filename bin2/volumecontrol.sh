@@ -1,16 +1,12 @@
 #!/usr/bin/env sh
 
-# Source global control script
 scrDir=$(dirname "$(realpath "$0")")
 source "$scrDir/globalcontrol.sh"
 
-# Check if SwayOSD is installed
 use_swayosd=false
 if command -v swayosd-client >/dev/null 2>&1 && pgrep -x swayosd-server >/dev/null; then
     use_swayosd=true
 fi
-
-# Define functions
 
 print_usage() {
     cat <<EOF
@@ -41,11 +37,36 @@ EOF
     exit 1
 }
 
-notify_vol() {
-    vol=$(pamixer $srce --get-volume)
-    angle=$(( (($vol + 2) / 5) * 5 ))
+get_default_sink_id() {
+    wpctl status | sed 's/├/ /g; s/─/ /g; s/└/ /g; s/│/ /g' | grep -E "^\s+\*\s+[0-9]+\." | grep -v "Camera" | head -1 | awk '{print $2}' | tr -d '.'
+}
 
-    # Cap angle at 100 for available icons
+get_default_source_id() {
+    wpctl status | sed 's/├/ /g; s/─/ /g; s/└/ /g; s/│/ /g' | grep -E "^\s+\*\s+[0-9]+\." | grep -v "Camera" | tail -1 | awk '{print $2}' | tr -d '.'
+}
+
+get_sink_name() {
+    local id=$1
+    wpctl inspect "$id" 2>/dev/null | grep "node.description" | head -1 | cut -d'"' -f2
+}
+
+get_source_name() {
+    local id=$1
+    wpctl inspect "$id" 2>/dev/null | grep "node.description" | head -1 | cut -d'"' -f2
+}
+
+list_sinks() {
+    wpctl status | sed 's/├/ /g; s/─/ /g; s/└/ /g; s/│/ /g' | grep -E "^\s+[0-9]+\.\s+" | grep -v "Camera" | awk '{$1=""; print $0}' | sed 's/^\s*//' | cut -d'[' -f1 | sed 's/\s*$//'
+}
+
+get_sink_id_by_name() {
+    local name="$1"
+    wpctl status | sed 's/├/ /g; s/─/ /g; s/└/ /g; s/│/ /g' | grep -E "\s+[0-9]+\.\s+.*$name" | head -1 | awk '{print $2}' | tr -d '.'
+}
+
+notify_vol() {
+    vol=$(wpctl get-volume "$target_id" | awk '{print int($2 * 100)}')
+    angle=$(( (($vol + 2) / 5) * 5 ))
     [ $angle -gt 100 ] && angle=100
 
     ico="${icodir}/vol-${angle}.svg"
@@ -54,9 +75,9 @@ notify_vol() {
 }
 
 notify_mute() {
-    mute=$(pamixer "${srce}" --get-mute | cat)
-    [ "${srce}" == "--default-source" ] && dvce="mic" || dvce="speaker"
-    if [ "${mute}" == "true" ]; then
+    [ "${target_type}" = "source" ] && dvce="mic" || dvce="speaker"
+    muted=$(wpctl get-volume "$target_id" 2>&1 | grep -i "muted")
+    if [ -n "$muted" ]; then
         notify-send -a "t2" -r 91190 -t 800 -i "${icodir}/muted-${dvce}.svg" "muted" "${nsink}"
     else
         notify-send -a "t2" -r 91190 -t 800 -i "${icodir}/unmuted-${dvce}.svg" "unmuted" "${nsink}"
@@ -67,20 +88,18 @@ change_volume() {
     local action=$1
     local step=$2
     local device=$3
-    local delta="-"
-    local mode="--output-volume"
+    local suffix=""
 
-    [ "${action}" = "i" ] && delta="+"
-    [ "${srce}" = "--default-source" ] && mode="--input-volume"
+    [ "${action}" = "i" ] && suffix="+"
+    [ "${action}" = "d" ] && suffix="-"
+
     case $device in
-        "pamixer")            
-            $use_swayosd && swayosd-client ${mode} "${delta}${step}"  && exit 0
-            pamixer $srce -"$action" "$step" --allow-boost
-            vol=$(pamixer $srce --get-volume)
+        "wpctl")            
+            $use_swayosd && wpctl set-volume "$target_id" "${step}%${suffix}" 2>/dev/null && exit 0
+            wpctl set-volume "$target_id" "${step}%${suffix}"
             ;;
         "playerctl")
             playerctl --player="$srce" volume "$(awk -v step="$step" 'BEGIN {print step/200}')${delta}"
-            vol=$(playerctl --player="$srce" volume | awk '{ printf "%.0f\n", $0 * 200}')
             ;;
     esac
     
@@ -89,12 +108,10 @@ change_volume() {
 
 toggle_mute() {
     local device=$1
-    local mode="--output-volume"
-    [ "${srce}" = "--default-source" ] && mode="--input-volume"
     case $device in
-        "pamixer") 
-            $use_swayosd && swayosd-client "${mode}" mute-toggle && exit 0
-            pamixer $srce -t
+        "wpctl") 
+            $use_swayosd && wpctl set-mute "$target_id" toggle 2>/dev/null && exit 0
+            wpctl set-mute "$target_id" toggle
             notify_mute
             ;;
         "playerctl")
@@ -107,7 +124,7 @@ toggle_mute() {
                     last_volume=$(cat "$volume_file")
                     playerctl --player="$srce" volume "$last_volume"
                 else
-                    playerctl --player="$srce" volume 0.5  # Default to 50% if no saved volume
+                    playerctl --player="$srce" volume 0.5
                 fi
             fi
             notify_mute
@@ -118,19 +135,19 @@ toggle_mute() {
 select_output() {
     local selection=$1
     if [ -n "$selection" ]; then
-        device=$(pactl list sinks | grep -C2 -F "Description: $selection" | grep Name | cut -d: -f2 | xargs)
-        if pactl set-default-sink "$device"; then
+        sink_id=$(get_sink_id_by_name "$selection")
+        if wpctl set-default "$sink_id" 2>/dev/null; then
             notify-send -t 2000 -r 2 -u low "Activated: $selection"
         else
             notify-send -t 2000 -r 2 -u critical "Error activating $selection"
         fi
     else
-        pactl list sinks | grep -ie "Description:" | awk -F ': ' '{print $2}' | sort
+        list_sinks
     fi
 }
 
 toggle_output() {
-    local default_sink=$(pamixer --get-default-sink | awk -F '"' 'END{print $(NF - 1)}')
+    local default_sink=$(get_sink_name "$(get_default_sink_id)")
     mapfile -t sink_array < <(select_output)
     local current_index=$(printf '%s\n' "${sink_array[@]}" | grep -n "$default_sink" | cut -d: -f1)
     local next_index=$(( (current_index % ${#sink_array[@]}) + 1 ))
@@ -138,16 +155,13 @@ toggle_output() {
     select_output "$next_sink"
 }
 
-# Main script logic
-
-# Set default variables
 icodir="${confDir}/dunst/icons/vol"
 step=5
-# Parse options
+
 while getopts "iop:st" opt; do
     case $opt in
-        i) device="pamixer"; srce="--default-source"; nsink=$(pamixer --list-sources | awk -F '"' 'END {print $(NF - 1)}') ;;
-        o) device="pamixer"; srce=""; nsink=$(pamixer --get-default-sink | awk -F '"' 'END{print $(NF - 1)}') ;;
+        i) device="wpctl"; target_type="source"; target_id=$(get_default_source_id); nsink=$(get_source_name "$target_id") ;;
+        o) device="wpctl"; target_type="sink"; target_id=$(get_default_sink_id); nsink=$(get_sink_name "$target_id") ;;
         p) device="playerctl"; srce="${OPTARG}"; nsink=$(playerctl --list-all | grep -w "$srce") ;;
         s) select_output "$(select_output | rofi -dmenu -config "${confDir}/rofi/notification.rasi")"; exit ;;
         t) toggle_output; exit ;;
@@ -157,10 +171,8 @@ done
 
 shift $((OPTIND-1))
 
-# Check if device is set
 [ -z "$device" ] && print_usage
 
-# Execute action
 case $1 in
     i|d) change_volume "$1" "${2:-$step}" "$device" ;;
     m) toggle_mute "$device" ;;

@@ -21,7 +21,7 @@
 ~/.zshrc:~/Downloads/mar/HyDE/.zshrc
 ~/.local/share/bin/:~/Downloads/mar/HyDE/bin2,take/net_usage.db,take/net_usage_state,take/net_usage.log.error
 ~/.config/input-remapper-2/:~/Downloads/mar/HyDE/Config/.config/input-remapper-2
-~/.config/hyprdynamicmonitors/:~/Downloads/mar/HyDE/Config/.config/hyprdynamicmonitors
+~/.config/hyprdynamicmonitorsi/:~/Downloads/mar/HyDE/Config/.config/hyprdynamicmonitors
 ~/.config/mimeapps.list:~/Downloads/mar/HyDE/Config/.config/mimeapps.list
 ~/.p10k.zsh:~/Downloads/mar/HyDE/
 ~/.config/xournalpp/:~/Downloads/mar/HyDE/Config/.config/xournalpp/
