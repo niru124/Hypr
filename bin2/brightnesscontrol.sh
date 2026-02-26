@@ -82,15 +82,24 @@ monitor_selection() {
         return ""
     fi
 
-    monitor_count=$(hyprctl monitors | grep -c "Monitor")
+    monitors=$(hyprctl monitors | grep "Monitor" | awk '{print $2}')
+    monitor_count=$(echo "$monitors" | wc -l)
 
-    if [ "$monitor_count" -le 1 ]; then
+    has_hdmi=false
+    for monitor in $monitors; do
+        case "$monitor" in
+            HD*)
+                has_hdmi=true
+                break
+                ;;
+        esac
+    done
+
+    if [ "$monitor_count" -le 1 ] && [ "$has_hdmi" = false ]; then
         return ""
     fi
 
-    monitors=$(hyprctl monitors | grep "Monitor" | awk '{print $2}')
-
-    selected_monitor=$(echo "$monitors" | rofi -dmenu -p "Select monitor to adjust brightness" --theme "$(~/.config/rofi/wifi-theme.rasi)"2>/dev/null)
+    selected_monitor=$(echo "$monitors" | rofi -dmenu -p "Select monitor to adjust brightness" --theme "$HOME/.config/rofi/timer.rasi" 2>/dev/null)
 
     if [ -z "$selected_monitor" ]; then
         echo "No monitor selected..."
@@ -103,7 +112,7 @@ monitor_selection() {
 is_external_monitor() {
     local monitor_name="$1"
     case "$monitor_name" in
-        HDMI-*|DP-*|DVI-*|*HDMI*|*DP*|*DVI*)
+        HD*|HDMI-*|DP-*|DVI-*|*HDMI*|*DP*|*DVI*)
             return 0
             ;;
         *)
@@ -144,9 +153,21 @@ else
 
     if [ -z "$selected_monitor" ]; then
         if command -v hyprctl >/dev/null 2>&1; then
-            monitor_count=$(hyprctl monitors | grep -c "Monitor")
-            if [ "$monitor_count" -eq 1 ]; then
-                selected_monitor=$(hyprctl monitors | grep "Monitor" | awk '{print $2}')
+            monitors=$(hyprctl monitors | grep "Monitor" | awk '{print $2}')
+            monitor_count=$(echo "$monitors" | wc -l)
+            
+            has_hdmi=false
+            for monitor in $monitors; do
+                case "$monitor" in
+                    HD*)
+                        has_hdmi=true
+                        break
+                        ;;
+                esac
+            done
+            
+            if [ "$monitor_count" -eq 1 ] && [ "$has_hdmi" = false ]; then
+                selected_monitor=$(echo "$monitors" | awk '{print $1}')
                 echo "$selected_monitor" > "$selected_monitor_file" 2>/dev/null
             else
                 selected_monitor=$(monitor_selection)

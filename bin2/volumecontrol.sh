@@ -37,35 +37,42 @@ EOF
     exit 1
 }
 
-get_default_sink_id() {
-    wpctl status | sed 's/├/ /g; s/─/ /g; s/└/ /g; s/│/ /g' | grep -E "^\s+\*\s+[0-9]+\." | grep -v "Camera" | head -1 | awk '{print $2}' | tr -d '.'
+get_default_sink() {
+    pactl get-default-sink
 }
 
-get_default_source_id() {
-    wpctl status | sed 's/├/ /g; s/─/ /g; s/└/ /g; s/│/ /g' | grep -E "^\s+\*\s+[0-9]+\." | grep -v "Camera" | tail -1 | awk '{print $2}' | tr -d '.'
+get_default_source() {
+    pactl get-default-source
 }
 
 get_sink_name() {
-    local id=$1
-    wpctl inspect "$id" 2>/dev/null | grep "node.description" | head -1 | cut -d'"' -f2
+    local sink=$1
+    pactl list sinks | grep -A10 "^Sink #${sink}" | grep "Description:" | sed 's/.*Description: //'
 }
 
 get_source_name() {
-    local id=$1
-    wpctl inspect "$id" 2>/dev/null | grep "node.description" | head -1 | cut -d'"' -f2
+    local source=$1
+    pactl list sources | grep -A10 "^Source #${source}" | grep "Description:" | sed 's/.*Description: //'
 }
 
 list_sinks() {
-    wpctl status | sed 's/├/ /g; s/─/ /g; s/└/ /g; s/│/ /g' | grep -E "^\s+[0-9]+\.\s+" | grep -v "Camera" | awk '{$1=""; print $0}' | sed 's/^\s*//' | cut -d'[' -f1 | sed 's/\s*$//'
+    pactl list sinks short | awk '{print $2}' | while read -r sink; do
+        echo "$sink" | sed 's/.*://' | sed 's/_/ /g'
+    done
 }
 
 get_sink_id_by_name() {
     local name="$1"
-    wpctl status | sed 's/├/ /g; s/─/ /g; s/└/ /g; s/│/ /g' | grep -E "\s+[0-9]+\.\s+.*$name" | head -1 | awk '{print $2}' | tr -d '.'
+    pactl list sinks short | grep -i "$name" | awk '{print $1}'
+}
+
+get_source_id_by_name() {
+    local name="$1"
+    pactl list sources short | grep -i "$name" | awk '{print $1}'
 }
 
 notify_vol() {
-    vol=$(wpctl get-volume "$target_id" | awk '{print int($2 * 100)}')
+    vol=$(pactl get-${target_type}-volume "$target" | head -1 | awk -F'/' '{print $2}' | tr -d ' %')
     angle=$(( (($vol + 2) / 5) * 5 ))
     [ $angle -gt 100 ] && angle=100
 
@@ -76,8 +83,8 @@ notify_vol() {
 
 notify_mute() {
     [ "${target_type}" = "source" ] && dvce="mic" || dvce="speaker"
-    muted=$(wpctl get-volume "$target_id" 2>&1 | grep -i "muted")
-    if [ -n "$muted" ]; then
+    muted=$(pactl get-${target_type}-mute "$target" | awk '{print $2}')
+    if [ "$muted" = "yes" ]; then
         notify-send -a "t2" -r 91190 -t 800 -i "${icodir}/muted-${dvce}.svg" "muted" "${nsink}"
     else
         notify-send -a "t2" -r 91190 -t 800 -i "${icodir}/unmuted-${dvce}.svg" "unmuted" "${nsink}"
@@ -88,15 +95,15 @@ change_volume() {
     local action=$1
     local step=$2
     local device=$3
-    local suffix=""
+    local delta=""
 
-    [ "${action}" = "i" ] && suffix="+"
-    [ "${action}" = "d" ] && suffix="-"
+    [ "${action}" = "i" ] && delta="+"
+    [ "${action}" = "d" ] && delta="-"
 
     case $device in
-        "wpctl")            
-            $use_swayosd && wpctl set-volume "$target_id" "${step}%${suffix}" 2>/dev/null && exit 0
-            wpctl set-volume "$target_id" "${step}%${suffix}"
+        "pactl")            
+            $use_swayosd && swayosd-client --${target_type}-volume "${delta}${step}%" 2>/dev/null && exit 0
+            pactl set-${target_type}-volume "$target" "${delta}${step}%"
             ;;
         "playerctl")
             playerctl --player="$srce" volume "$(awk -v step="$step" 'BEGIN {print step/200}')${delta}"
@@ -109,9 +116,9 @@ change_volume() {
 toggle_mute() {
     local device=$1
     case $device in
-        "wpctl") 
-            $use_swayosd && wpctl set-mute "$target_id" toggle 2>/dev/null && exit 0
-            wpctl set-mute "$target_id" toggle
+        "pactl") 
+            $use_swayosd && swayosd-client --${target_type}-volume mute-toggle 2>/dev/null && exit 0
+            pactl set-${target_type}-mute "$target" toggle
             notify_mute
             ;;
         "playerctl")
@@ -135,19 +142,19 @@ toggle_mute() {
 select_output() {
     local selection=$1
     if [ -n "$selection" ]; then
-        sink_id=$(get_sink_id_by_name "$selection")
-        if wpctl set-default "$sink_id" 2>/dev/null; then
+        sink=$(get_sink_id_by_name "$selection")
+        if pactl set-default-sink "$sink"; then
             notify-send -t 2000 -r 2 -u low "Activated: $selection"
         else
             notify-send -t 2000 -r 2 -u critical "Error activating $selection"
         fi
     else
-        list_sinks
+        pactl list sinks | grep -E "^Sink #|^[[:space:]]*Description:" | paste - - | sed 's/.*Description: //' | cut -d$'\t' -f1
     fi
 }
 
 toggle_output() {
-    local default_sink=$(get_sink_name "$(get_default_sink_id)")
+    local default_sink=$(get_sink_name "$(get_default_sink)")
     mapfile -t sink_array < <(select_output)
     local current_index=$(printf '%s\n' "${sink_array[@]}" | grep -n "$default_sink" | cut -d: -f1)
     local next_index=$(( (current_index % ${#sink_array[@]}) + 1 ))
@@ -160,8 +167,8 @@ step=5
 
 while getopts "iop:st" opt; do
     case $opt in
-        i) device="wpctl"; target_type="source"; target_id=$(get_default_source_id); nsink=$(get_source_name "$target_id") ;;
-        o) device="wpctl"; target_type="sink"; target_id=$(get_default_sink_id); nsink=$(get_sink_name "$target_id") ;;
+        i) device="pactl"; target_type="source"; target=$(get_default_source); nsink=$(get_source_name "$target") ;;
+        o) device="pactl"; target_type="sink"; target=$(get_default_sink); nsink=$(get_sink_name "$target") ;;
         p) device="playerctl"; srce="${OPTARG}"; nsink=$(playerctl --list-all | grep -w "$srce") ;;
         s) select_output "$(select_output | rofi -dmenu -config "${confDir}/rofi/notification.rasi")"; exit ;;
         t) toggle_output; exit ;;

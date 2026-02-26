@@ -18,8 +18,10 @@ return {
     },
     config = {
       clangd = {
-        capabilities = { offsetEncoding = "utf-8" },
-        cmd = { "clangd", "--background-index" },
+        capabilities = {
+          offsetEncoding = "utf-8",
+        },
+        cmd = { "clangd", "--background-index", "--compile-commands-dir=." },
       },
       lua_ls = {
         settings = {
@@ -27,7 +29,10 @@ return {
             runtime = { version = "LuaJIT" },
             diagnostics = { globals = { "vim" } },
             workspace = {
-              library = vim.api.nvim_get_runtime_file("", true),
+              library = vim.api.nvim_get_runtime_file(
+                "",
+                true
+              ),
               checkThirdParty = false,
             },
             telemetry = { enable = false },
@@ -35,7 +40,7 @@ return {
         },
       },
       jedi_language_server = {},
-      sqlls = {},
+      -- sqlls = {},
     },
     mappings = {
       n = {
@@ -45,10 +50,13 @@ return {
           cond = "textDocument/declaration",
         },
         ["<Leader>uY"] = {
-          function() require("astrolsp.toggles").buffer_semantic_tokens() end,
+          function()
+            require("astrolsp.toggles").buffer_semantic_tokens()
+          end,
           desc = "Toggle LSP semantic highlight (buffer)",
           cond = function(client)
-            return client.supports_method "textDocument/semanticTokens/full" and vim.lsp.semantic_tokens ~= nil
+            return client.supports_method "textDocument/semanticTokens/full"
+              and vim.lsp.semantic_tokens ~= nil
           end,
         },
       },

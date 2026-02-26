@@ -2,8 +2,8 @@
 
 LINK=$(iw dev wlan0 link 2>/dev/null)
 
-if [[ "$LINK" == "Not connected" ]]; then
-    echo "{\"text\": \"<span foreground='#6c7086' font_size='120%'>󰤭</span>\", \"class\": \"off\"}"
+if [[ "$LINK" == "Not connected." ]]; then
+    echo "{\"text\": \"<span foreground='#6c7086' font_size='120%'>󰤭 </span>\", \"class\": \"off\"}"
     exit 0
 fi
 

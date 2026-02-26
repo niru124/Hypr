@@ -217,7 +217,7 @@
     max_icon_size = 128
 
     # Paths to default icons (only necessary when not using recursive icon lookup)
-    icon_path = /home/nirantar/.icons/Tela-circle-dracula/16/actions:/home/nirantar/.icons/Tela-circle-dracula/16/apps:/home/nirantar/.icons/Tela-circle-dracula/16/devices:/home/nirantar/.icons/Tela-circle-dracula/16/mimetypes:/home/nirantar/.icons/Tela-circle-dracula/16/panel:/home/nirantar/.icons/Tela-circle-dracula/16/places:/home/nirantar/.icons/Tela-circle-dracula/16/status
+    icon_path = /home/pencil/.icons/Tela-circle-dracula/16/actions:/home/pencil/.icons/Tela-circle-dracula/16/apps:/home/pencil/.icons/Tela-circle-dracula/16/devices:/home/pencil/.icons/Tela-circle-dracula/16/mimetypes:/home/pencil/.icons/Tela-circle-dracula/16/panel:/home/pencil/.icons/Tela-circle-dracula/16/places:/home/pencil/.icons/Tela-circle-dracula/16/status
 
     ### History ###
 
@@ -231,7 +231,7 @@
     ### Misc/Advanced ###
 
     # dmenu path.
-    dmenu = /usr/bin/rofi -config "/home/nirantar/.config/rofi/notification.rasi" -dmenu -p dunst:
+    dmenu = /usr/bin/rofi -config "/home/pencil/.config/rofi/notification.rasi" -dmenu -p dunst:
 
     # Browser for opening urls in context menu.
     browser = /usr/bin/xdg-open
@@ -445,19 +445,19 @@
     background = "#f5e0dc"
     foreground = "#1e1e2e"
     frame_color = "#f38ba8"
-    icon = "/home/nirantar/.config/dunst/icons/critical.svg"
+    icon = "/home/pencil/.config/dunst/icons/critical.svg"
     timeout = 0
 
 [urgency_low]
-    background = "#8A65A380"
-    foreground = "#EACCFFE6"
-    frame_color = "#8A65A303"
-    icon = "/home/nirantar/.config/dunst/icons/hyprdots.svg"
+    background = "#A3856580"
+    foreground = "#FFE6CCE6"
+    frame_color = "#A3856503"
+    icon = "/home/pencil/.config/dunst/icons/hyprdots.svg"
     timeout = 5
 
 [urgency_normal]
-    background = "#493A6B80"
-    foreground = "#DCCCFFE6"
-    frame_color = "#493A6B03"
-    icon = "/home/nirantar/.config/dunst/icons/hyprdots.svg"
+    background = "#603A6B80"
+    foreground = "#F4CCFFE6"
+    frame_color = "#603A6B03"
+    icon = "/home/pencil/.config/dunst/icons/hyprdots.svg"
     timeout = 5

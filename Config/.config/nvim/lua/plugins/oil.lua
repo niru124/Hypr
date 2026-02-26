@@ -10,6 +10,9 @@ local function setup_oil_float()
       max_width = 80,
       max_height = 25,
     },
+    view_options = {
+      show_hidden = true,
+    },
   }
 
   if vim.g.oil_position == "right" then

@@ -4,6 +4,8 @@ configuration {
     show-icons:                  true;
     drun-display-format:         "{name}";
     font:                        "JetBrainsMono Nerd Font 10";
+    case-sensitive:              false;
+    fuzzy:                       true;
 }
 
 @theme "~/.config/rofi/theme.rasi"
@@ -24,9 +26,23 @@ window {
 }
 mainbox {
     enabled:                     true;
+    orientation:                 vertical;
+    children:                    [ "inputbar", "box" ];
+    background-color:            transparent;
+}
+box {
+    enabled:                     true;
     orientation:                 horizontal;
     children:                    [ "dummy", "frame", "dummy" ];
     background-color:            transparent;
+}
+inputbar {
+    enabled:                     true;
+    spacing:                     0em;
+    padding:                     1em;
+    background-color:            @main-bg;
+    text-color:                  @main-fg;
+    children:                    [ "entry" ];
 }
 frame {
     children:                    [ "listview" ];
@@ -82,4 +98,20 @@ element-text {
     cursor:                      inherit;
     background-color:            transparent;
     text-color:                  inherit;
+}
+entry {
+    enabled:                     true;
+    cursor:                      text;
+    background-color:            transparent;
+    text-color:                  @main-fg;
+    expand:                      true;
+    horizontal-align:           0.5;
+}
+entry placeholder {
+    background-color:            transparent;
+    text-color:                  @main-fg;
+}
+entry selected.normal {
+    background-color:            @select-bg;
+    text-color:                  @select-fg;
 }

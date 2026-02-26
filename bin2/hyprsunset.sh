@@ -11,7 +11,7 @@ fi
 icodir="${confDir}/dunst/icons/vol" # Make sure this path is correct
 
 # Define the temperature range for your icons and clamping
-min_kelvin_script=2500
+min_kelvin_script=500
 max_kelvin_script=7500
 
 # Default step for increase/decrease if not specified by user

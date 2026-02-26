@@ -5,5 +5,5 @@
     "format": "{}",
     "tooltip": true,
     "tooltip-format": "Click to manage Wi-Fi",
-    "on-click": "python3 ~/Downloads/nm-applet/wifi-gtk/wifi-manager.py",
+    "on-click": "wifi-manager-gtk",
 },

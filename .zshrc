@@ -9,6 +9,7 @@ export ZSH="$HOME/.oh-my-zsh"
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 ZSH_THEME="powerlevel10k/powerlevel10k"
+# source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -72,17 +73,7 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Add wisely, as too many plugins slow down shell startup.
 # plugins=(git)
 
-# source $ZSH/oh-my-zsh.sh
-
-# Preferred editor for local and remote sessions
-if [[ -n $SSH_CONNECTION ]]; then
-  export EDITOR='vim'
-else
-  export EDITOR='nvim'
-fi
-
-
-# Plugins
+# plugins must be defined before sourcing oh-my-zsh
 plugins=(
   git
   zsh-autosuggestions
@@ -95,6 +86,19 @@ plugins=(
   extract
   zsh-vi-mode
 )
+
+# Initialize completion system BEFORE loading OMZ
+fpath=(~/.zsh/completion $fpath)
+autoload -U compinit && compinit
+
+# Load Oh My Zsh
+source $ZSH/oh-my-zsh.sh
+if [[ -n $SSH_CONNECTION ]]; then
+  export EDITOR='vim'
+else
+  export EDITOR='nvim'
+fi
+
 
 # Load Oh My Zsh
 
@@ -123,17 +127,6 @@ export MANPAGER='nvim +Man!'
 # zstyle ':fzf-tab-complete:z:*' fzf preview 'ls --color $realpath'
 
 # -------------------------
-# Other useful aliases
-# -------------------------
-
-alias ll='ls -lah'
-alias gs='git status'
-alias ga='git add'
-alias gc='git commit'
-alias gp='git push'
-alias gl='git pull'
-
-# -------------------------
 # Environment tweaks
 # -------------------------
 
@@ -160,6 +153,7 @@ FAST_HIGHLIGHT_TIMEOUT=10
 zstyle ':autocomplete:*complete*:*' insert-unambiguous yes
 
 # aliases
+alias rm='trash put'
 alias ball='input-remapper-control --command start --device "HS6209 2.4G Wireless Receiver" --preset "PICO MOUSI"'
 
 alias tt='toru stream'
@@ -175,9 +169,4 @@ export PATH=$HOME/.opencode/bin:$PATH
 autoload -Uz edit-command-line
 zle -N edit-command-line
 bindkey '^x^e' edit-command-line
-fpath=(~/.zsh/completion $fpath)
-autoload -U compinit && compinit
-export PYENV_ROOT="$HOME/.pyenv"
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-[[ -d $PYENV_ROOT/shims ]] && export PATH="$PYENV_ROOT/shims:$PATH"
-eval "$(pyenv init -)"
+eval "$(atuin init zsh)"

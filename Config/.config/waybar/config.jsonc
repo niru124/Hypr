@@ -205,7 +205,7 @@
 
 "custom/powerprofile": {
   "format": "{}",
-  "exec": "sh -c 'case $(powerprofilesctl get) in performance) echo \"\" ;; balanced) echo \"󰠳\" ;; power-saver) echo \"󰻈 \" ;; *) echo \"\" ;; esac'",
+  "exec": "sh -c 'case $(powerprofilesctl get) in performance) echo \" \" ;; balanced) echo \"󰠳 \" ;; power-saver) echo \"󰻈 \" ;; *) echo \"\" ;; esac'",
   "interval": 10,
   "on-click": "sh -c 'case $(powerprofilesctl get) in performance) powerprofilesctl set balanced ;; balanced) powerprofilesctl set power-saver ;; power-saver) powerprofilesctl set performance ;; esac'",
   "size": 30
@@ -258,7 +258,7 @@
     "format": "{}",
     "tooltip": true,
     "tooltip-format": "Click to manage Wi-Fi",
-    "on-click": "python3 ~/Downloads/nm-applet/wifi-gtk/wifi-manager.py",
+    "on-click": "wifi-manager-gtk",
 },
     "battery": {
         "states": {
