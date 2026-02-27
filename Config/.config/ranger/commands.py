@@ -3,6 +3,21 @@ import subprocess
 from ranger.api.commands import Command
 
 
+class trash(Command):
+    def execute(self):
+        selected_files = [f.path for f in self.fm.thistab.get_selection()]
+        if not selected_files:
+            self.fm.notify("No files selected!", bad=True)
+            return
+
+        for f in selected_files:
+            subprocess.run(
+                ["trash", "put", f],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+
+
 class trashy(Command):
     def execute(self):
         selected_files = [f.path for f in self.fm.thistab.get_selection()]

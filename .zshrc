@@ -93,6 +93,9 @@ autoload -U compinit && compinit
 
 # Load Oh My Zsh
 source $ZSH/oh-my-zsh.sh
+
+# Load vcs_info for prompt themes
+autoload -Uz vcs_info
 if [[ -n $SSH_CONNECTION ]]; then
   export EDITOR='vim'
 else
@@ -153,7 +156,6 @@ FAST_HIGHLIGHT_TIMEOUT=10
 zstyle ':autocomplete:*complete*:*' insert-unambiguous yes
 
 # aliases
-alias rm='trash put'
 alias ball='input-remapper-control --command start --device "HS6209 2.4G Wireless Receiver" --preset "PICO MOUSI"'
 
 alias tt='toru stream'
@@ -169,4 +171,7 @@ export PATH=$HOME/.opencode/bin:$PATH
 autoload -Uz edit-command-line
 zle -N edit-command-line
 bindkey '^x^e' edit-command-line
+
+. "$HOME/.atuin/bin/env"
+
 eval "$(atuin init zsh)"
