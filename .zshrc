@@ -1,3 +1,10 @@
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
 
@@ -9,7 +16,6 @@ export ZSH="$HOME/.oh-my-zsh"
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 ZSH_THEME="powerlevel10k/powerlevel10k"
-# source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -71,9 +77,19 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-# plugins=(git)
+plugins=(git)
 
-# plugins must be defined before sourcing oh-my-zsh
+source $ZSH/oh-my-zsh.sh
+
+# Preferred editor for local and remote sessions
+if [[ -n $SSH_CONNECTION ]]; then
+  export EDITOR='vim'
+else
+  export EDITOR='nvim'
+fi
+
+
+# Plugins
 plugins=(
   git
   zsh-autosuggestions
@@ -86,22 +102,6 @@ plugins=(
   extract
   zsh-vi-mode
 )
-
-# Initialize completion system BEFORE loading OMZ
-fpath=(~/.zsh/completion $fpath)
-autoload -U compinit && compinit
-
-# Load Oh My Zsh
-source $ZSH/oh-my-zsh.sh
-
-# Load vcs_info for prompt themes
-autoload -Uz vcs_info
-if [[ -n $SSH_CONNECTION ]]; then
-  export EDITOR='vim'
-else
-  export EDITOR='nvim'
-fi
-
 
 # Load Oh My Zsh
 
@@ -130,6 +130,17 @@ export MANPAGER='nvim +Man!'
 # zstyle ':fzf-tab-complete:z:*' fzf preview 'ls --color $realpath'
 
 # -------------------------
+# Other useful aliases
+# -------------------------
+
+alias ll='ls -lah'
+alias gs='git status'
+alias ga='git add'
+alias gc='git commit'
+alias gp='git push'
+alias gl='git pull'
+
+# -------------------------
 # Environment tweaks
 # -------------------------
 
@@ -148,10 +159,10 @@ setopt extended_glob
 
 FAST_HIGHLIGHT_TIMEOUT=10
 
-# source <(carapace completion zsh)
+source <(carapace completion zsh)
 
 # ZSH_AUTOCOMPLETE_STRATEGY=('match_order' 'prefix' 'approximate')
-# source $ZSH/oh-my-zsh.sh
+source $ZSH/oh-my-zsh.sh
 # all Tab widgets
 zstyle ':autocomplete:*complete*:*' insert-unambiguous yes
 
@@ -161,17 +172,17 @@ alias ball='input-remapper-control --command start --device "HS6209 2.4G Wireles
 alias tt='toru stream'
 
 export PATH="$HOME/.local/bin:$PATH"
-export LC_ALL=en_US.UTF-8
-export LANG=en_US.UTF-8
 
 # opencode
-export PATH=$HOME/.opencode/bin:$PATH
+export PATH=/home/nirantar/.opencode/bin:$PATH
 
 # Open buffer line in editor
 autoload -Uz edit-command-line
 zle -N edit-command-line
 bindkey '^x^e' edit-command-line
-
-. "$HOME/.atuin/bin/env"
-
-eval "$(atuin init zsh)"
+fpath=(~/.zsh/completion $fpath)
+autoload -U compinit && compinit
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+[[ -d $PYENV_ROOT/shims ]] && export PATH="$PYENV_ROOT/shims:$PATH"
+eval "$(pyenv init -)"

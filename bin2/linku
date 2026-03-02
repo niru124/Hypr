@@ -1,376 +1,57 @@
 #!/usr/bin/env bash
 
-# Colors
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
-YELLOW='\033[1;33m'
-RED='\033[0;31m'
-CYAN='\033[0;36m'
-NC='\033[0m'
-
-# --- Configuration Setup ---
-CONFIG_DIR="$HOME/.config/linku"
-CONFIG_FILE="$CONFIG_DIR/config"
-
-# 1. Set Defaults
-use_backup=true
-explicit_dry_run=false
-skip_confirm=false
-MAX_COMMITS=50
-BACKUP_ROOT="$HOME/backup"
-
-# 2. Load Config File
-if [[ -f "$CONFIG_FILE" ]]; then
-    source "$CONFIG_FILE"
-fi
-
-# 3. Expand Tilde (~) in BACKUP_ROOT
-BACKUP_ROOT="${BACKUP_ROOT/#\~/$HOME}"
-
-# Paths
-backup_repo_path=""
-dest_base_prefix=""     # Stores the path from lines starting with @
-txt_file=""
-target_src=""
-target_dst=""
-
-# --- Help ---
-show_help() {
-    echo -e "${CYAN}Linku - Structured Dotfile Sync & Backup${NC}"
-    echo "Usage: linku [options] <source> [destination]"
-    echo ""
-    echo "Options:"
-    echo "  -y, --no-dry    Skip preview (Immediate Sync)"
-    echo "  -n, --dry-run   Preview ONLY"
-    echo "  --no-backup     Disable backup"
-    echo ""
-    echo "Structure Definition (in .txt file):"
-    echo "  @/path/to/base/      <- Defines the base of the destination drive"
-    echo "  src:dst              <- Sync pair"
-    echo ""
-    echo "  The backup folder will mirror the folder structure of 'dst'"
-    echo "  relative to the '@' base path."
-}
-
-# --- Args ---
-while [[ $# -gt 0 ]]; do
-    case "$1" in
-        --no-backup) use_backup=false; shift ;;
-        --no-dry|-y) skip_confirm=true; shift ;;
-        --dry-run|-n) explicit_dry_run=true; shift ;;
-        --help|-h) show_help; exit 0 ;;
-        *.txt) txt_file="$1"; shift ;;
-        *)
-            if [[ -z "$target_src" ]]; then target_src="$1"
-            elif [[ -z "$target_dst" ]]; then target_dst="$1"; fi
-            shift ;;
-    esac
-done
-
-# --- Determine Backup Repo Path ---
-if [[ -n "$txt_file" ]]; then
-    base=$(basename "$txt_file")
-    backup_repo_path="$BACKUP_ROOT/${base%.*}"
-else
-    backup_repo_path="$BACKUP_ROOT/manual"
-fi
-
-global_excludes=()
-
-# --- Pretty Print ---
-prettify_rsync() {
-    local output="$1"
-    if [[ -z "$output" ]]; then return; fi
-    echo "$output" | while IFS= read -r line; do
-        local code="${line%% *}"
-        local file="${line#* }"
-        if [[ "$line" == *deleting* ]]; then echo -e "  ${RED}[-]${NC} $file (del)"
-        elif [[ "$code" == ">f+++++++" ]]; then echo -e "  ${GREEN}[+]${NC} $file (new)"
-        elif [[ "$code" == *d* && "$code" != "."* ]]; then echo -e "  ${BLUE}[d]${NC} $file (dir)"
-        elif [[ "$code" == ">f"* ]]; then echo -e "  ${YELLOW}[~]${NC} $file (mod)"
-        fi
-    done
-}
-
-# --- Git History Management ---
-manage_git_history() {
-    local repo="$1"
-    if [[ ! -d "$repo/.git" || "$MAX_COMMITS" -le 0 ]]; then return; fi
-
-    local count
-    count=$(git -C "$repo" rev-list --count HEAD 2>/dev/null)
-
-    if [[ "$count" -gt "$MAX_COMMITS" ]]; then
-        echo -e "🧹 ${YELLOW}History limit ($count/$MAX_COMMITS). Pruning old backups...${NC}"
-        
-        git -C "$repo" checkout --orphan temp_history_limit >/dev/null 2>&1
-        git -C "$repo" add -A >/dev/null 2>&1
-        git -C "$repo" commit -m "History Reset: Limit reached ($(date '+%Y-%m-%d'))" >/dev/null 2>&1
-        git -C "$repo" branch -D master >/dev/null 2>&1
-        git -C "$repo" branch -m master >/dev/null 2>&1
-        git -C "$repo" gc --prune=now --aggressive >/dev/null 2>&1
-        
-        echo -e "✨ ${GREEN}History flattened to save space.${NC}"
-    fi
-}
-
-# --- 1. Prepare Backup Repo ---
-init_backup_repo() {
-    if [[ "$use_backup" != true ]]; then return; fi
-    mkdir -p "$backup_repo_path"
-    if [[ ! -d "$backup_repo_path/.git" ]]; then
-        git -C "$backup_repo_path" init -q
-        git -C "$backup_repo_path" config user.email "backup@linku"
-        git -C "$backup_repo_path" config user.name "Linku Backup"
-    fi
-}
-
-# --- 2. Update Mirror (Strict Structure Logic) ---
-update_backup_mirror() {
+# 🔁 Sync function using rsync
+sync_config() {
     local src="$1"
     local dst="$2"
-    shift 2
-    local excludes=("$@")
-    
-    if [[ "$use_backup" != true ]]; then return; fi
-    if [[ ! -e "$src" ]]; then return; fi
 
-    local rsync_opts=(-a --delete --delete-excluded)
-    for ex in "${excludes[@]}"; do rsync_opts+=(--exclude="$ex"); done
+    # Expand ~
+    src="${src/#\~/$HOME}"
+    dst="${dst/#\~/$HOME}"
 
-    local target_backup_path=""
+    # Ensure destination directory exists
+    mkdir -p "$dst"
 
-    # --- Structured Backup Calculation ---
-    # Check if we have a base prefix and if destination matches it
-    if [[ -n "$dest_base_prefix" && "$dst" == "$dest_base_prefix"* ]]; then
-        
-        # 1. Remove the prefix from the destination
-        # e.g. /run/.../pencil/Downloads/Suar -> pencil/Downloads/Suar
-        local relative_path="${dst#$dest_base_prefix}"
-        
-        # 2. Clean leading slash if prefix didn't include it
-        relative_path="${relative_path#/}"
-        
-        # 3. Build full backup path
-        target_backup_path="$backup_repo_path/$relative_path"
-    else
-        # Fallback: Flat structure if no match
-        target_backup_path="$backup_repo_path/$(basename "$src")"
-    fi
-
-    # --- Execution ---
-    if [[ -d "$src" ]]; then
-        # If it's a directory, we create the folder in backup
-        # and sync the CONTENTS of src into it.
-        mkdir -p "$target_backup_path"
-        rsync "${rsync_opts[@]}" "$src/" "$target_backup_path/" >/dev/null 2>&1
-    elif [[ -f "$src" ]]; then
-        # If it's a file, we create the parent folder in backup
-        # and sync the file to the specific path
-        mkdir -p "$(dirname "$target_backup_path")"
-        rsync "${rsync_opts[@]}" "$src" "$target_backup_path" >/dev/null 2>&1
-    fi
+    # Sync with rsync
+    echo "🔄 Syncing: $src → $dst"
+    rsync -avh --delete "$src"/ "$dst"/
 }
 
-# --- 3. Sync Node ---
-sync_node() {
-    local src="$1"
-    local dst="$2"
-    local is_dry="$3"
-    shift 3
-    local excludes=("$@")
-
-    local rsync_opts=(-ai --delete --delete-excluded)
-    for ex in "${excludes[@]}"; do rsync_opts+=(--exclude="$ex"); done
-
-    # DRY RUN
-    if [[ "$is_dry" == true ]]; then
-        rsync_opts+=(--dry-run)
-        local output=""
-        local header=""
-        
-        if [[ ! -e "$src" ]]; then echo -e "${RED}⚠️  Missing: $src${NC}"; return; fi
-
-        if [[ -d "$src" ]]; then
-            header="${BLUE}📁 Dir:${NC} $src → $dst"
-            output=$(rsync "${rsync_opts[@]}" "$src"/ "$dst"/ 2>/dev/null)
-        else
-            header="${BLUE}📄 File:${NC} $src → $dst"
-            if [[ -d "$dst" ]]; then output=$(rsync "${rsync_opts[@]}" "$src" "$dst"/ 2>/dev/null)
-            else output=$(rsync "${rsync_opts[@]}" "$src" "$dst" 2>/dev/null)
-            fi
-        fi
-
-        if [[ -n "$output" ]]; then
-            echo -e "$header"
-            prettify_rsync "$output"
-        fi
-        return
-    fi
-
-    # REAL RUN
-    # 1. Mirror Source to Backup (Using Dst to calculate structure)
-    update_backup_mirror "$src" "$dst" "${excludes[@]}"
-
-    # 2. Sync Source to Destination
-    rsync_opts=(-a --delete --delete-excluded)
-    for ex in "${excludes[@]}"; do rsync_opts+=(--exclude="$ex"); done
-
-    if [[ -d "$src" ]]; then
-        mkdir -p "$dst"
-        rsync "${rsync_opts[@]}" "$src"/ "$dst"/ >/dev/null
-    elif [[ -f "$src" ]]; then
-        if [[ -d "$dst" ]]; then
-            mkdir -p "$dst"
-            rsync "${rsync_opts[@]}" "$src" "$dst"/ >/dev/null
-        else
-            mkdir -p "$(dirname "$dst")"
-            rsync "${rsync_opts[@]}" "$src" "$dst" >/dev/null
-        fi
-    fi
-}
-
-# --- Git Commit Logic ---
-commit_backups() {
-    if [[ "$use_backup" != true || ! -d "$backup_repo_path" ]]; then return; fi
-
-    git -C "$backup_repo_path" add -A
-
-    local has_changes
-    has_changes=$(git -C "$backup_repo_path" status --porcelain)
-    
-    local commit_count
-    commit_count=$(git -C "$backup_repo_path" rev-list --count HEAD 2>/dev/null || echo "0")
-
-    if [[ -n "$has_changes" || "$commit_count" == "0" ]]; then
-        local msg=""
-        if [[ "$commit_count" == "0" ]]; then
-            msg="Initial Backup"
-            echo -e "📦 ${GREEN}Initialized & Backed up:${NC} $backup_repo_path"
-        else
-            msg="Sync: $(date '+%Y-%m-%d %H:%M')"
-            echo -e "📦 ${GREEN}Backup updated:${NC} $backup_repo_path"
-        fi
-        
-        if ! git -C "$backup_repo_path" diff --cached --quiet; then
-             git -C "$backup_repo_path" commit -q -m "$msg"
-        fi
-    fi
-
-    manage_git_history "$backup_repo_path"
-}
-
-# --- Process File ---
+# 📁 If input is a text file
 process_txt_file() {
     local file="$1"
-    local current_run_dry="$2"
 
-    if [[ ! -f "$file" ]]; then echo "❌ File not found"; exit 1; fi
+    # Convert line breaks and multiple spaces/tabs into single space
+    entries=$(tr '\n' ' ' < "$file" | tr -s ' ')
 
-    if [[ "$current_run_dry" == false ]]; then init_backup_repo; fi
+    for pair in $entries; do
+        # Split by colon
+        src="${pair%%:*}"
+        dst="${pair##*:}"
 
-    # --- Pre-Read: Parse headers (@ and #) ---
-    while IFS= read -r line || [[ -n "$line" ]]; do
-        line=$(echo "$line" | xargs)
-        if [[ "$line" =~ ^@(.+)$ ]]; then
-            dest_base_prefix="${BASH_REMATCH[1]}"
-            dest_base_prefix="${dest_base_prefix/#\~/$HOME}"
-        elif [[ "$line" =~ ^#(.+)$ ]]; then
-            local excludes_str="${BASH_REMATCH[1]}"
-            IFS=',' read -r -a global_excludes <<< "$excludes_str"
-            for i in "${!global_excludes[@]}"; do global_excludes[$i]=$(echo "${global_excludes[$i]}" | xargs); done
-        fi
-    done < "$file"
-
-    # --- Main Loop ---
-    while IFS= read -r line || [[ -n "$line" ]]; do
-        line=$(echo "$line" | xargs)
-        
-        if [[ -z "$line" || "$line" == \#* || "$line" == @* ]]; then
+        # Check that both parts exist
+        if [[ -z "$src" || -z "$dst" ]]; then
+            echo "⚠️ Invalid pair: $pair"
             continue
         fi
 
-        local pair="$line"
-        local path_part="${pair%%,*}"
-        local excludes_part="${pair#*,}"
-        if [[ "$path_part" == "$pair" ]]; then excludes_part=""; fi
-        
-        local src="${path_part%%:*}"
-        local dst="${path_part#*:}"
-        
-        if [[ -z "$src" || -z "$dst" ]]; then continue; fi
-        
-        src="${src/#\~/$HOME}"
-        dst="${dst/#\~/$HOME}"
-        
-        if [[ -n "$dest_base_prefix" && ! "$dst" == /* ]]; then
-            dst="$dest_base_prefix$dst"
-        fi
-
-        IFS=',' read -r -a excludes <<< "$excludes_part"
-        for i in "${!excludes[@]}"; do excludes[$i]=$(echo "${excludes[$i]}" | xargs); done
-        local all_excludes=("${global_excludes[@]}" "${excludes[@]}")
-        
-        sync_node "$src" "$dst" "$current_run_dry" "${all_excludes[@]}"
-
-    done < "$file"
-
-    if [[ "$current_run_dry" == false ]]; then
-        commit_backups
-    fi
+        sync_config "$src" "$dst"
+    done
 }
 
-# --- Main ---
+# 🚀 Main logic
 main() {
-    if [[ ! -d "$CONFIG_DIR" ]]; then mkdir -p "$CONFIG_DIR"; fi
-
-    run_batch() {
-        local is_dry="$1"
-        if [[ -n "$txt_file" ]]; then
-            process_txt_file "$txt_file" "$is_dry"
-        elif [[ -n "$target_src" && -n "$target_dst" ]]; then
-            if [[ "$is_dry" == false ]]; then init_backup_repo; fi
-            local src="${target_src/#\~/$HOME}"
-            local dst="${target_dst/#\~/$HOME}"
-            sync_node "$src" "$dst" "$is_dry" "${global_excludes[@]}"
-            if [[ "$is_dry" == false ]]; then commit_backups; fi
-        else
-            show_help; exit 1
-        fi
-    }
-
-    if [[ "$explicit_dry_run" == true ]]; then
-        echo -e "${CYAN}🔍 PREVIEW (Dry Run)${NC}"
-        run_batch true
-        echo -e "\n${BLUE}ℹ️  No changes made.${NC}"; exit 0
+    if [[ $# -eq 1 && "$1" == *.txt ]]; then
+        process_txt_file "$1"
+    elif [[ $# -eq 2 ]]; then
+        sync_config "$1" "$2"
+    else
+        echo "❌ Usage:"
+        echo "  $0 source_path destination_path"
+        echo "  $0 links.txt   # with src:dst src:dst ..."
+        exit 1
     fi
-
-    if [[ "$skip_confirm" == true ]]; then
-        run_batch false
-        echo -e "${GREEN}✅ Done.${NC}"; exit 0
-    fi
-
-    echo -e "${CYAN}🔍 ANALYZING...${NC}"
-    run_batch true
-
-    echo ""
-    echo -e "${YELLOW}⚠️  Review changes.${NC}"
-    if [[ "$use_backup" == true ]]; then
-        echo -e "   Backup Repo: ${BLUE}$backup_repo_path${NC}"
-        if [[ -n "$dest_base_prefix" ]]; then
-             echo -e "   Structure:   ${BLUE}Mapped by destination${NC} (Base: $dest_base_prefix)"
-        else
-             echo -e "   Structure:   ${BLUE}Flat${NC} (Source Name)"
-        fi
-    fi
-    
-    read -p "   Proceed? [y/N] " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then echo -e "${RED}❌ Cancelled.${NC}"; exit 0; fi
-
-    echo -e "${GREEN}🚀 Syncing...${NC}"
-    run_batch false
-    echo -e "${GREEN}✅ Success.${NC}"
 }
 
 main "$@"
+

@@ -1,4 +1,4 @@
-#LOCAL_APPDATA_FONTCONFIG_CACHE,.git
+#LOCAL_APPDATA_FONTCONFIG_CACHE,.git,.ruff_cache
 ~/.config/mpv/:/run/media/pencil/E/home/nirantar/Downloads/mar/Hypr/Config/.config/mpv,cache/,script-opts/memo-history.log
 ~/.config/yazi/:/run/media/pencil/E/home/nirantar/Downloads/mar/Hypr/Config/.config/yazi
 ~/.config/zathura/:/run/media/pencil/E/home/nirantar/Downloads/mar/Hypr/Config/.config/zathura,md_notes/,notes.db

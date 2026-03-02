@@ -1,5 +1,5 @@
 [Default Applications]
-application/pdf=sioyek.desktop
+application/pdf=org.gnome.Evince.desktop
 image/jpeg=nsxiv.desktop
 image/png=nsxiv.desktop
 x-scheme-handler/msteams=teams.desktop
@@ -29,9 +29,10 @@ image/svg+xml=feh.desktop
 audio/mpeg=mpv.desktop
 audio/x-wav=mpv.desktop
 audio/flac=mpv.desktop
+application/octet-stream=Alacritty.desktop
 
 [Added Associations]
-application/pdf=com.github.xournalpp.xournalpp.desktop;scrivano.desktop;org.pwmt.zathura-pdf-poppler.desktop;org.gnome.Evince.desktop;sioyek.desktop;
+application/pdf=org.gnome.Evince.desktop;com.github.xournalpp.xournalpp.desktop;scrivano.desktop;org.pwmt.zathura-pdf-poppler.desktop;sioyek.desktop;
 image/jpeg=feh.desktop;org.gnome.Loupe.desktop;nsxiv.desktop;
 image/png=org.gnome.Loupe.desktop;nsxiv.desktop;feh.desktop;
 x-scheme-handler/sms=org.gnome.Shell.Extensions.GSConnect.desktop;
@@ -50,3 +51,4 @@ text/markdown=nvim.desktop;
 text/x-python=org.gnome.TextEditor.desktop;
 application/x-shellscript=org.gnome.TextEditor.desktop;
 inode/directory=nsxiv.desktop;
+application/octet-stream=Alacritty.desktop;

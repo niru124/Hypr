@@ -1,0 +1,401 @@
+#!/usr/bin/env python3
+import os
+import sys
+import shutil
+import argparse
+import subprocess
+from urllib.parse import unquote
+
+# Add commands directory to path
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+from commands.trash_lib import (
+    get_all_trash,
+    find_in_trash,
+    find_by_filename,
+    remove_from_trash,
+    add_to_trash,
+    init_db,
+)
+
+init_db()
+
+
+def get_trash_path(original_path, username):
+    """Get appropriate trash location based on where the file was"""
+    
+    if original_path.startswith(f"/run/media/{username}/"):
+        parts = original_path.split("/")
+        if len(parts) >= 5:
+            mount = parts[4]
+            trash_path = f"/run/media/{username}/{mount}/.Trash-1000"
+            os.makedirs(os.path.join(trash_path, "files"), exist_ok=True)
+            os.makedirs(os.path.join(trash_path, "info"), exist_ok=True)
+            return trash_path
+    
+    if original_path.startswith(f"/media/{username}/"):
+        parts = original_path.split("/")
+        if len(parts) >= 5:
+            mount = parts[4]
+            trash_path = f"/media/{username}/{mount}/.Trash-1000"
+            os.makedirs(os.path.join(trash_path, "files"), exist_ok=True)
+            os.makedirs(os.path.join(trash_path, "info"), exist_ok=True)
+            return trash_path
+    
+    if original_path.startswith("/mnt/"):
+        parts = original_path.split("/")
+        if len(parts) >= 3:
+            mount = parts[2]
+            trash_path = f"/mnt/{mount}/.Trash-1000"
+            os.makedirs(os.path.join(trash_path, "files"), exist_ok=True)
+            os.makedirs(os.path.join(trash_path, "info"), exist_ok=True)
+            return trash_path
+    
+    trash_dir = os.path.expanduser("~/.local/share/Trash")
+    os.makedirs(os.path.join(trash_dir, "files"), exist_ok=True)
+    os.makedirs(os.path.join(trash_dir, "info"), exist_ok=True)
+    return trash_dir
+
+
+def scan_system_trash(username):
+    items = []
+    bases = [f"/run/media/{username}", f"/media/{username}", "/mnt", "/run/media", "/media"]
+    
+    for base in bases:
+        if not os.path.exists(base):
+            continue
+        try:
+            for mount in os.listdir(base):
+                trash_path = os.path.join(base, mount, ".Trash-1000")
+                if os.path.exists(trash_path):
+                    info_dir = os.path.join(trash_path, "info")
+                    files_dir = os.path.join(trash_path, "files")
+                    if os.path.exists(info_dir) and os.path.exists(files_dir):
+                        for f in os.listdir(files_dir):
+                            info_file = os.path.join(info_dir, f + ".trashinfo")
+                            if os.path.exists(info_file):
+                                with open(info_file) as fh:
+                                    for line in fh:
+                                        if line.startswith("Path="):
+                                            orig_path = unquote(line[5:].strip())
+                                            if not orig_path.startswith("/"):
+                                                orig_path = "/" + orig_path
+                                            items.append({
+                                                "original_path": orig_path,
+                                                "trash_path": trash_path,
+                                                "file_name": f,
+                                                "is_system": True
+                                            })
+                                            break
+        except PermissionError:
+            pass
+    
+    return items
+
+
+def cmd_list():
+    username = subprocess.run(["id", "-nu"], capture_output=True, text=True).stdout.strip()
+    
+    rows = get_all_trash()
+    system_items = scan_system_trash(username)
+    
+    all_items = []
+    
+    for row in rows:
+        trash_path = row[2]
+        file_name = row[3]
+        # Check if file actually exists in trash
+        src1 = os.path.join(trash_path, "files", file_name)
+        src2 = os.path.join(trash_path, file_name)
+        if os.path.exists(src1) or os.path.exists(src2):
+            all_items.append({
+                "original_path": row[1],
+                "trash_path": row[2],
+                "file_name": row[3],
+                "is_system": False
+            })
+    
+    for item in system_items:
+        exists_in_db = any(x["original_path"] == item["original_path"] for x in all_items)
+        if not exists_in_db:
+            all_items.append(item)
+    
+    if not all_items:
+        print("Trash is empty!")
+        return
+    
+    # Print in box format
+    print("┌" + "─" * 20 + "┬" + "─" * 50 + "┬" + "─" * 40 + "┐")
+    print("│ {:^18} │ {:^48} │ {:^38} │".format("File Name", "Original Path", "Trash Location"))
+    print("├" + "─" * 20 + "┼" + "─" * 50 + "┼" + "─" * 40 + "┤")
+    
+    for item in all_items:
+        fname = item['file_name'][:18] if len(item['file_name']) > 18 else item['file_name']
+        opath = item['original_path'][:48] if len(item['original_path']) > 48 else item['original_path']
+        tpath = item['trash_path'][:38] if len(item['trash_path']) > 38 else item['trash_path']
+        print("│ {:18} │ {:48} │ {:38} │".format(fname, opath, tpath))
+    
+    print("└" + "─" * 20 + "┴" + "─" * 50 + "┴" + "─" * 40 + "┘")
+    print(f"\nTotal: {len(all_items)} item(s)")
+
+
+def cmd_restore(*files):
+    username = subprocess.run(["id", "-nu"], capture_output=True, text=True).stdout.strip()
+    
+    rows = get_all_trash()
+    system_items = scan_system_trash(username)
+    
+    all_items = []
+    
+    for row in rows:
+        all_items.append({
+            "original_path": row[1],
+            "trash_path": row[2],
+            "file_name": row[3],
+            "is_system": False
+        })
+    
+    for item in system_items:
+        exists_in_db = any(x["original_path"] == item["original_path"] for x in all_items)
+        if not exists_in_db:
+            all_items.append(item)
+    
+    if not all_items:
+        print("Trash is empty!")
+        return
+    
+    # If no files specified, use fzf
+    if not files:
+        lines = [f"{item['file_name']} | {item['original_path']} -> {item['trash_path']}" for item in all_items]
+        
+        fzf = subprocess.Popen(
+            ["fzf", "--prompt", "Restore> ", "--multi"],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            text=True,
+        )
+        stdout, _ = fzf.communicate(input="\n".join(lines))
+        
+        if fzf.returncode != 0 or not stdout.strip():
+            return
+        
+        selected = stdout.strip().split("\n")
+        files = [s.split(" | ")[0] for s in selected]
+    
+    for filename in files:
+        # Find the file in trash
+        src = None
+        
+        # Try to find by filename in DB
+        db_results = find_by_filename(filename)
+        if db_results:
+            trash_id, original_path, trash_path, trash_name = db_results[0]
+            # Check both with and without /files suffix
+            test_src = os.path.join(trash_path, "files", trash_name)
+            if os.path.exists(test_src):
+                src = test_src
+            elif os.path.exists(os.path.join(trash_path, trash_name)):
+                src = os.path.join(trash_path, trash_name)
+        
+        # Try system trashes if not found
+        if not src:
+            for base in [f"/run/media/{username}", f"/media/{username}", "/mnt"]:
+                if not os.path.exists(base):
+                    continue
+                try:
+                    for mount in os.listdir(base):
+                        trash_path = os.path.join(base, mount, ".Trash-1000")
+                        if os.path.exists(trash_path):
+                            files_dir = os.path.join(trash_path, "files")
+                            if os.path.exists(files_dir):
+                                test_src = os.path.join(files_dir, os.path.basename(filename))
+                                if os.path.exists(test_src):
+                                    src = test_src
+                                    break
+                except PermissionError:
+                    pass
+        
+        if not src:
+            print(f"Not found: {filename}")
+            continue
+        
+        original_path = os.path.basename(filename)
+        
+        result = subprocess.run(["mv", src, original_path], capture_output=True, text=True)
+        if result.returncode == 0 and os.path.exists(original_path):
+            if src.startswith(os.path.expanduser("~/.local/share")):
+                remove_from_trash(original_path)
+            print(f"Restored: {original_path}")
+        else:
+            print(f"Failed: {filename}")
+
+
+def cmd_delete(*files):
+    username = subprocess.run(["id", "-nu"], capture_output=True, text=True).stdout.strip()
+    
+    rows = get_all_trash()
+    system_items = scan_system_trash(username)
+    
+    all_items = []
+    
+    for row in rows:
+        all_items.append({
+            "original_path": row[1],
+            "trash_path": row[2],
+            "file_name": row[3],
+            "is_system": False
+        })
+    
+    for item in system_items:
+        exists_in_db = any(x["original_path"] == item["original_path"] for x in all_items)
+        if not exists_in_db:
+            all_items.append(item)
+    
+    if not all_items:
+        print("Trash is empty!")
+        return
+    
+    # If no files specified, use fzf
+    if not files:
+        lines = [f"{item['file_name']} | {item['original_path']} -> {item['trash_path']}" for item in all_items]
+        
+        fzf = subprocess.Popen(
+            ["fzf", "--prompt", "Delete> ", "--multi"],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            text=True,
+        )
+        stdout, _ = fzf.communicate(input="\n".join(lines))
+        
+        if fzf.returncode != 0 or not stdout.strip():
+            return
+        
+        selected = stdout.strip().split("\n")
+        files = [s.split(" | ")[0] for s in selected]
+    
+    for filename in files:
+        src = None
+        original_path = None
+        
+        # Try to find by filename in DB
+        db_results = find_by_filename(filename)
+        if db_results:
+            trash_id, original_path, trash_path, trash_name = db_results[0]
+            # Check both with and without /files suffix
+            test_src = os.path.join(trash_path, "files", trash_name)
+            if os.path.exists(test_src):
+                src = test_src
+            elif os.path.exists(os.path.join(trash_path, trash_name)):
+                src = os.path.join(trash_path, trash_name)
+        
+        # If not found in DB, try system trashes
+        if not src:
+            for base in [f"/run/media/{username}", f"/media/{username}", "/mnt"]:
+                if not os.path.exists(base):
+                    continue
+                try:
+                    for mount in os.listdir(base):
+                        trash_path = os.path.join(base, mount, ".Trash-1000")
+                        if os.path.exists(trash_path):
+                            files_dir = os.path.join(trash_path, "files")
+                            if os.path.exists(files_dir):
+                                test_src = os.path.join(files_dir, os.path.basename(filename))
+                                if os.path.exists(test_src):
+                                    src = test_src
+                                    break
+                except PermissionError:
+                    pass
+        
+        if not src:
+            print(f"Not found: {filename}")
+            continue
+        
+        result = subprocess.run(["rm", "-rf", src], capture_output=True, text=True)
+        if result.returncode == 0:
+            # Remove from DB if it was in DB
+            if original_path:
+                remove_from_trash(original_path)
+            print(f"Deleted: {os.path.basename(filename)}")
+        else:
+            print(f"Failed: {filename}")
+
+
+def cmd_put(*files):
+    if not files:
+        print("Usage: rtrash put <filename> [<filename>...]")
+        return
+    
+    username = subprocess.run(["id", "-nu"], capture_output=True, text=True).stdout.strip()
+    
+    for f in files:
+        if not os.path.exists(f):
+            print(f"Not found: {f}")
+            continue
+            
+        file_name = os.path.basename(f)
+        is_dir = os.path.isdir(f)
+        
+        trash_path = get_trash_path(os.path.abspath(f), username)
+        trash_files = os.path.join(trash_path, "files")
+        
+        unique_name = file_name
+        counter = 1
+        while os.path.exists(os.path.join(trash_files, unique_name)):
+            if "." in file_name:
+                parts = file_name.rsplit(".", 1)
+                unique_name = f"{parts[0]}_{counter}.{parts[1]}"
+            else:
+                unique_name = f"{file_name}_{counter}"
+            counter += 1
+        
+        dst = os.path.join(trash_files, unique_name)
+        
+        try:
+            shutil.move(f, dst)
+            add_to_trash(os.path.abspath(f), trash_path, unique_name, is_dir)
+            
+            if ".Trash-1000" in trash_path:
+                info_file = os.path.join(trash_path, "info", unique_name + ".trashinfo")
+                with open(info_file, "w") as fh:
+                    fh.write(f"[Trash Info]\nPath={os.path.abspath(f)}\nDeletionDate=\n")
+            
+            print(f"Trashed: {file_name}")
+        except Exception as e:
+            print(f"Error: {e}")
+
+
+def main():
+    parser = argparse.ArgumentParser(prog="rtrash")
+    subparsers = parser.add_subparsers(dest="command", help="Commands")
+    
+    subparsers.add_parser("list", help="List trashed files")
+    subparsers.add_parser("ls", help="List trashed files (alias for list)")
+    
+    restore_parser = subparsers.add_parser("restore", help="Restore file from trash (opens fzf if no file specified)")
+    restore_parser.add_argument("files", nargs="*", help="Files to restore")
+    
+    delete_parser = subparsers.add_parser("delete", help="Permanently delete from trash (opens fzf if no file specified)")
+    delete_parser.add_argument("files", nargs="*", help="Files to delete")
+    
+    put_parser = subparsers.add_parser("put", help="Move file to trash")
+    put_parser.add_argument("files", nargs="+", help="Files to trash")
+    
+    put_parser = subparsers.add_parser("rm", help="Alias for delete")
+    put_parser.add_argument("files", nargs="+", help="Files to delete")
+    
+    args = parser.parse_args()
+    
+    if args.command == "list" or args.command == "ls":
+        cmd_list()
+    elif args.command == "restore":
+        cmd_restore(*args.files)
+    elif args.command == "delete" or args.command == "rm":
+        cmd_delete(*args.files)
+    elif args.command == "put":
+        cmd_put(*args.files)
+    else:
+        parser.print_help()
+
+
+if __name__ == "__main__":
+    main()

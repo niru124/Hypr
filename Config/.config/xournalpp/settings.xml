@@ -261,7 +261,7 @@
     <data name="eraser">
       <attribute name="drawingType" type="string" value="default"/>
       <attribute name="size" type="string" value="MEDIUM"/>
-      <attribute name="type" type="string" value="deleteStroke"/>
+      <attribute name="type" type="string" value="default"/>
     </data>
     <data name="hand">
       <attribute name="drawingType" type="string" value="default"/>
@@ -287,11 +287,11 @@
       <attribute name="size" type="string" value="MEDIUM"/>
     </data>
     <data name="pen">
-      <attribute name="color" type="hex" value="ff8aadf4"/>
+      <attribute name="color" type="hex" value="ffcad3f5"/>
       <attribute name="drawingType" type="string" value="default"/>
       <attribute name="fill" type="int" value="0"/>
       <attribute name="fillAlpha" type="int" value="128"/>
-      <attribute name="size" type="string" value="MEDIUM"/>
+      <attribute name="size" type="string" value="BIG"/>
       <attribute name="style" type="string" value="plain"/>
     </data>
     <data name="playObject">
