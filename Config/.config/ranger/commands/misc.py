@@ -3,6 +3,29 @@ import subprocess
 from ranger.api.commands import Command
 
 
+class mkfile(Command):
+    def execute(self):
+        filename = self.arg(1)
+        if not filename:
+            self.fm.notify("No name provided", bad=True)
+            return
+
+        target = os.path.join(self.fm.thisdir.path, filename.rstrip("/"))
+
+        if filename.endswith("/"):
+            try:
+                os.makedirs(target, exist_ok=True)
+                self.fm.notify(f"Created directory: {filename}")
+            except Exception as e:
+                self.fm.notify(f"Error: {e}", bad=True)
+        else:
+            try:
+                os.mknod(target)
+                self.fm.notify(f"Created file: {filename}")
+            except Exception as e:
+                self.fm.notify(f"Error: {e}", bad=True)
+
+
 class wormhole_send(Command):
     def execute(self):
         import os

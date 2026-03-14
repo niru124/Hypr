@@ -12,6 +12,7 @@ return {
         -- "sqlls",
         -- "bashls",
         "arduino_language_server",
+        -- "jdtls" handled by astrocommunity
       },
     },
   },
@@ -24,6 +25,7 @@ return {
         "black",
         "beautysh",
         "sqlfmt",
+        "google-java-format",
       },
     },
   },
@@ -33,6 +35,8 @@ return {
       ensure_installed = {
         "codelldb",
         "debugpy",
+        "java-test",
+        "java-debug-adapter",
       },
     },
   },

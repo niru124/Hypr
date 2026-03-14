@@ -26,3 +26,4 @@ nsxiv
 ranger
 python-pillow
 python-pdf2image
+inotify-tools

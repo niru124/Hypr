@@ -40,6 +40,9 @@ return {
         },
       },
       jedi_language_server = {},
+      handlers = {
+        jdtls = false,
+      },
       -- sqlls = {},
     },
     mappings = {

@@ -33,7 +33,7 @@ application/octet-stream=Alacritty.desktop
 
 [Added Associations]
 application/pdf=org.gnome.Evince.desktop;com.github.xournalpp.xournalpp.desktop;scrivano.desktop;org.pwmt.zathura-pdf-poppler.desktop;sioyek.desktop;
-image/jpeg=feh.desktop;org.gnome.Loupe.desktop;nsxiv.desktop;
+image/jpeg=org.gnome.Loupe.desktop;feh.desktop;nsxiv.desktop;
 image/png=org.gnome.Loupe.desktop;nsxiv.desktop;feh.desktop;
 x-scheme-handler/sms=org.gnome.Shell.Extensions.GSConnect.desktop;
 x-scheme-handler/tel=org.gnome.Shell.Extensions.GSConnect.desktop;

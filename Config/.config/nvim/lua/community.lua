@@ -11,6 +11,7 @@ return {
   { import = "astrocommunity.pack.cpp" },
   { import = "astrocommunity.pack.python" },
   { import = "astrocommunity.pack.sql" },
+  -- { import = "astrocommunity.pack.java" }, # configured manually
   {
     import = "astrocommunity.colorscheme.catppuccin",
   },
