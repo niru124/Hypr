@@ -176,6 +176,10 @@ export PATH="$HOME/.local/bin:$PATH"
 # opencode
 export PATH=/home/nirantar/.opencode/bin:$PATH
 
+nvoil() {
+  nvim -c 'lua require("lazy").load({ plugins = { "oil.nvim" } }); require("oil").open()' "$@"
+}
+
 # Open buffer line in editor
 autoload -Uz edit-command-line
 zle -N edit-command-line

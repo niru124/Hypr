@@ -61,4 +61,3 @@ if (( DELTA_RX > 0 || DELTA_TX > 0 )); then
     sqlite3 "$DB_FILE" "INSERT INTO net_usage (date, rx_bytes, tx_bytes) VALUES ('$CURRENT_DATE', $DELTA_RX, $DELTA_TX);"
   fi
 fi
-

@@ -51,6 +51,8 @@ r_override="window{location:${x_pos} ${y_pos};anchor:${x_pos} ${y_pos};x-offset:
 chosen=$(rofi \
   -modi emoji \
   -show emoji \
+  -emoji-file "$HOME/.config/rofi/all_emojis.txt" \
+  -emoji-mode prompt \
   -emoji-format '{emoji} {name}' \
   -kb-secondary-copy "" \
   -kb-custom-1 Ctrl+c \

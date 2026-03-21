@@ -72,6 +72,30 @@ return {
 
   "andweeb/presence.nvim",
   {
+    "hrsh7th/nvim-cmp",
+    opts = function(_, opts)
+      opts.window = {
+        completion = {
+          col_offset = -1,
+          side_padding = 0,
+        },
+        documentation = {
+          border = "rounded",
+          winhighlight = "NormalFloat:Normal,FloatBorder:Normal",
+        },
+      }
+      opts.formatting = {
+        format = function(entry, vim_item)
+          if vim.bo.filetype == "java" then
+            vim_item.detail = nil
+          end
+          return vim_item
+        end,
+      }
+      return opts
+    end,
+  },
+  {
     "ray-x/lsp_signature.nvim",
     event = "BufRead",
     config = function() require("lsp_signature").setup() end,
