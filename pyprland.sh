@@ -15,11 +15,11 @@ yay -S --noconfirm pyprland
 # Update hyprpm
 hyprpm update
 
-# Add hyprscroller plugin
-hyprpm add https://github.com/cpiber/hyprscroller
-
-# Enable hyprscroller plugin
-hyprpm enable hyprscroller
+# # Add hyprscroller plugin
+# hyprpm add https://github.com/cpiber/hyprscroller
+#
+# # Enable hyprscroller plugin
+# hyprpm enable hyprscroller
 
 echo "--- Pyprland Installation Complete ---"
 

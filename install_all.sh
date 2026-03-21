@@ -132,15 +132,15 @@ if confirm_action "Run Non-Essential Packages Installation (install_non_essentia
 	echo
 fi
 
-if confirm_action "Run Hyprpm Plugins Installation (install_hyprpm_plugins.sh)"; then
-	if [ -f "./install_hyprpm_plugins.sh" ]; then
-		chmod +x ./install_hyprpm_plugins.sh
-		./install_hyprpm_plugins.sh
-	else
-		echo "install_hyprpm_plugins.sh not found."
-	fi
-	echo
-fi
+# if confirm_action "Run Hyprpm Plugins Installation (install_hyprpm_plugins.sh)"; then
+# 	if [ -f "./install_hyprpm_plugins.sh" ]; then
+# 		chmod +x ./install_hyprpm_plugins.sh
+# 		./install_hyprpm_plugins.sh
+# 	else
+# 		echo "install_hyprpm_plugins.sh not found."
+# 	fi
+# 	echo
+# fi
 
 echo "Installation script finished. Please review the output for any errors."
 echo "You may need to log out and back in for some changes to take effect."
