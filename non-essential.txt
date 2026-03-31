@@ -27,3 +27,6 @@ ranger
 python-pillow
 python-pdf2image
 inotify-tools
+tesseract
+tesseract-data-eng
+tesseract-data-hin

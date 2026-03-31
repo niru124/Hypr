@@ -17,7 +17,10 @@ use_backup=true
 explicit_dry_run=false
 skip_confirm=false
 MAX_COMMITS=50
+GIT_MAX_COMMITS=50
+BORG_MAX_COMMITS=10
 BACKUP_ROOT="$HOME/backup"
+MODE="sync"             # Default mode
 
 # 2. Load Config File
 if [[ -f "$CONFIG_FILE" ]]; then
@@ -27,30 +30,34 @@ fi
 # 3. Expand Tilde (~) in BACKUP_ROOT
 BACKUP_ROOT="${BACKUP_ROOT/#\~/$HOME}"
 
-# Paths
+# Paths & State
 backup_repo_path=""
-dest_base_prefix=""     # Stores the path from lines starting with @
+dest_base_prefix=""     
 txt_file=""
 target_src=""
 target_dst=""
+tracker_backend="git"   # Default to git unless $borg is specified
 
 # --- Help ---
 show_help() {
-    echo -e "${CYAN}Linku - Structured Dotfile Sync & Backup${NC}"
-    echo "Usage: linku [options] <source> [destination]"
+    echo -e "${CYAN}Linku - Hybrid Dotfile Sync & Backup (Git/Borg)${NC}"
+    echo "Usage: linku [options] <command>[arguments]"
+    echo ""
+    echo "Commands:"
+    echo "  linku files.txt          Sync files (Preview -> Confirm -> Sync)"
+    echo "  linku restore files.txt  Mount backup history to restore old files"
     echo ""
     echo "Options:"
-    echo "  -y, --no-dry    Skip preview (Immediate Sync)"
-    echo "  -n, --dry-run   Preview ONLY"
-    echo "  --no-backup     Disable backup"
+    echo "  -y, --no-dry             Skip preview (Immediate Sync)"
+    echo "  -n, --dry-run            Preview ONLY"
+    echo "  --no-backup              Disable backup"
     echo ""
     echo "Structure Definition (in .txt file):"
+    echo "  \$borg [N]                <- Use BorgBackup (N = keep last N backups)"
+    echo "  \$git [N]                 <- Use Git (N = keep last N commits)"
     echo "  @/path/to/base/          <- Defines the base of the destination drive"
-    echo "  src:dst                  <- Sync pair"
-    echo "  ~/Dir/*.pdf:Dest/*.pdf   <- Wildcard Support!"
-    echo ""
-    echo "  The backup folder will mirror the exact folder structure of 'dst'"
-    echo "  relative to the '@' base path."
+    echo "  #exclude                 <- Global exclude patterns"
+    echo "  src:dst                  <- Sync pair (Supports Wildcards like *.pdf)"
 }
 
 # --- Args ---
@@ -60,6 +67,7 @@ while [[ $# -gt 0 ]]; do
         --no-dry|-y) skip_confirm=true; shift ;;
         --dry-run|-n) explicit_dry_run=true; shift ;;
         --help|-h) show_help; exit 0 ;;
+        restore) MODE="restore"; shift ;;
         *.txt) txt_file="$1"; shift ;;
         *)
             if [[ -z "$target_src" ]]; then target_src="$1"
@@ -77,6 +85,34 @@ else
 fi
 
 global_excludes=()
+
+# --- Parse Config File Headers ---
+parse_headers() {
+    local file="$1"
+    if [[ ! -f "$file" ]]; then return; fi
+    
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        line=$(echo "$line" | xargs)
+        if [[ "$line" =~ ^@(.+)$ ]]; then
+            dest_base_prefix="${BASH_REMATCH[1]}"
+            dest_base_prefix="${dest_base_prefix/#\~/$HOME}"
+        elif [[ "$line" =~ ^#(.+)$ ]]; then
+            local excludes_str="${BASH_REMATCH[1]}"
+            IFS=',' read -r -a global_excludes <<< "$excludes_str"
+            for i in "${!global_excludes[@]}"; do global_excludes[$i]=$(echo "${global_excludes[$i]}" | xargs); done
+        elif [[ "$line" =~ ^\$git[[:space:]]*([[:digit:]]+)?$ ]]; then
+            tracker_backend="git"
+            if [[ -n "${BASH_REMATCH[1]}" ]]; then
+                GIT_MAX_COMMITS="${BASH_REMATCH[1]}"
+            fi
+        elif [[ "$line" =~ ^\$borg[[:space:]]*([[:digit:]]+)?$ ]]; then
+            tracker_backend="borg"
+            if [[ -n "${BASH_REMATCH[1]}" ]]; then
+                BORG_MAX_COMMITS="${BASH_REMATCH[1]}"
+            fi
+        fi
+    done < "$file"
+}
 
 # --- Pretty Print ---
 prettify_rsync() {
@@ -96,21 +132,19 @@ prettify_rsync() {
 # --- Git History Management ---
 manage_git_history() {
     local repo="$1"
-    if [[ ! -d "$repo/.git" || "$MAX_COMMITS" -le 0 ]]; then return; fi
+    if [[ ! -d "$repo/.git" || "$GIT_MAX_COMMITS" -le 0 ]]; then return; fi
 
     local count
     count=$(git -C "$repo" rev-list --count HEAD 2>/dev/null)
 
-    if [[ "$count" -gt "$MAX_COMMITS" ]]; then
-        echo -e "🧹 ${YELLOW}History limit ($count/$MAX_COMMITS). Pruning old backups...${NC}"
-        
+    if [[ "$count" -gt "$GIT_MAX_COMMITS" ]]; then
+        echo -e "🧹 ${YELLOW}Git limit ($count/$MAX_COMMITS). Pruning old backups...${NC}"
         git -C "$repo" checkout --orphan temp_history_limit >/dev/null 2>&1
         git -C "$repo" add -A >/dev/null 2>&1
         git -C "$repo" commit -m "History Reset: Limit reached ($(date '+%Y-%m-%d'))" >/dev/null 2>&1
         git -C "$repo" branch -D master >/dev/null 2>&1
         git -C "$repo" branch -m master >/dev/null 2>&1
         git -C "$repo" gc --prune=now --aggressive >/dev/null 2>&1
-        
         echo -e "✨ ${GREEN}History flattened to save space.${NC}"
     fi
 }
@@ -119,10 +153,85 @@ manage_git_history() {
 init_backup_repo() {
     if [[ "$use_backup" != true ]]; then return; fi
     mkdir -p "$backup_repo_path"
-    if [[ ! -d "$backup_repo_path/.git" ]]; then
-        git -C "$backup_repo_path" init -q
-        git -C "$backup_repo_path" config user.email "backup@linku"
-        git -C "$backup_repo_path" config user.name "Linku Backup"
+
+    if [[ "$tracker_backend" == "git" ]]; then
+        if [[ ! -d "$backup_repo_path/.git" ]]; then
+            git -C "$backup_repo_path" init -q
+            git -C "$backup_repo_path" config user.email "backup@linku"
+            git -C "$backup_repo_path" config user.name "Linku Backup"
+        fi
+    elif [[ "$tracker_backend" == "borg" ]]; then
+        if ! command -v borg &> /dev/null; then
+            echo -e "${RED}❌ BorgBackup is not installed! Please install 'borgbackup'.${NC}"
+            exit 1
+        fi
+        local borg_repo_dir="$backup_repo_path/.borg_repo"
+        if [[ ! -d "$borg_repo_dir" ]]; then
+            borg init --encryption=none "$borg_repo_dir" >/dev/null 2>&1
+        fi
+    fi
+}
+
+# --- RESTORE MODE ---
+# --- RESTORE MODE ---
+handle_restore() {
+    if [[ -z "$txt_file" ]]; then
+        echo -e "${RED}❌ Please specify a file to restore from (e.g., linku restore files.txt)${NC}"
+        exit 1
+    fi
+
+    parse_headers "$txt_file"
+
+    if [[ "$tracker_backend" == "borg" ]]; then
+        local borg_repo_dir="$backup_repo_path/.borg_repo"
+        local mount_point="$backup_repo_path/RESTORE_MOUNT"
+        
+        if [[ ! -d "$borg_repo_dir" ]]; then
+            echo -e "${RED}❌ No Borg repository found at $borg_repo_dir${NC}"
+            exit 1
+        fi
+        
+        mkdir -p "$mount_point"
+        
+        if mountpoint -q "$mount_point"; then
+            echo -e "${YELLOW}⚠️  Already mounted. To unmount safely, run: borg umount $mount_point${NC}"
+        else
+            echo -e "🔄 Mounting Borg repository to: ${BLUE}$mount_point${NC}"
+            
+            # Try to mount, and catch the error if it fails (like missing FUSE)
+            if ! borg mount "$borg_repo_dir" "$mount_point"; then
+                echo -e "\n${RED}❌ Failed to mount the Borg repository.${NC}"
+                echo -e "${YELLOW}It looks like FUSE support is missing on your system.${NC}"
+                echo -e "Please install the required packages:"
+                echo -e "  Arch Linux:    sudo pacman -S python-llfuse fuse3"
+                echo -e "  Ubuntu/Debian: sudo apt install python3-llfuse fuse3"
+                echo -e "  Fedora:        sudo dnf install python3-llfuse fuse3"
+                rmdir "$mount_point" 2>/dev/null
+                exit 1
+            fi
+            
+            echo -e "✅ ${GREEN}Successfully mounted!${NC}"
+            echo -e "📂 You can now open your file manager and browse:"
+            echo -e "   ${BLUE}$mount_point${NC}"
+            echo -e "   Inside, you will see folders for every backup date/time."
+            echo -e "   Simply copy the older files you want back to your main drive."
+            echo ""
+            echo -e "🛑 ${YELLOW}Press [ENTER] to safely unmount and exit when you are done restoring.${NC}"
+            read -r
+            
+            echo "Unmounting..."
+            borg umount "$mount_point"
+            rmdir "$mount_point" 2>/dev/null
+            echo -e "✅ Unmounted safely."
+        fi
+
+    elif [[ "$tracker_backend" == "git" ]]; then
+         echo -e "📂 Your Git repository is at: ${BLUE}$backup_repo_path${NC}"
+         echo -e "To restore older files, open a terminal and run:"
+         echo -e "  1. ${YELLOW}cd $backup_repo_path${NC}"
+         echo -e "  2. ${YELLOW}git log --oneline${NC}  (Find the commit hash)"
+         echo -e "  3. ${YELLOW}git checkout <hash> -- <filename>${NC}  (Restore the specific file)"
+         echo -e "  4. Copy it back to your original location."
     fi
 }
 
@@ -136,12 +245,11 @@ update_backup_mirror() {
     if [[ "$use_backup" != true ]]; then return; fi
     if [[ ! -e "$src" ]]; then return; fi
 
-    local rsync_opts=(-a --delete --delete-excluded)
+    local rsync_opts=(-a --delete --delete-excluded --exclude=".git" --exclude=".borg_repo" --exclude="RESTORE_MOUNT")
     for ex in "${excludes[@]}"; do rsync_opts+=(--exclude="$ex"); done
 
     local target_backup_path=""
 
-    # --- Structured Backup Calculation ---
     if [[ -n "$dest_base_prefix" && "$dst" == "$dest_base_prefix"* ]]; then
         local relative_path="${dst#$dest_base_prefix}"
         relative_path="${relative_path#/}"
@@ -150,7 +258,6 @@ update_backup_mirror() {
         target_backup_path="$backup_repo_path/$(basename "$src")"
     fi
 
-    # --- Execution ---
     if [[ -d "$src" ]]; then
         mkdir -p "$target_backup_path"
         rsync "${rsync_opts[@]}" "$src/" "$target_backup_path/" >/dev/null 2>&1
@@ -176,7 +283,6 @@ sync_node() {
     local rsync_opts=(-ai --delete --delete-excluded)
     for ex in "${excludes[@]}"; do rsync_opts+=(--exclude="$ex"); done
 
-    # DRY RUN
     if [[ "$is_dry" == true ]]; then
         rsync_opts+=(--dry-run)
         local output=""
@@ -202,7 +308,6 @@ sync_node() {
         return
     fi
 
-    # REAL RUN
     update_backup_mirror "$src" "$dst" "${excludes[@]}"
 
     rsync_opts=(-a --delete --delete-excluded)
@@ -225,33 +330,50 @@ sync_node() {
     fi
 }
 
-# --- Git Commit Logic ---
+# --- History Tracker Commit Logic ---
 commit_backups() {
     if [[ "$use_backup" != true || ! -d "$backup_repo_path" ]]; then return; fi
 
-    git -C "$backup_repo_path" add -A
+    if [[ "$tracker_backend" == "git" ]]; then
+        git -C "$backup_repo_path" add -A
+        local has_changes=$(git -C "$backup_repo_path" status --porcelain)
+        local commit_count=$(git -C "$backup_repo_path" rev-list --count HEAD 2>/dev/null || echo "0")
 
-    local has_changes
-    has_changes=$(git -C "$backup_repo_path" status --porcelain)
-    local commit_count
-    commit_count=$(git -C "$backup_repo_path" rev-list --count HEAD 2>/dev/null || echo "0")
+        if [[ -n "$has_changes" || "$commit_count" == "0" ]]; then
+            local msg="Sync: $(date '+%Y-%m-%d %H:%M')"
+            if [[ "$commit_count" == "0" ]]; then msg="Initial Backup"; fi
+            
+            if ! git -C "$backup_repo_path" diff --cached --quiet; then
+                 git -C "$backup_repo_path" commit -q -m "$msg"
+                 echo -e "📦 ${GREEN}Git backup committed:${NC} $backup_repo_path"
+            fi
+        fi
+        manage_git_history "$backup_repo_path"
 
-    if [[ -n "$has_changes" || "$commit_count" == "0" ]]; then
-        local msg=""
-        if [[ "$commit_count" == "0" ]]; then
-            msg="Initial Backup"
-            echo -e "📦 ${GREEN}Initialized & Backed up:${NC} $backup_repo_path"
-        else
-            msg="Sync: $(date '+%Y-%m-%d %H:%M')"
-            echo -e "📦 ${GREEN}Backup updated:${NC} $backup_repo_path"
+    elif [[ "$tracker_backend" == "borg" ]]; then
+        local borg_repo_dir="$backup_repo_path/.borg_repo"
+        
+        # Only commit if the staging directory actually has files (skip if completely empty)
+        if [[ -z "$(ls -A "$backup_repo_path" 2>/dev/null | grep -v -E '^\.borg_repo$|^RESTORE_MOUNT$')" ]]; then
+             return
+        fi
+
+        echo -e "📦 ${CYAN}Compressing & Saving to Borg Vault (zstd)...${NC}"
+        
+        cd "$backup_repo_path" || return
+        
+        local snapshot_name="Sync-{now:%Y-%m-%d_%H-%M-%S}"
+        borg create --compression auto,zstd \
+            "$borg_repo_dir::$snapshot_name" \
+            . --exclude './.borg_repo' --exclude './RESTORE_MOUNT' >/dev/null 2>&1
+            
+        if [[ "$BORG_MAX_COMMITS" -gt 0 ]]; then
+            borg prune --keep-last "$BORG_MAX_COMMITS" "$borg_repo_dir" >/dev/null 2>&1
         fi
         
-        if ! git -C "$backup_repo_path" diff --cached --quiet; then
-             git -C "$backup_repo_path" commit -q -m "$msg"
-        fi
+        echo -e "✨ ${GREEN}Borg snapshot verified & pruned successfully.${NC}"
+        cd - >/dev/null || return
     fi
-
-    manage_git_history "$backup_repo_path"
 }
 
 # --- Process File ---
@@ -261,26 +383,13 @@ process_txt_file() {
 
     if [[ ! -f "$file" ]]; then echo "❌ File not found"; exit 1; fi
 
+    # Headers are now parsed earlier globally by parse_headers()
     if [[ "$current_run_dry" == false ]]; then init_backup_repo; fi
 
-    # --- Pre-Read: Parse headers (@ and #) ---
-    while IFS= read -r line || [[ -n "$line" ]]; do
-        line=$(echo "$line" | xargs)
-        if [[ "$line" =~ ^@(.+)$ ]]; then
-            dest_base_prefix="${BASH_REMATCH[1]}"
-            dest_base_prefix="${dest_base_prefix/#\~/$HOME}"
-        elif [[ "$line" =~ ^#(.+)$ ]]; then
-            local excludes_str="${BASH_REMATCH[1]}"
-            IFS=',' read -r -a global_excludes <<< "$excludes_str"
-            for i in "${!global_excludes[@]}"; do global_excludes[$i]=$(echo "${global_excludes[$i]}" | xargs); done
-        fi
-    done < "$file"
-
-    # --- Main Loop ---
     while IFS= read -r line || [[ -n "$line" ]]; do
         line=$(echo "$line" | xargs)
         
-        if [[ -z "$line" || "$line" == \#* || "$line" == @* ]]; then continue; fi
+        if [[ -z "$line" || "$line" == \#* || "$line" == @* || "$line" == \$* ]]; then continue; fi
 
         local pair="$line"
         local path_part="${pair%%,*}"
@@ -303,9 +412,7 @@ process_txt_file() {
         for i in "${!excludes[@]}"; do excludes[$i]=$(echo "${excludes[$i]}" | xargs); done
         local all_excludes=("${global_excludes[@]}" "${excludes[@]}")
         
-        # --- Wildcard Support Logic ---
         if [[ "$src" == *\** || "$src" == *\?* || "$src" == *\[* ]]; then
-            # Expand wildcard correctly (handles spaces safely)
             local expanded_srcs=()
             while IFS= read -r match; do
                 expanded_srcs+=("$match")
@@ -316,24 +423,18 @@ process_txt_file() {
                 continue
             fi
 
-            # Loop over all expanded file matches
             for expanded_src in "${expanded_srcs[@]}"; do
                 local base_name=$(basename "$expanded_src")
                 local expanded_dst=""
 
-                # Resolve wildcard mapping behavior
-                if [[ "$dst" == *\** ]]; then
-                    expanded_dst="$(dirname "$dst")/$base_name"
-                elif [[ "$dst" == */ ]]; then
-                    expanded_dst="${dst}${base_name}"
-                else
-                    expanded_dst="${dst}/${base_name}"
+                if [[ "$dst" == *\** ]]; then expanded_dst="$(dirname "$dst")/$base_name"
+                elif [[ "$dst" == */ ]]; then expanded_dst="${dst}${base_name}"
+                else expanded_dst="${dst}/${base_name}"
                 fi
 
                 sync_node "$expanded_src" "$expanded_dst" "$current_run_dry" "${all_excludes[@]}"
             done
         else
-            # Standard single source sync
             sync_node "$src" "$dst" "$current_run_dry" "${all_excludes[@]}"
         fi
 
@@ -347,6 +448,17 @@ process_txt_file() {
 # --- Main ---
 main() {
     if [[ ! -d "$CONFIG_DIR" ]]; then mkdir -p "$CONFIG_DIR"; fi
+
+    # Check if user requested RESTORE MODE
+    if [[ "$MODE" == "restore" ]]; then
+        handle_restore
+        exit 0
+    fi
+
+    # Initialize Headers early so preview knows which tracker we use
+    if [[ -n "$txt_file" ]]; then
+        parse_headers "$txt_file"
+    fi
 
     run_batch() {
         local is_dry="$1"
@@ -380,7 +492,14 @@ main() {
     echo ""
     echo -e "${YELLOW}⚠️  Review changes.${NC}"
     if [[ "$use_backup" == true ]]; then
+        if [[ "$tracker_backend" == "borg" ]]; then
+            echo -e "   Tracker:     ${BLUE}BorgBackup (Zstd Chunk Deduplication)${NC}"
+        else
+            echo -e "   Tracker:     ${BLUE}Git (Standard History)${NC}"
+        fi
+        
         echo -e "   Backup Repo: ${BLUE}$backup_repo_path${NC}"
+        
         if [[ -n "$dest_base_prefix" ]]; then
              echo -e "   Structure:   ${BLUE}Mapped by destination${NC} (Base: $dest_base_prefix)"
         else

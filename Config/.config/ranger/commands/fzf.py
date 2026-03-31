@@ -173,6 +173,7 @@ class fzf_open_with(Command):
                 preconfigured_commands = {
                     "evince": "evince {}",
                     "zathura": "zathura {}",
+                    "papers": "papers {}",
                 }
             elif ext in audio_extensions:
                 preconfigured_commands = {
