@@ -102,6 +102,7 @@ else
 fi
 # Link rtrash so that it could be used from anywhere
 ln -s ~/.config/ranger/rtrash ~/.local/bin/rtrash
+
 # Make all .sh scripts executable in ~/.local/share/bin
 echo "Making scripts executable in ~/.local/share/bin..."
 chmod +x ~/.local/share/bin/*.sh || true # Use true to prevent script from exiting if no .sh files are found

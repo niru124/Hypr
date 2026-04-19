@@ -121,6 +121,39 @@ if confirm_action "AstroNvim (Neovim configuration)"; then
 	echo
 fi
 
+# Vim
+if confirm_action "Vim Configuration"; then
+	if [ -f "./vim.sh" ]; then
+		chmod +x ./vim.sh
+		./vim.sh
+	else
+		echo "vim.sh not found."
+	fi
+	echo
+fi
+
+# Tmux and Keyd
+if confirm_action "Tmux and Keyd Configuration"; then
+	if [ -f "./tmux_and_keyd.sh" ]; then
+		chmod +x ./tmux_and_keyd.sh
+		./tmux_and_keyd.sh
+	else
+		echo "tmux_and_keyd.sh not found."
+	fi
+	echo
+fi
+
+# Themes
+if confirm_action "Themes (Catppuccin, Bibata)"; then
+	if [ -f "./install_themes.sh" ]; then
+		chmod +x ./install_themes.sh
+		./install_themes.sh
+	else
+		echo "install_themes.sh not found."
+	fi
+	echo
+fi
+
 # Additional Installations
 if confirm_action "Run Non-Essential Packages Installation (install_non_essential.sh)"; then
 	if [ -f "./install_non_essential.sh" ]; then

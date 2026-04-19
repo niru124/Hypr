@@ -9,10 +9,8 @@ return {
         "lua_ls",
         "clangd",
         "jedi_language_server",
-        -- "sqlls",
-        -- "bashls",
+        "jdtls",
         "arduino_language_server",
-        -- "jdtls" handled by astrocommunity
       },
     },
   },

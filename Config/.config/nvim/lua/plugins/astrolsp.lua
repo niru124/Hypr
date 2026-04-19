@@ -58,8 +58,7 @@ return {
           end,
           desc = "Toggle LSP semantic highlight (buffer)",
           cond = function(client)
-            return client.supports_method "textDocument/semanticTokens/full"
-              and vim.lsp.semantic_tokens ~= nil
+            return client.server_capabilities.semanticTokensProvider ~= nil
           end,
         },
       },

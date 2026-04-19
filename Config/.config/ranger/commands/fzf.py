@@ -145,6 +145,7 @@ class fzf_open_with(Command):
                 ".java",
             }
             archive_extensions = {".zip", ".tar", ".gz", ".bz2", ".xz", ".7z", ".rar"}
+            archive_extensions = {".md"}
 
             if ext in image_extensions:
                 import os
@@ -194,6 +195,12 @@ class fzf_open_with(Command):
                 preconfigured_commands = {
                     "unzip": f'unzip -d "{os.path.splitext(selected_file.path)[0]}" {{}}',
                     "xdg-open": "xdg-open {}",
+                }
+
+            elif ext in archive_extensions:
+                preconfigured_commands = {
+                    "Marktext": "marktext {}",
+                    "Nvim": "nvim {}",
                 }
             else:
                 preconfigured_commands = {

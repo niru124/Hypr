@@ -30,3 +30,7 @@ inotify-tools
 tesseract
 tesseract-data-eng
 tesseract-data-hin
+vim
+python3-dev
+libffi-dev 
+libssl-dev

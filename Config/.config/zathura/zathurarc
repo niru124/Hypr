@@ -28,5 +28,5 @@ map f adjust_window width
 map <C-+> zoom in
 map <C--> zoom out
 
-map j feedkeys "<C-Down>"
-map k feedkeys "<C-Up>"
+map j scroll down
+map k scroll up

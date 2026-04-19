@@ -171,6 +171,8 @@ alias ball='input-remapper-control --command start --device "HS6209 2.4G Wireles
 
 alias tt='toru stream'
 
+alias rm='rm -i'
+
 export PATH="$HOME/.local/bin:$PATH"
 
 # opencode
@@ -190,3 +192,8 @@ export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 [[ -d $PYENV_ROOT/shims ]] && export PATH="$PYENV_ROOT/shims:$PATH"
 eval "$(pyenv init -)"
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/home/pencil/.lmstudio/bin"
+# End of LM Studio CLI section
+
