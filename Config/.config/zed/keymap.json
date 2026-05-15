@@ -5,15 +5,15 @@
       "jj": "editor::Cancel",
       "ctrl-[": "editor::Cancel",
       "ctrl-d": "editor::HalfPageDown",
-      "ctrl-u": "editor::HalfPageUp"
-    }
+      "ctrl-u": "editor::HalfPageUp",
+    },
   },
   {
     "context": "Pane",
     "bindings": {
       "shift-\\": "pane::SplitRight",
-      "-": "pane::SplitDown"
-    }
+      "ctrl-shift--": "pane::SplitDown",
+    },
   },
   {
     "bindings": {
@@ -23,58 +23,58 @@
       "alt-backspace": "editor::DeleteToPreviousWordStart",
       "ctrl-s": "workspace::Save",
       "ctrl-p": "file_finder::Toggle",
-      "ctrl-shift-p": "command_palette::Toggle"
-    }
+      "ctrl-shift-p": "command_palette::Toggle",
+    },
   },
   {
     "context": "Editor && (vim_mode == normal || vim_mode == visual)",
     "bindings": {
-      "space": "file_finder::Toggle"
-    }
+      "space": "file_finder::Toggle",
+    },
   },
   {
     "context": "Workspace && (vim_mode == normal || vim_mode == visual)",
     "bindings": {
       "space e": "project_panel::ToggleFocus",
-      "ctrl-shift-\\": "terminal_panel::Toggle"
-    }
+      "ctrl-shift-\\": "terminal_panel::Toggle",
+    },
   },
   {
     "context": "ProjectPanel",
     "bindings": {
-      "space e": "workspace::ToggleLeftDock"
-    }
+      "space e": "workspace::ToggleLeftDock",
+    },
   },
   {
     "context": "Pane",
     "bindings": {
-      "space q": "pane::CloseActiveItem"
-    }
+      "space q": "pane::CloseActiveItem",
+    },
   },
   {
     "bindings": {
       "ctrl-b h": "workspace::ActivatePaneLeft",
       "ctrl-b j": "workspace::ActivatePaneDown",
       "ctrl-b k": "workspace::ActivatePaneUp",
-      "ctrl-b l": "workspace::ActivatePaneRight"
-    }
+      "ctrl-b l": "workspace::ActivatePaneRight",
+    },
   },
   {
     "context": "Terminal",
     "bindings": {
-      "ctrl-shift-`": "workspace::ToggleBottomDock"
-    }
+      "ctrl-shift-`": "workspace::ToggleBottomDock",
+    },
   },
   {
     "context": "VimControl && !menu",
     "bindings": {
-      "space f w": "project_symbols::Toggle"
-    }
+      "space f w": "project_symbols::Toggle",
+    },
   },
   {
     "context": "VimControl && !menu",
     "unbind": {
-      "g shift-s": "project_symbols::Toggle"
-    }
-  }
+      "g shift-s": "project_symbols::Toggle",
+    },
+  },
 ]

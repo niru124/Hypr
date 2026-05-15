@@ -12,9 +12,12 @@
       "dnd-inhibited-none": ""
     },
     "return-type": "json",
-    "exec-if": "which swaync-client",
-    "exec": "swaync-client -swb",
-    "on-click": "swaync-client -t -sw",
-    "on-click-right": "swaync-client -d -sw",
+    "exec-if": "which dunstctl",
+    "exec": "$scrPath/notifications.py",
+    "on-click": "dunstctl history-pop",
+    "on-click-middle": "dunstctl clear-history",
+    "on-click-right": "dunstctl close-all",
+    "on-scroll-up": "dunstctl history-pop",
+    "on-scroll-down": "dunstctl history-pop",
     "escape": true
   },
