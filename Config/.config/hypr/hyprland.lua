@@ -146,5 +146,6 @@ dofile(os.getenv("HOME") .. "/.config/hypr/keybindings.lua")
 dofile(os.getenv("HOME") .. "/.config/hypr/windowrules.lua")
 dofile(os.getenv("HOME") .. "/.config/hypr/monitors.lua")
 dofile(os.getenv("HOME") .. "/.config/hypr/nvidia.lua")
+dofile(os.getenv("HOME") .. "/.config/hypr/gestures.lua")
 
 -- Keybindings are in keybindings.lua
