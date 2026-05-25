@@ -449,15 +449,15 @@
     timeout = 0
 
 [urgency_low]
-    background = "#8D65A380"
-    foreground = "#EDCCFFE6"
-    frame_color = "#8D65A303"
-    icon = "/home/pencil/.config/dunst/icons/clock-fast.svg"
+    background = "#A3736580"
+    foreground = "#FFD7CCE6"
+    frame_color = "#A3736503"
+    icon = "/home/pencil/.config/dunst/icons/hyprdots.svg"
     timeout = 5
 
 [urgency_normal]
-    background = "#553A6B80"
-    foreground = "#E9CCFFE6"
-    frame_color = "#553A6B03"
-    icon = "/home/pencil/.config/dunst/icons/clock-fast.svg"
+    background = "#3A3E6B80"
+    foreground = "#CCD1FFE6"
+    frame_color = "#3A3E6B03"
+    icon = "/home/pencil/.config/dunst/icons/hyprdots.svg"
     timeout = 5

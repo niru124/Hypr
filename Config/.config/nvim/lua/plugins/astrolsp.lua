@@ -52,8 +52,18 @@ return {
         },
       },
       jedi_language_server = {},
-      handlers = {
-        jdtls = false,
+      jdtls = {
+        settings = {
+          java = {
+            eclipse = { downloadSources = true },
+            configuration = { updateBuildConfiguration = "interactive" },
+            maven = { downloadSources = true },
+            implementationsCodeLens = { enabled = true },
+            referencesCodeLens = { enabled = true },
+            references = { includeDecompiledSources = true },
+            inlayHints = { parameterNames = { enabled = "all" } },
+          },
+        },
       },
       -- sqlls = {},
     },

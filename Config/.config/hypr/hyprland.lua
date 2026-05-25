@@ -77,27 +77,6 @@ hl.config({
     gaps_out = 4,
     border_size = 3,
     layout = "scrolling",
-    ["col.active_border"] = {
-      colors = {
-        "rgba(155,122,194,1)",
-        "rgba(189,154,230,1)",
-        "rgba(40,12,62,1)",
-        "rgba(209,170,240,1)",
-        "rgba(155,122,194,1)",
-        "rgba(189,154,230,1)",
-        "rgba(40,12,62,1)",
-        "rgba(209,170,240,1)",
-      },
-    },
-    ["col.inactive_border"] = {
-      colors = {
-        "rgba(81,87,109,1)",
-        "rgba(98,104,128,1)",
-        "rgba(115,121,148,1)",
-        "rgba(131,139,167,1)",
-      },
-      angle = 45,
-    },
   },
 })
 
@@ -158,24 +137,11 @@ hl.config({
   },
 })
 
--- Animations (disabled preset)
-hl.curve("wind", { type = "bezier", points = { {0.05, 0.9}, {0.1, 1.05} } })
-hl.curve("winIn", { type = "bezier", points = { {0.1, 1.1}, {0.1, 1.1} } })
-hl.curve("winOut", { type = "bezier", points = { {0.3, -0.3}, {0, 1} } })
-hl.curve("liner", { type = "bezier", points = { {1, 1}, {1, 1} } })
-hl.curve("linear", { type = "bezier", points = { {1, 1}, {1, 1} } })
-
-hl.animation({ leaf = "windows", enabled = false, speed = 3, curve = "wind", style = "slide" })
-hl.animation({ leaf = "windowsIn", enabled = false, speed = 3, curve = "winIn", style = "slide" })
-hl.animation({ leaf = "windowsOut", enabled = false, speed = 3, curve = "winOut", style = "slide" })
-hl.animation({ leaf = "windowsMove", enabled = false, speed = 2, curve = "wind", style = "slide" })
-hl.animation({ leaf = "border", enabled = true, speed = 7, bezier = "linear" })
-hl.animation({ leaf = "borderangle", enabled = true, speed = 30, bezier = "linear", style = "loop" })
-hl.animation({ leaf = "fade", enabled = false, speed = 10, curve = "default" })
-hl.animation({ leaf = "workspaces", enabled = false, speed = 5, curve = "wind" })
-hl.animation({ leaf = "specialWorkspace", enabled = false, speed = 5, curve = "wind", style = "slidevert" })
+-- Load animation preset (selected via rofi)
+dofile(os.getenv("HOME") .. "/.config/hypr/animations/animations.lua")
 
 -- Source additional configuration files
+dofile(os.getenv("HOME") .. "/.config/hypr/themes/colors.lua")
 dofile(os.getenv("HOME") .. "/.config/hypr/keybindings.lua")
 dofile(os.getenv("HOME") .. "/.config/hypr/windowrules.lua")
 dofile(os.getenv("HOME") .. "/.config/hypr/monitors.lua")

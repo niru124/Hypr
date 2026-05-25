@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 DCOL="$HOME/.cache/hyde/wall.dcol"
-CONFIG="$HOME/.config/hypr/hyprland.conf"
+CONFIG="$HOME/.config/hypr/themes/colors.conf"
 
 if [[ ! -f "$DCOL" ]]; then
 	echo "❌ Missing .dcol file at $DCOL"
@@ -22,44 +22,33 @@ active_colors=(
 	"$(fix_rgba "$dcol_2xa8_rgba")"
 )
 
-# Inactive border colors (hardcoded in rgba)
+# Inactive border colors (dynamic from .dcol)
 inactive_colors=(
-	"rgba(81,87,109,1)"
-	"rgba(98,104,128,1)"
-	"rgba(115,121,148,1)"
-	"rgba(131,139,167,1)"
+	"$(fix_rgba "$dcol_pry1_rgba")"
+	"$(fix_rgba "$dcol_pry2_rgba")"
+	"$(fix_rgba "$dcol_1xa3_rgba")"
+	"$(fix_rgba "$dcol_1xa4_rgba")"
 )
 
 # Construct lines for config
 active_line="    col.active_border = ${active_colors[*]} ${active_colors[*]}"
 inactive_line="    col.inactive_border = ${inactive_colors[*]} 45deg"
 
-# Update hyprland.conf
-if grep -q '^[[:space:]]*general[[:space:]]*{' "$CONFIG"; then
-	if grep -q '^[[:space:]]*col\.active_border' "$CONFIG"; then
-		sed -i -E "s|^[[:space:]]*col\.active_border.*|$active_line|" "$CONFIG"
-	else
-		sed -i "/^[[:space:]]*general[[:space:]]*{/a\\$active_line" "$CONFIG"
-	fi
+# Update colors.conf
+mkdir -p "$(dirname "$CONFIG")"
 
-	if grep -q '^[[:space:]]*col\.inactive_border' "$CONFIG"; then
-		sed -i -E "s|^[[:space:]]*col\.inactive_border.*|$inactive_line|" "$CONFIG"
-	else
-		sed -i "/^[[:space:]]*general[[:space:]]*{/a\\$inactive_line" "$CONFIG"
-	fi
-else
-	cat >>"$CONFIG" <<EOF
-
+cat > "$CONFIG" <<EOF
 general {
-    gaps_in = 4
-    gaps_out = 4
-    border_size = 1
-$active_line
-$inactive_line
+    col.active_border = ${active_colors[*]} ${active_colors[*]}
+    col.inactive_border = ${inactive_colors[*]} 45deg
+}
+
+group {
+    col.border_active = ${active_colors[*]} ${active_colors[*]}
+    col.border_inactive = ${inactive_colors[*]} 45deg
 }
 EOF
-fi
 
 hyprctl reload
 
-echo "✅ Updated col.active_border (dynamic) and col.inactive_border (hardcoded rgba) in general block from $DCOL"
+echo "✅ Updated border colors (dynamic from wallpaper) in $CONFIG"

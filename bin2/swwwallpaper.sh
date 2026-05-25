@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 
 #// lock instance
@@ -116,8 +116,72 @@ echo ":: applying wall :: \"$(readlink -f "${wallSet}")\""
 swww img "$(readlink "${wallSet}")" --transition-bezier .43,1.19,1,.4 --transition-type "${xtrans}" --transition-duration "${wallTransDuration}" --transition-fps "${wallFramerate}" --invert-y --transition-pos "$(hyprctl cursorpos | grep -E '^[0-9]' || echo "0,0")" &
 
 notify -normal --app-name "ThemeSwitch" "" -message-new-instant
-# Wait a moment to ensure wallpaper is set (optional)
 sleep 0.5
 
-# Run border color update script
-border.sh
+# Update border colors directly from .dcol file
+if [ -f "${wallDcl}" ]; then
+    . "${wallDcl}"
+
+    dcol_1xa6_rgba_fix="${dcol_1xa6_rgba//\\1/1}"
+    dcol_1xa7_rgba_fix="${dcol_1xa7_rgba//\\1/1}"
+    dcol_pry2_rgba_fix="${dcol_pry2_rgba//\\1/1}"
+    dcol_2xa8_rgba_fix="${dcol_2xa8_rgba//\\1/1}"
+    dcol_pry1_rgba_fix="${dcol_pry1_rgba//\\1/1}"
+    dcol_1xa3_rgba_fix="${dcol_1xa3_rgba//\\1/1}"
+    dcol_1xa4_rgba_fix="${dcol_1xa4_rgba//\\1/1}"
+
+    mkdir -p "$HOME/.config/hypr/themes"
+    cat > "$HOME/.config/hypr/themes/colors.lua" <<EOF
+hl.config({
+  general = {
+    ["col.active_border"] = {
+      colors = {
+        "${dcol_1xa6_rgba_fix}",
+        "${dcol_1xa7_rgba_fix}",
+        "${dcol_pry2_rgba_fix}",
+        "${dcol_2xa8_rgba_fix}",
+        "${dcol_1xa6_rgba_fix}",
+        "${dcol_1xa7_rgba_fix}",
+        "${dcol_pry2_rgba_fix}",
+        "${dcol_2xa8_rgba_fix}",
+      },
+    },
+    ["col.inactive_border"] = {
+      colors = {
+        "${dcol_pry1_rgba_fix}",
+        "${dcol_pry2_rgba_fix}",
+        "${dcol_1xa3_rgba_fix}",
+        "${dcol_1xa4_rgba_fix}",
+      },
+      angle = 45,
+    },
+  },
+  group = {
+    ["col.border_active"] = {
+      colors = {
+        "${dcol_1xa6_rgba_fix}",
+        "${dcol_1xa7_rgba_fix}",
+        "${dcol_pry2_rgba_fix}",
+        "${dcol_2xa8_rgba_fix}",
+        "${dcol_1xa6_rgba_fix}",
+        "${dcol_1xa7_rgba_fix}",
+        "${dcol_pry2_rgba_fix}",
+        "${dcol_2xa8_rgba_fix}",
+      },
+    },
+    ["col.border_inactive"] = {
+      colors = {
+        "${dcol_pry1_rgba_fix}",
+        "${dcol_pry2_rgba_fix}",
+        "${dcol_1xa3_rgba_fix}",
+        "${dcol_1xa4_rgba_fix}",
+      },
+      angle = 45,
+    },
+  },
+})
+EOF
+
+    hyprctl -q reload
+    echo "✅ Border colors updated from wallpaper"
+fi
