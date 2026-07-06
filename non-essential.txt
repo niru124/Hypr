@@ -36,3 +36,4 @@ libffi-dev
 libssl-dev
 niri-screen-time-git
 helium-browser-bin 
+simple-mtpfs

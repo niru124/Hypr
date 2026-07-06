@@ -27,7 +27,7 @@ max_size = "1920px 100%"
 
 [scratchpads.ranger]
 animation = "fromTop"
-command = "kitty --class main-ranger -e ranger"
+command = "kitty --class main-ranger -e lf"
 class = "main-ranger"
 size = "90% 80%"
 max_size = "1920px 100%"

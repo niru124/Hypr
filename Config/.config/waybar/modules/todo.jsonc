@@ -1,0 +1,9 @@
+"custom/todo": {
+  "format-json": "{text}",
+  "tooltip-format": "{tooltip}",
+  "exec": "/home/pencil/.local/share/bin/waybar_todo.sh",
+  "return-type": "json",
+  "interval": 60,
+  "tooltip": true,
+  "on-click": "~/.local/share/bin/rofi_todo.sh"
+},

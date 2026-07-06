@@ -30,6 +30,7 @@ set shellopts '-eu'
 # is newline. You need to consider the values of these options and create your
 # commands accordingly.
 set ifs "\n"
+set trash "rtrash put"
 
 # Use the `dim` attribute instead of underline for the cursor in the preview pane
 set cursorpreviewfmt "\033[7;2m"
@@ -54,17 +55,17 @@ map xt tar
 map xx extract
 map xn extract_to_dir
 
-map o $open $f ; lf -remote "send ${id} quit"
-map O $open -R $fx
+map o openers
+map O $xdg-open -R $fx
 map Q $lf -remote "send quit" # close all window
 map i $$lf_previewer "$f"
 map I %file "$f"
 
 map y
 map yy copy
-map yp $printf "%s" "$fx" | pbcopy       # full path
-map yn $printf "%s" "${fx##*/}" | pbcopy # filename
-map yd $printf "%s" "${fx%/*}" | pbcopy  # dirname
+map yp $printf "%s" "$fx" | wl-copy       # full path
+map yn $printf "%s" "${fx##*/}" | wl-copy # filename
+map yd $printf "%s" "${fx%/*}" | wl-copy  # dirname
 
 map d
 map dd cut
@@ -138,7 +139,38 @@ cmd chmod ${{
 }}
 
 cmd quicklook &{{
-    qlmanage -p $f &>/dev/null
+    xdg-open "$f" &>/dev/null
+}}
+
+cmd openers ${{
+    case "$f" in
+        *.pdf|*.PDF)
+            choice=$(printf "evince\nzathura" | fzf +m --prompt="Open PDF with: ")
+            ;;
+        *.jpg|*.jpeg|*.png|*.gif|*.bmp|*.webp)
+            choice=$(printf "nsxiv\nfeh\nsatty\nfotokilof" | fzf +m --prompt="Open image with: ")
+            ;;
+        *.mp4|*.mkv|*.avi|*.webm|*.mov)
+            choice=$(printf "mpv\nvlc" | fzf +m --prompt="Open video with: ")
+            ;;
+        *.mp3|*.flac|*.wav|*.ogg)
+            choice=$(printf "mpv\nvlc" | fzf +m --prompt="Open audio with: ")
+            ;;
+        *.html|*.htm)
+            choice=$(printf "firefox\nchromium\nsurf" | fzf +m --prompt="Open with: ")
+            ;;
+        *)
+            choice=""
+            ;;
+    esac
+    if [ -n "$choice" ]; then
+        case "$choice" in
+            satty) satty -f "$f" >/dev/null 2>&1 & ;;
+            *) "$choice" "$f" >/dev/null 2>&1 & ;;
+        esac
+    else
+        xdg-open "$f" >/dev/null 2>&1 &
+    fi
 }}
 
 cmd lfopen ${{

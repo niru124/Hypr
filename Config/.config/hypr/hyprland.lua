@@ -64,9 +64,11 @@ hl.config({
     touchpad = {
       natural_scroll = true,
     },
+    accel_profile = "adaptive",
     sensitivity = 1,
-    force_no_accel = true,
+    -- force_no_accel = true,
     numlock_by_default = false,
+
   },
 })
 

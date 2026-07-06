@@ -2,6 +2,6 @@
   "format": "{}°",
   "tooltip": true,
   "interval": 3600,
-  "exec": "wttrbar --location sindri",
+  "exec": "wttrbar --location kolkata",
   "return-type": "json"
 },

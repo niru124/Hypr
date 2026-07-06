@@ -160,6 +160,9 @@ return {
           { noremap = true, silent = true }
         ),
 
+        -- Open current file in new tab
+        ["<Leader>te"] = { "<Cmd>tabedit %<CR>", desc = "Open current file in new tab" },
+
         -- Go to function implementation
         vim.api.nvim_set_keymap(
           "n",

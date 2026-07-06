@@ -449,15 +449,15 @@
     timeout = 0
 
 [urgency_low]
-    background = "#A3736580"
-    foreground = "#FFD7CCE6"
-    frame_color = "#A3736503"
+    background = "#6590A380"
+    foreground = "#CCEFFFE6"
+    frame_color = "#6590A303"
     icon = "/home/pencil/.config/dunst/icons/hyprdots.svg"
     timeout = 5
 
 [urgency_normal]
-    background = "#3A3E6B80"
-    foreground = "#CCD1FFE6"
-    frame_color = "#3A3E6B03"
+    background = "#3A496B80"
+    foreground = "#CCDCFFE6"
+    frame_color = "#3A496B03"
     icon = "/home/pencil/.config/dunst/icons/hyprdots.svg"
     timeout = 5

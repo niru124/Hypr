@@ -127,6 +127,7 @@ tooltip {
 #taskbar,
 #temperature,
 #custom-theme,
+#custom-todo,
 #custom-tor,
 #tray,
 #custom-updates,
@@ -196,5 +197,9 @@ tooltip {
 
 #custom-powerprofile {
     font-size: 17px;
+}
+
+#custom-todo.overdue {
+    color: #ff6699;
 }
 

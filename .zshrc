@@ -176,7 +176,10 @@ alias rm='rm -i'
 export PATH="$HOME/.local/bin:$PATH"
 
 # opencode
-export PATH=/home/nirantar/.opencode/bin:$PATH
+export PATH="$HOME.opencode/bin:$PATH"
+
+# cargo
+export PATH="$HOME/.cargo/bin:$PATH"
 
 nvoil() {
   nvim -c 'lua require("lazy").load({ plugins = { "oil.nvim" } }); require("oil").open()' "$@"

@@ -226,15 +226,24 @@ func generatePreview(cache string, opts previewOpts) string {
 	case opts.mime == "application/msword",
 		opts.ext == ".xlsx",
 		opts.ext == ".ppt",
-		opts.ext == ".pptx",
-		opts.ext == ".mp4",
-		opts.ext == ".mov":
+		opts.ext == ".pptx":
 		err := qlmanagePreview(opts.fp, cache)
 		if err != nil {
 			log.Printf("qlmanagePreview failed: %v\n", err)
 			return ""
 		}
 		return cache
+	case strings.HasPrefix(opts.mime, "video/"):
+		// Try ffmpegthumbnailer first, then fall back to ffmpeg
+		runOutput(`ffmpegthumbnailer -i "%s" -o "%s" -s 1024 2>/dev/null`, opts.fp, cache)
+		if _, err := os.Stat(cache); err == nil {
+			return cache
+		}
+		runOutput(`ffmpeg -i "%s" -ss "%s" -vframes 1 -y "%s" 2>/dev/null`, opts.fp, "00:00:01", cache)
+		if _, err := os.Stat(cache); err == nil {
+			return cache
+		}
+		return ""
 	default:
 		return ""
 	}
@@ -352,7 +361,7 @@ func previewText(opts previewOpts) {
 	}
 
 	// Check if it's a binary file (not text-based)
-	if !isTextFile(opts.mime) {
+	if !isTextFile(&opts) {
 		displayBinaryFileInfo(opts)
 		return
 	}
@@ -370,15 +379,22 @@ func previewText(opts previewOpts) {
 	}
 }
 
-func isTextFile(mime string) bool {
-	return strings.HasPrefix(mime, "text/") ||
+func isTextFile(opts *previewOpts) bool {
+	mime := opts.mime
+	if strings.HasPrefix(mime, "text/") ||
 		mime == "application/json" ||
 		mime == "application/xml" ||
 		mime == "application/javascript" ||
+		mime == "application/typescript" ||
 		strings.HasSuffix(mime, "+json") ||
 		strings.HasSuffix(mime, "+xml") ||
 		strings.HasSuffix(mime, "wordprocessingml.document") ||
-		mime == "inode/x-empty"
+		mime == "inode/x-empty" {
+		return true
+	}
+	// Fallback: check file encoding for text-like content
+	encoding := runOutput(`file -b --mime-encoding "%s"`, opts.fp)
+	return encoding != "binary"
 }
 
 func displayBinaryFileInfo(opts previewOpts) {

@@ -6,9 +6,9 @@
   <property name="pressureMultiplier" value="3.27"/>
   <property name="zoomGesturesEnabled" value="true"/>
   <property name="selectedToolbar" value="Portrait"/>
-  <property name="lastSavePath" value="/home/pencil/Documents/Cryptography"/>
-  <property name="lastOpenPath" value="/home/pencil/Documents/Cryptography"/>
-  <property name="lastImagePath" value="/home/pencil/Documents/Cryptography"/>
+  <property name="lastSavePath" value="/home/pencil/big/Cryptorgraphy"/>
+  <property name="lastOpenPath" value="/home/pencil/big/Cryptorgraphy"/>
+  <property name="lastImagePath" value="/home/pencil/Downloads"/>
   <property name="edgePanSpeed" value="20"/>
   <property name="edgePanMaxMult" value="5"/>
   <property name="zoomStep" value="10"/>
@@ -239,7 +239,7 @@
     <attribute name="count" type="int" value="9"/>
   </data>
   <data name="tools">
-    <attribute name="current" type="string" value="hand"/>
+    <attribute name="current" type="string" value="pen"/>
     <data name="drawArrow"/>
     <data name="drawCoordinateSystem"/>
     <data name="drawDoubleArrow"/>
@@ -248,7 +248,7 @@
     <data name="drawSpline"/>
     <data name="eraser">
       <attribute name="size" type="string" value="MEDIUM"/>
-      <attribute name="type" type="string" value="deleteStroke"/>
+      <attribute name="type" type="string" value="default"/>
     </data>
     <data name="hand"/>
     <data name="highlighter">
@@ -264,15 +264,15 @@
       <attribute name="size" type="string" value="MEDIUM"/>
     </data>
     <data name="laserPointerPen">
-      <attribute name="color" type="hex" value="ffff0000"/>
+      <attribute name="color" type="hex" value="ff24273a"/>
       <attribute name="size" type="string" value="MEDIUM"/>
     </data>
     <data name="pen">
-      <attribute name="color" type="hex" value="ffc6a0f6"/>
+      <attribute name="color" type="hex" value="ffa6da95"/>
       <attribute name="drawingType" type="string" value="default"/>
       <attribute name="fill" type="int" value="0"/>
       <attribute name="fillAlpha" type="int" value="128"/>
-      <attribute name="size" type="string" value="MEDIUM"/>
+      <attribute name="size" type="string" value="THIN"/>
       <attribute name="style" type="string" value="plain"/>
     </data>
     <data name="playObject"/>
