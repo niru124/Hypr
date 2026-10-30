@@ -18,7 +18,7 @@
 
 	"modules-left": ["custom/padd","custom/l_end","cpu","memory","custom/cpuinfo","disk","custom/gpu","custom/fan","custom/memory_swap","custom/r_end","custom/l_end","idle_inhibitor","clock","custom/weather","custom/r_end","","custom/padd"],
 	"modules-center": ["custom/padd","","custom/l_end","hyprland/workspaces","custom/r_end","custom/padd"],
-	"modules-right": ["custom/padd","custom/l_end","","custom/tor","network","custom/net_usage","pulseaudio","pulseaudio#microphone","custom/powerprofile","custom/r_end","custom/l_end","privacy","bluetooth","custom/blue","custom/networki","battery","custom/r_end","custom/l_end","custom/mount","custom/todo","custom/notifications","custom/power","custom/r_end","custom/padd"],
+	"modules-right": ["custom/padd","custom/l_end","","custom/tor","network","custom/net_usage","pulseaudio","pulseaudio#microphone","custom/powerprofile","custom/r_end","custom/l_end","privacy","bluetooth","custom/blue","custom/networki","battery","custom/r_end","custom/l_end","custom/mount","custom/todo","custom/notifications","custom/waybarlock","custom/power","custom/r_end","custom/padd"],
 
 
 // sourced from modules based on config.ctl //
@@ -152,8 +152,7 @@
     "network": {
         "tooltip": true,
     "format-wifi": "<span foreground='#99ffdd'> {bandwidthDownBytes}</span> <span foreground='#ffcc66'> {bandwidthUpBytes}</span>",
-        "rotate":" ${r_deg
-    }","format-ethernet": "󰈀 ","tooltip-format": "Network: <big><b>{essid}</b></big>\nSignal strength: <b>{signaldBm}dBm ({signalStrength}%)</b>\nFrequency: <b>{frequency}MHz</b>\nInterface: <b>{ifname}</b>\nIP: <b>{ipaddr}/{cidr}</b>\nGateway: <b>{gwaddr}</b>\nNetmask: <b>{netmask}</b>",
+        "rotate":" 0","format-ethernet": "󰈀 ","tooltip-format": "Network: <big><b>{essid}</b></big>\nSignal strength: <b>{signaldBm}dBm ({signalStrength}%)</b>\nFrequency: <b>{frequency}MHz</b>\nInterface: <b>{ifname}</b>\nIP: <b>{ipaddr}/{cidr}</b>\nGateway: <b>{gwaddr}</b>\nNetmask: <b>{netmask}</b>",
     "format-linked": "󰈀 {ifname} (No IP)",
     "format-disconnected": "󰖪 ",
     "tooltip-format-disconnected": "Disconnected",
@@ -295,7 +294,7 @@
 "custom/todo": {
   "format-json": "{text}",
   "tooltip-format": "{tooltip}",
-  "exec": "/home/pencil/.local/share/bin/waybar_todo.sh",
+  "exec": "~/.local/share/bin/waybar_todo.sh",
   "return-type": "json",
   "interval": 60,
   "tooltip": true,
@@ -329,6 +328,14 @@
         "interval": 1,
         "tooltip": true,
         "escape": true
+    },
+    "custom/waybarlock": {
+        "format": "{}",
+        "return-type": "json",
+        "exec": "~/.local/share/bin/waybar-themelock.sh status",
+        "interval": 5,
+        "on-click": "~/.local/share/bin/waybar-themelock.sh toggle",
+        "tooltip": true
     },
     "custom/power": {
         "format": "{}",

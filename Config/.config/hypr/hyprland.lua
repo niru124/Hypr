@@ -27,16 +27,17 @@ hl.on("hyprland.start", function()
   hl.exec_cmd(scrPath .. "/batterynotify.sh")
   hl.exec_cmd("hyprsunset -t 2500K")
   hl.exec_cmd("pypr")
-  hl.exec_cmd("hyprpm reload")
-  hl.exec_cmd("smooth-scroll")
-  hl.exec_cmd("hyprpm reload Hyprspace")
-  hl.exec_cmd("hyprshader on")
+
+  local so = os.getenv("HOME") .. "/.config/hypr/plugins/scrolloverview.lua"
+  local f = io.open(so, "r")
+  if f then f:close(); dofile(so) end
+  hl.exec_cmd("hyprshade on")
   hl.exec_cmd("youtube-local")
   hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")
   hl.exec_cmd("/usr/lib/xdg-desktop-portal")
   hl.exec_cmd("niri-screen-time -daemon")
-  hl.exec_cmd("hyprdynamicmonitors prepare")
-  hl.exec_cmd("hyprdynamicmonitors run")
+--  hl.exec_cmd("hyprdynamicmonitors prepare")
+--  hl.exec_cmd("hyprdynamicmonitors run --enable-lid-events")
   hl.exec_cmd(scrPath .. "/recent.sh")
 end)
 
@@ -151,3 +152,6 @@ dofile(os.getenv("HOME") .. "/.config/hypr/nvidia.lua")
 dofile(os.getenv("HOME") .. "/.config/hypr/gestures.lua")
 
 -- Keybindings are in keybindings.lua
+
+-- Added by hyprmoncfg: its generated monitor rules load last, so nothing before this can override the applied layout.
+do local path = os.getenv("HOME") .. "/.config/hypr/hyprmoncfg-monitors.lua"; local file = io.open(path, "r"); if file then file:close(); dofile(path) end end

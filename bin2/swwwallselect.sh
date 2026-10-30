@@ -12,8 +12,8 @@ elem_border=$(( hypr_border * 3 ))
 
 #// scale for monitor
 mon_x_res=$(hyprctl -j monitors | jq '.[] | select(.focused==true) | .width')
-mon_scale=$(hyprctl -j monitors | jq '.[] | select(.focused==true) | .scale' | sed "s/\.//")
-mon_x_res=$(( mon_x_res * 100 / mon_scale ))
+mon_scale=$(hyprctl -j monitors | jq '.[] | select(.focused==true) | .scale')
+mon_x_res=$(awk -v w="${mon_x_res}" -v s="${mon_scale}" 'BEGIN{printf "%d", w/s}')
 
 #// generate config
 elm_width=$(( (28 + 8 + 5) * rofiScale ))

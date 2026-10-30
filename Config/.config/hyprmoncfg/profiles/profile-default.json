@@ -1,0 +1,41 @@
+{
+  "name": "profile-default",
+  "created_at": "2026-09-02T11:08:41.234562528Z",
+  "updated_at": "2026-09-02T17:48:59.34376434Z",
+  "outputs": [
+    {
+      "key": "au optronics|0x21ed",
+      "match_key": "au optronics|0x21ed",
+      "name": "eDP-1",
+      "description": "AU Optronics 0x21ED",
+      "make": "AU Optronics",
+      "model": "0x21ED",
+      "enabled": true,
+      "mode": "1920x1080@60.06Hz",
+      "width": 1920,
+      "height": 1080,
+      "refresh": 60.06,
+      "x": 300,
+      "y": 300,
+      "scale": 1,
+      "transform": 0,
+      "bitdepth": 8,
+      "cm": "srgb",
+      "sdr_brightness": 1,
+      "sdr_saturation": 1,
+      "sdr_min_luminance": 0.2,
+      "sdr_max_luminance": 80,
+      "min_luminance": 0
+    }
+  ],
+  "workspaces": {
+    "enabled": false,
+    "strategy": "sequential",
+    "max_workspaces": 9,
+    "group_size": 3,
+    "monitor_order": [
+      "au optronics|0x21ed"
+    ]
+  },
+  "exec": ""
+}

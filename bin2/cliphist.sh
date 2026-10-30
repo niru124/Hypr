@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 # Set variables
 scrDir=$(dirname "$(realpath "$0")")
@@ -16,9 +16,8 @@ elem_border=$([ $hypr_border -eq 0 ] && echo "5" || echo $hypr_border)
 readarray -t curPos < <(hyprctl cursorpos -j | jq -r '.x,.y')
 readarray -t monRes < <(hyprctl -j monitors | jq '.[] | select(.focused==true) | .width,.height,.scale,.x,.y')
 readarray -t offRes < <(hyprctl -j monitors | jq -r '.[] | select(.focused==true).reserved | map(tostring) | join("\n")')
-monRes[2]="$(echo "${monRes[2]}" | sed "s/\.//")"
-monRes[0]="$(( ${monRes[0]} * 100 / ${monRes[2]} ))"
-monRes[1]="$(( ${monRes[1]} * 100 / ${monRes[2]} ))"
+monRes[0]="$(awk -v w="${monRes[0]}" -v s="${monRes[2]}" 'BEGIN{printf "%d", w/s}')"
+monRes[1]="$(awk -v h="${monRes[1]}" -v s="${monRes[2]}" 'BEGIN{printf "%d", h/s}')"
 curPos[0]="$(( ${curPos[0]} - ${monRes[3]} ))"
 curPos[1]="$(( ${curPos[1]} - ${monRes[4]} ))"
 
@@ -44,10 +43,12 @@ r_override="window{location:${x_pos} ${y_pos};anchor:${x_pos} ${y_pos};x-offset:
 
 # Show main menu if no arguments are passed
 if [ $# -eq 0 ]; then
-    main_action=$(echo -e "History\nDelete\nView Favorites\nManage Favorites\nClear History" | rofi -dmenu -theme-str "entry { placeholder: \"Choose action\";}" -theme-str "${r_scale}" -theme-str "${r_override}" -config "${roconf}")
+    main_action=$(echo -e "History\nDelete\nView Favorites\nManage Favorites\nClear History" | rofi -dmenu -theme-str "entry { placeholder: \"Choose action\";}" -theme-str "${r_scale}" -theme-str "${r_override}" -config "${roconf}") || exit 0
 else
     main_action="History"
 fi
+
+[ -z "${main_action}" ] && exit 0
 
 case "${main_action}" in
 "History")
@@ -97,7 +98,9 @@ case "${main_action}" in
     fi
     ;;
 "Manage Favorites")
-    manage_action=$(echo -e "Add to Favorites\nDelete from Favorites\nClear All Favorites" | rofi -dmenu -theme-str "entry { placeholder: \"Manage Favorites\";}" -theme-str "${r_scale}" -theme-str "${r_override}" -config "${roconf}")
+    manage_action=$(echo -e "Add to Favorites\nDelete from Favorites\nClear All Favorites" | rofi -dmenu -theme-str "entry { placeholder: \"Manage Favorites\";}" -theme-str "${r_scale}" -theme-str "${r_override}" -config "${roconf}") || exit 0
+
+    [ -z "${manage_action}" ] && exit 0
 
     case "${manage_action}" in
     "Add to Favorites")

@@ -93,7 +93,6 @@ fi
 plugins=(
   git
   zsh-autosuggestions
-  zsh-syntax-highlighting
   fast-syntax-highlighting
   # zsh-autocomplete
   fzf
@@ -173,13 +172,15 @@ alias tt='toru stream'
 
 alias rm='rm -i'
 
+# dotfiles helpers live in ~/.local/share/bin (see install_core.sh)
+[[ -d "$HOME/.local/share/bin" ]] && export PATH="$HOME/.local/share/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 
 # opencode
-export PATH="$HOME.opencode/bin:$PATH"
+[[ -d "$HOME.opencode/bin" ]] && export PATH="$HOME.opencode/bin:$PATH"
 
 # cargo
-export PATH="$HOME/.cargo/bin:$PATH"
+[[ -d "$HOME/.cargo/bin" ]] && export PATH="$HOME/.cargo/bin:$PATH"
 
 nvoil() {
   nvim -c 'lua require("lazy").load({ plugins = { "oil.nvim" } }); require("oil").open()' "$@"
@@ -197,6 +198,26 @@ export PYENV_ROOT="$HOME/.pyenv"
 eval "$(pyenv init -)"
 
 # Added by LM Studio CLI (lms)
-export PATH="$PATH:/home/pencil/.lmstudio/bin"
+[[ -d "$HOME/.lmstudio/bin" ]] && export PATH="$PATH:$HOME/.lmstudio/bin"
 # End of LM Studio CLI section
+
+
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+
+# JDTLS Maven bootstrap on cd: seed .project/.classpath for any new Maven project
+_bootstrap_jdtls_on_cd() {
+  [[ -f pom.xml ]] || return 0
+  [[ -f .classpath || -f .project ]] && return 0
+  [[ -f .jdtls-skip ]] && return 0
+  command -v mvn >/dev/null 2>&1 || return 0
+  local dirname
+  dirname=${PWD:t}
+  read -q "yn?Seed JDTLS classpath for ${dirname}? [y/N] " || { print -r; return 0 }
+  print -r
+  $HOME/bin/bootstrap-jdtls.sh "$PWD"
+}
+autoload -Uz add-zsh-hook
+add-zsh-hook chpwd _bootstrap_jdtls_on_cd
 

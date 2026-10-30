@@ -1,14 +1,18 @@
-# HyDE - Hyprland Desktop Environment Setup
+# HyDE - Hyprland Desktop Environment
 
-HyDE is a comprehensive setup for a beautiful and functional Hyprland desktop environment on Arch Linux. It includes dotfiles, scripts, and installation automation for a complete rice with themes, tools, and plugins(pyprland and hyprpm).
+A personal Hyprland setup for Arch Linux: dotfiles, helper scripts and an
+installer that can set everything up from a fresh installation.
+
+The dotfiles grew out of [HyDE](https://github.com/HyDE-Project/HyDE) and have
+been heavily customised; see the "Credits" section.
 
 ## Features
 
-- **Modular Installation**: Interactive setup with selective component installation.
-- **Dotfiles**: Pre-configured Hyprland, Waybar, Dunst, Kitty, and more.
-- **Themes**: Catppuccin color scheme with custom fonts and cursors.
-- **Tools**: Neovim with AstroNvim, Pyprland plugins, zoxide, and more.
-- **Scripts**: Custom scripts for wallpapers, quotes, battery, etc.
+- **Modular installation** – pick components with `--only` or answer prompts.
+- **Idempotent installer** – safe to re-run; existing files are backed up.
+- **Dotfiles** – Hyprland, Waybar, Dunst, Kitty, Rofi, Hyprlock, and more.
+- **Themes** – Catppuccin GTK theme and Bibata cursors.
+- **Tools** – Neovim/AstroNvim, pyprland, zoxide, fzf, and more.
 
 ## Screenshots
 
@@ -17,71 +21,102 @@ HyDE is a comprehensive setup for a beautiful and functional Hyprland desktop en
 ![Waybar](assets/images/waybar/waybar.png)
 ![Rofi App Launcher](assets/images/rofi/app_launcher.png)
 
-## Prerequisites
+## Requirements
 
-- Arch Linux (or compatible)
-- Basic system with pacman and yay (AUR helper)
-- Root access for some configurations (e.g., greetd)
+- Arch Linux (or an Arch-based distribution)
+- An existing graphical session is **not** required, but the installer expects
+  a normal user account with `sudo` rights.
+- Network access (packages, fonts, wallpapers).
 
-## Quick Start
+## Quick start
 
-1. Clone the repository:
+```bash
+sudo pacman -S --needed git
+git clone --depth 1 https://github.com/niru124/Hypr.git
+cd Hypr
+./install_all.sh
+```
 
-   ```bash
-   sudo pacman -S git
-   ```
+`install_all.sh` asks before each component. Useful flags:
 
-1. Clone the repository:
+```bash
+./install_all.sh --help              # list components and options
+./install_all.sh --yes               # non-interactive, accept everything
+./install_all.sh --dry-run           # show what would run
+./install_all.sh --only core,zsh     # run selected components only
+```
 
-   ```bash
-   git clone --depth 1 https://github.com/niru124/Hypr.git
-   cd HyDE
-   ```
+After the installer finishes, log out and back in (or reboot) so the new shell
+configuration, groups and services take effect.
 
-1. Run the main installer:
+## Components
 
-   ```bash
-   ./install_all.sh
-   ```
+| Component    | Script                     | What it does                                            |
+| ------------ | -------------------------- | ------------------------------------------------------- |
+| `core`       | `install_core.sh`          | pacman + AUR packages, dotfiles, helper scripts         |
+| `zsh`        | `install_zsh.sh`           | Oh My Zsh, Powerlevel10k, plugins, `.zshrc`             |
+| `wallpapers` | `install_wallpapers.sh`    | clones the wallpaper collection into `~/.config/hyde`  |
+| `gpu`        | `install_gpu_drivers.sh`   | Mesa/NVIDIA userspace drivers for the detected GPU      |
+| `fonts`      | `install_fonts.sh`         | Nerd Fonts, Noto emoji, display fonts                   |
+| `pyprland`   | `pyprland.sh`              | pyprland from the AUR                                   |
+| `greetd`     | `tui_greet.sh`             | configures tuigreet (run through sudo)                  |
+| `astronvim`  | `install_astronvim.sh`     | AstroNvim configuration (previous config is backed up)  |
+| `vim`        | `vim.sh`                   | `~/.vimrc`                                              |
+| `tmux_keyd`  | `tmux_and_keyd.sh`         | tmux config, TPM and the keyd remapping                 |
+| `themes`     | `install_themes.sh`        | GTK theme and cursor theme                              |
+| `optional`   | `install_non_essential.sh` | optional packages, selected with fzf                    |
 
-   Follow the y/n prompts to select components.
+Every script can also be run on its own, e.g. `./install_fonts.sh`.
 
-## Installation Scripts
+`install_hyprpm_plugins.sh` is **not** part of the default flow: Hyprland 0.56
+and newer ship a native `scrolling` layout that supersedes the old
+`hyprscroller` plugin. Run it manually only if you know you need the plugin.
 
-The main script `install_all.sh` orchestrates the setup by calling modular scripts based on user confirmation. Order of execution:
+## Layout
 
-1. **Core Packages** (`install_core.sh`): Installs essential pacman packages (all), optional AUR packages (fzf selection), copies dotfiles, scripts, installs zoxide.
-2. **Non-Essential Packages** (`install_non_essential.sh`): Interactive fzf selection from non-essential.txt for additional AUR packages.
-3. **Fonts** (`install_fonts.sh`): Installs Nerd Fonts (CaskaydiaCove, 0xProto, JetBrainsMono) and custom fonts (Abocat, Steelfish Outline, Mexcellent).
-4. **Pyprland** (`pyprland.sh`): Installs Pyprland from AUR.
-5. **TUI Greet Configuration** (`tui_greet.sh`): Configures greetd with tuigreet for Hyprland login.
-6. **AstroNvim** (`install_astronvim.sh`): Sets up Neovim with AstroNvim configuration.
-7. **Non-Essential Packages** (optional rerun of `install_non_essential.sh`).
-8. **Hyprpm Plugins** (optional `install_hyprpm_plugins.sh`).
+```
+.
+├── install_all.sh          # entry point
+├── install_*.sh            # components
+├── lib/common.sh           # shared helpers (logging, backups, packages)
+├── pacman_necessary.txt    # official-repo packages
+├── yay_necessary.txt       # AUR packages
+├── non-essential.txt       # optional packages
+├── Config/.config/         # dotfiles, copied to ~/.config
+├── bin2/                   # helper scripts, copied to ~/.local/share/bin
+├── assets/                 # screenshots
+└── themes/                 # GTK theme and cursor theme archives
+```
 
-## Individual Scripts
+## Notes
 
-Run specific scripts directly for partial setups:
+- Dotfiles are copied with `rsync`, and every file that would be overwritten is
+  saved under `~/.config-backup/<timestamp>/` (a `latest` symlink points to the
+  most recent backup).
+- Shell dotfiles are backed up the same way before being replaced.
+- Private or machine-specific files (`.zshrc` history, caches) are ignored via
+  `.gitignore`.
+- `greetd` is **enabled** but not started, so the installer can be run from a
+  live desktop session without terminating it. Reboot to use the greeter.
 
-- `./install_core.sh`: Core setup with package installation and dotfiles.
-- `./install_non_essential.sh`: Additional packages with selection.
-- `./install_fonts.sh`: Font installation.
-- `./pyprland.sh`: Pyprland installation.
-- `./tui_greet.sh`: Greetd configuration (requires sudo).
-- `./install_astronvim.sh`: AstroNvim setup.
-- `./pacman_necessary.sh`: Install all pacman packages from pacman_necessary.txt.
-- `./yay_necessary.sh`: Select and install AUR packages from yay_necessary.txt with fzf.
+## Keybindings and usage
 
-## Configuration
+- Hyprland keybindings: `Config/.config/hypr/hyprland.conf`.
+- Waybar modules: scripts in `~/.local/share/bin/` (added to `PATH` by
+  `.zshrc`).
+- Wallpapers: the `wall` script, stored in `~/.config/hyde/themes/`.
+- Lock-screen quotes: `quotes.json`.
 
-- Dotfiles are in `Config/.config/`.
-- Scripts are in `bin2/` (copied to `~/.local/share/bin/`).
-- Wallpapers and assets in `assets/`.
-- Customize themes in `Config/.config/themes/`.
+## Credits
 
-## Keybindings and Usage
+- [HyDE](https://github.com/HyDE-Project/HyDE) – the original project these
+  dotfiles are based on.
+- [AstroNvim](https://github.com/AstroNvim/AstroNvim),
+  [Powerlevel10k](https://github.com/romkatv/powerlevel10k),
+  [waybar](https://github.com/Alexays/Waybar) and the other upstream projects
+  whose configurations are included here.
 
-- Hyprland keybindings: Check `Config/.config/hypr/hyprland.conf`.
-- Waybar modules: Custom scripts in `~/.local/share/bin/`.
-- Wallpaper: Use `wall` script for dynamic wallpapers and wallpapers are stored in `~/.config/hyde/themes/`.
-- Quotes: Random quotes on lock screen from `quotes.json`.
+## License
+
+No license file is included yet. If you plan to redistribute this repository,
+add one (HyDE itself is GPL-3.0) and keep the upstream attribution above.

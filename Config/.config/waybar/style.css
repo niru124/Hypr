@@ -132,6 +132,7 @@ tooltip {
 #tray,
 #custom-updates,
 #custom-wallchange,
+#custom-waybarlock,
 #custom-wbar,
 #custom-weather,
 #window,
@@ -201,5 +202,9 @@ tooltip {
 
 #custom-todo.overdue {
     color: #ff6699;
+}
+
+#custom-waybarlock.locked {
+    color: @wb-act-fg;
 }
 

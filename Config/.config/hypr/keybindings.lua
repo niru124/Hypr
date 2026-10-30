@@ -4,12 +4,25 @@
 local scrPath = os.getenv("HOME") .. "/.local/share/bin"
 local mainMod = "SUPER"
 
+-- Dispatch the right action for the layout of the active workspace.
+-- (From the Hyprland wiki: Configuring > Lua code snippets > Per-layout binds)
+local function layout_bind(bind_table)
+  return function()
+    local workspace = hl.get_active_special_workspace() or hl.get_active_workspace()
+    if not workspace then return end
+    local layout = workspace.tiled_layout
+    if bind_table[layout] then
+      hl.dispatch(bind_table[layout])
+    end
+  end
+end
+
 -- Toggle special workspace
 hl.bind(mainMod .. " + S", hl.dsp.workspace.toggle_special(""))
 -- App variables
 local term = "kitty"
 local editor = "nvim"
-local file = "thunar"
+local file = "strata"
 local browser = "librewolf"
 
 -- Scripts
@@ -25,7 +38,7 @@ hl.bind("ALT + F11", hl.dsp.window.fullscreen({ action = "toggle" }))
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("swaylock"))
 hl.bind(mainMod .. " + SHIFT + F", hl.dsp.exec_cmd(scrPath .. "/windowpin.sh"))
 hl.bind(mainMod .. " + BACKSPACE", hl.dsp.exec_cmd(scrPath .. "/logoutlaunch.sh"))
-hl.bind("CTRL + ALT + T", hl.dsp.exec_cmd("killall waybar || (env reload_flag=1 " .. scrPath .. "/wbarconfgen.sh)"))
+hl.bind("CTRL + ALT + T", hl.dsp.exec_cmd("killall waybar; (env reload_flag=1 " .. scrPath .. "/wbarconfgen.sh)"))
 hl.bind("CTRL + F12", hl.dsp.exec_cmd("killall grimblast || textHypr.sh"))
 hl.bind("CTRL + F11", hl.dsp.exec_cmd("cd ~/STT/ && /usr/bin/python3 ~/STT/record_gui"))
 
@@ -77,10 +90,12 @@ hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"), { locked = true })
 hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { locked = true })
 
 -- Brightness control
-hl.bind("ALT + XF86MonBrightnessDown", hl.dsp.exec_cmd(scrPath .. "/brightnesscontrol.sh d"), { repeating = true })
-hl.bind("ALT + XF86MonBrightnessUp", hl.dsp.exec_cmd(scrPath .. "/brightnesscontrol.sh i"), { repeating = true })
-hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd(scrPath .. "/brightnesscontrol.sh i -s"), { repeating = true })
-hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd(scrPath .. "/brightnesscontrol.sh d -s"), { repeating = true })
+-- Primary keys use the remembered monitor (auto re-selects only when the
+-- monitor set changes). ALT+ variants force the monitor selection menu.
+hl.bind("ALT + XF86MonBrightnessDown", hl.dsp.exec_cmd(scrPath .. "/brightnesscontrol.sh d -s"), { repeating = true })
+hl.bind("ALT + XF86MonBrightnessUp", hl.dsp.exec_cmd(scrPath .. "/brightnesscontrol.sh i -s"), { repeating = true })
+hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd(scrPath .. "/brightnesscontrol.sh i"), { repeating = true })
+hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd(scrPath .. "/brightnesscontrol.sh d"), { repeating = true })
 
 -- Move between grouped windows
 hl.bind(mainMod .. " + CTRL + H", hl.dsp.group.prev())
@@ -109,11 +124,23 @@ hl.bind(mainMod .. " + ALT + N", hl.dsp.exec_cmd(scrPath .. "/go_back.sh"))
 hl.bind(mainMod .. " + Y", hl.dsp.exec_cmd("pkill -x rofi || " .. scrPath .. "/pass.sh"))
 
 -- Move/Change window focus
-hl.bind("ALT + L", function() hl.dispatch(hl.dsp.focus({ direction = "r" })) end)
-hl.bind("ALT + H", function() hl.dispatch(hl.dsp.focus({ direction = "l" })) end)
-hl.bind("ALT + J", function() hl.dispatch(hl.dsp.focus({ direction = "u" })) end)
-hl.bind("ALT + K", function() hl.dispatch(hl.dsp.focus({ direction = "d" })) end)
-hl.bind("ALT + TAB", function() hl.dispatch(hl.dsp.focus({ direction = "d" })) end)
+-- In the scrolling layout use the layout's own `focus` message: it moves focus,
+-- centers the tape, wraps at the ends and never jumps to another monitor (the
+-- plain movefocus dispatcher does exactly that when a window is fullscreen).
+local function focus_bind(dir)
+  return layout_bind({
+    scrolling = hl.dsp.layout("focus " .. dir),
+    dwindle   = hl.dsp.focus({ direction = dir }),
+    master    = hl.dsp.focus({ direction = dir }),
+    monocle   = hl.dsp.focus({ direction = dir }),
+  })
+end
+
+hl.bind("ALT + L", focus_bind("right"))
+hl.bind("ALT + H", focus_bind("left"))
+hl.bind("ALT + J", focus_bind("up"))
+hl.bind("ALT + K", focus_bind("down"))
+hl.bind("ALT + TAB", focus_bind("down"))
 
 -- Workspace switching (Alt key)
 for i = 1, 9 do
@@ -200,7 +227,35 @@ end)
 hl.bind("ALT + D", hl.dsp.exec_cmd("systemctl suspend && hyprlock && hyprctl reload"))
 -- Toggle focused window split
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))
-hl.bind("switch:Lid Switch", hl.dsp.exec_cmd("hyprlock && systemctl suspend && hyprctl reload"), { locked = true })
+local function internal_monitor()
+    for _, m in ipairs(hl.get_monitors()) do
+        if string.match(m.name, "^eDP") then return m.name end
+    end
+end
+
+local function has_external_monitor()
+    for _, m in ipairs(hl.get_monitors()) do
+        if not string.match(m.name, "^eDP") then return true end
+    end
+    return false
+end
+
+-- Lid closed: if an external monitor is connected keep the laptop awake
+-- (disable internal panel + lock); otherwise suspend.
+hl.bind("switch:on:Lid Switch", function()
+    if has_external_monitor() then
+        local internal = internal_monitor()
+        if internal then hl.monitor({ output = internal, disabled = true }) end
+        hl.dispatch(hl.dsp.exec_cmd("hyprlock"))
+    else
+        hl.dispatch(hl.dsp.exec_cmd("sleep 1 && systemctl suspend"))
+    end
+end, { locked = true })
+-- Lid opened: re-enable internal panel
+hl.bind("switch:off:Lid Switch", function()
+    local internal = internal_monitor()
+    if internal then hl.monitor({ output = internal, disabled = false }) end
+end, { locked = true })
 
 -- Move focused window to a workspace silently
 hl.bind(mainMod .. " + ALT + 1", hl.dsp.exec_cmd("hyprctl dispatch movetoworkspacesilent 1"))
@@ -226,3 +281,9 @@ hl.bind(mainMod .. " + DOWN", hl.dsp.exec_cmd("pypr layout_center next2"))
 
 -- Overview plugin
 hl.bind(mainMod .. " + U", hl.dsp.exec_cmd("plugin:overview:toggle"))
+
+-- Scroll-Overview plugin binds/submap live in plugins/scrolloverview.lua
+
+-- Cursor zoom (like 2-finger pinch)
+hl.bind(mainMod .. " + equal", hl.dsp.exec_cmd("hyprctl -q eval \"hl.config({cursor = {zoom_factor = $(hyprctl getoption cursor:zoom_factor -j | jq '.float * 1.1')}})\""), { repeating = true })
+hl.bind(mainMod .. " + minus", hl.dsp.exec_cmd("hyprctl -q eval \"hl.config({cursor = {zoom_factor = $(hyprctl getoption cursor:zoom_factor -j | jq '(.float * 0.9) | if . < 1 then 1 else . end')}})\""), { repeating = true })

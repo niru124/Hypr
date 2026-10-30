@@ -20,11 +20,13 @@ return {
         y = 0.5,
       }
     })
-    vim.api.nvim_set_keymap("n", "<leader>e", "", {
+    -- NOTE: <leader>e is the oil explorer (see oil.lua); ranger lives on <leader>E
+    vim.api.nvim_set_keymap("n", "<leader>E", "", {
       noremap = true,
       callback = function()
         require("ranger-nvim").open(true)
       end,
+      desc = "Ranger file explorer",
     })
   end,
 }

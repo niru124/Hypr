@@ -7,6 +7,36 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "title_bar": {
+    "show_sign_in": false
+  },
+  "terminal": {
+    "dock": "right"
+  },
+  "disable_ai": true,
+  "cli_default_open_behavior": "existing_window",
+  "vim": {
+    "toggle_relative_line_numbers": true
+  },
+  "gutter": {
+    "line_numbers": true
+  },
+  "icon_theme": "Material Icon Theme",
+  "which_key": {
+    "delay_ms": 600,
+    "enabled": true
+  },
+  "language_models": {
+    "opencode": {
+      "show_go_models": false,
+      "show_zen_models": false
+    }
+  },
+  "agent_servers": {
+    "opencode": {
+      "type": "registry"
+    }
+  },
   "project_panel": {
     "dock": "left"
   },
@@ -29,15 +59,31 @@
     "metrics": false
   },
   "vim_mode": true,
-  "relative_line_numbers": "enabled",
+  "relative_line_numbers": "wrapped",
   "base_keymap": "VSCode",
   "ui_font_family": "Geist Mono",
   "ui_font_size": 16,
   "buffer_font_family": "GeistMono Nerd Font",
-  "buffer_font_size": 15,
+  "buffer_font_size": 19.0,
   "theme": {
     "mode": "dark",
     "light": "One Light",
-    "dark": "Catppuccin Mocha (Blur)",
+    "dark": "Catppuccin Macchiato (Blur) [Heavy]",
+  },
+  "lsp": {
+    "jdtls": {
+      "settings": {
+        "java_home": "/usr/lib/jvm/java-21-openjdk"
+      },
+      "initialization_options": {
+        "settings": {
+          "java": {
+            "configuration": {
+              "updateBuildConfiguration": "disabled"
+            }
+          }
+        }
+      }
+    }
   },
   }

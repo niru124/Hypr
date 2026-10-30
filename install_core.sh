@@ -1,117 +1,127 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#
+# Core step: install pacman/AUR packages, copy dotfiles and helper scripts.
+#
+set -Eeuo pipefail
+IFS=$'\n\t'
 
-# Exit immediately if a command exits with a non-zero status.
-set -e
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+# shellcheck source=lib/common.sh
+source "$SCRIPT_DIR/lib/common.sh"
 
-# first install fzf here as it is later req in the script
-sudo pacman -S fzf
+PACMAN_LIST="$SCRIPT_DIR/pacman_necessary.txt"
+AUR_LIST="$SCRIPT_DIR/yay_necessary.txt"
+CONFIG_DIR="$SCRIPT_DIR/Config/.config"
+BIN_DIR="$SCRIPT_DIR/bin2"
+BIN_TARGET="$HOME/.local/share/bin"
 
-# Install build dependencies for yay
-sudo pacman -S --needed --noconfirm fakeroot binutils debugedit base-devel
+require_not_root
+require_arch
+need_cmd git
 
-# Install yay AUR helper
-echo "Installing yay AUR helper..."
-if ! command -v yay &>/dev/null; then
-	YAY_DIR=$(mktemp -d)
+log "core: packages, dotfiles and scripts"
+
+# --- yay ---------------------------------------------------------------------
+if ! command -v yay >/dev/null 2>&1; then
+	log "building yay from the AUR"
+	pacman_install base-devel fakeroot binutils
+	YAY_DIR="$(mktemp -d)"
+	# shellcheck disable=SC2064
+	trap 'rm -rf -- "$YAY_DIR"' EXIT
 	git clone --depth 1 https://aur.archlinux.org/yay.git "$YAY_DIR"
-	cd "$YAY_DIR"
-	makepkg -si --noconfirm
-	cd "$CURRENT_DIR"
-	rm -rf "$YAY_DIR"
-	echo "yay installation complete."
+	(
+		cd -- "$YAY_DIR"
+		makepkg -si --noconfirm
+	)
+	rm -rf -- "$YAY_DIR"
+	trap - EXIT
+	ok "yay installed"
 else
-	echo "yay is already installed."
+	ok "yay already installed"
 fi
 
-# Set up fzf key bindings and fuzzy completion
-# Properly append fzf initialization to .zshrc if not already present
-if ! grep -q 'eval "$(fzf --zsh)"' ~/.zshrc 2>/dev/null; then
-	echo 'eval "$(fzf --zsh)"' >>~/.zshrc
-fi
-# Also add fzf initialization to .bashrc for bash shells
-if [ -f ~/.bashrc ] && ! grep -q 'eval "$(fzf --bash)"' ~/.bashrc 2>/dev/null; then
-	echo 'eval "$(fzf --bash)"' >>~/.bashrc
-	# Source bashrc to apply fzf bindings in current session
-	source ~/.bashrc 2>/dev/null || true
-fi
+# --- pacman packages ---------------------------------------------------------
+pacman_install fzf
 
-# Correct way to get current directory of the script
-CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-echo "--- Starting Core Packages and Configuration Installation ---"
-
-PACKAGE_FILE="$CURRENT_DIR/pacman_necessary.txt"
-PACKAGE_FILE2="$CURRENT_DIR/yay_necessary.txt"
-
-# Check if package files exist
-if [ ! -f "$PACKAGE_FILE" ]; then
-	echo "Error: File '$PACKAGE_FILE' not found! Skipping pacman package installation."
-	PACKAGE_FILE=""
+mapfile -t PACMAN_PKGS < <(read_list "$PACMAN_LIST")
+if ((${#PACMAN_PKGS[@]})); then
+	mapfile -t KNOWN < <(known_pacman_pkgs "${PACMAN_PKGS[@]}")
+	if ((${#KNOWN[@]} < ${#PACMAN_PKGS[@]})); then
+		warn "some packages in $(basename -- "$PACMAN_LIST") are unknown to pacman and will be skipped"
+	fi
+	pacman_install "${KNOWN[@]}"
 fi
 
-if [ ! -f "$PACKAGE_FILE2" ]; then
-	echo "Error: File '$PACKAGE_FILE2' not found! Skipping AUR package installation."
-	PACKAGE_FILE2=""
+# matugen is in the CachyOS/chaotic repos as `matugen`, but on plain Arch it is
+# only available from the AUR. swwwallpaper.sh needs it for theming.
+if ! command -v matugen >/dev/null 2>&1; then
+	aur_install matugen-bin || true
+	command -v matugen >/dev/null 2>&1 ||
+		warn "matugen is not installed; wallpaper theming will not work"
 fi
 
-# System update
-echo "Updating system with pacman..."
-sudo pacman -Syu --noconfirm || true
-
-# Install packages via pacman
-if [ -n "$PACKAGE_FILE" ]; then
-	echo "Installing packages from '$PACKAGE_FILE' using pacman..."
-	xargs -a "$PACKAGE_FILE" sudo pacman -S --noconfirm --needed || true
-fi
-
-# Select and install packages via yay using fzf
-if [ -n "$PACKAGE_FILE2" ]; then
-	echo "Loading AUR packages from $PACKAGE_FILE2..."
-	selected=$(cat "$PACKAGE_FILE2" | fzf -m --prompt="Select AUR packages to install (Tab to select, Enter to confirm): ") || true
-
-	if [ -z "$selected" ]; then
-		echo "No AUR packages selected."
+# --- AUR packages ------------------------------------------------------------
+mapfile -t AUR_PKGS < <(read_list "$AUR_LIST")
+if ((${#AUR_PKGS[@]})); then
+	if [[ -t 0 && ${HYPR_ASSUME_YES:-0} -eq 0 ]]; then
+		mapfile -t SELECTED < <(
+			printf '%s\n' "${AUR_PKGS[@]}" |
+				fzf -m --prompt="Select AUR packages (Tab = select, Enter = confirm): " || true
+		)
 	else
-		echo "Installing selected AUR packages..."
-		echo "$selected" | xargs yay -S --noconfirm --needed || true
+		SELECTED=("${AUR_PKGS[@]}")
+	fi
+
+	if ((${#SELECTED[@]})); then
+		aur_install "${SELECTED[@]}"
+		ok "AUR packages processed (${#SELECTED[@]})"
+	else
+		log "no AUR packages selected"
 	fi
 fi
 
-echo "All core packages processed."
-
-# Copy configuration files to ~/.config using rsync
-CONFIG_DIR="$CURRENT_DIR/Config/.config"
-if [ -d "$CONFIG_DIR" ] && [ "$(ls -A "$CONFIG_DIR")" ]; then
-	echo "Copying configuration files from .config to ~/.config..."
-	mkdir -p "$HOME/.config"
-	rsync -avv --exclude='.*' "$CONFIG_DIR/" "$HOME/.config/" >/dev/null 2>&1 || true
-	echo "Configuration files copied."
+# --- dotfiles ----------------------------------------------------------------
+if [[ -d $CONFIG_DIR ]] && [[ -n $(ls -A -- "$CONFIG_DIR") ]]; then
+	log "copying dotfiles into ~/.config (existing files are backed up)"
+	TOP_BACKUP="$HOME/.config-backup/$(date +%F_%H%M%S)"
+	mkdir -p -- "$TOP_BACKUP"
+	# --backup-dir only stores files that are actually overwritten, so this
+	# stays cheap even when ~/.config is large.
+	rsync -a \
+		--backup --backup-dir="$TOP_BACKUP/config" \
+		--exclude='/files.txt' \
+		--exclude='/nvim_/' \
+		-- "$CONFIG_DIR/" "$HOME/.config/"
+	ln -sfn -- "$TOP_BACKUP" "$HOME/.config-backup/latest"
+	ok "dotfiles installed (backup: $TOP_BACKUP)"
 else
-	echo "Warning: '$CONFIG_DIR' does not exist or is empty. Skipping configuration copy."
+	warn "$CONFIG_DIR is missing or empty; skipping dotfiles"
 fi
 
-# Copy scripts to ~/.local/share/bin using rsync
-BIN_DIR="$CURRENT_DIR/bin2"
-if [ -d "$BIN_DIR" ] && [ "$(ls -A "$BIN_DIR")" ]; then
-	echo "Copying scripts to ~/.local/share/bin..."
-	mkdir -p ~/.local/share/bin
-	rsync -av --exclude='.*' "$BIN_DIR/" ~/.local/share/bin/ >/dev/null 2>&1 || true
-	echo "Scripts copied to ~/.local/share/bin."
+# --- helper scripts ----------------------------------------------------------
+if [[ -d $BIN_DIR ]] && [[ -n $(ls -A -- "$BIN_DIR") ]]; then
+	log "installing helper scripts into $BIN_TARGET"
+	mkdir -p -- "$BIN_TARGET"
+	rsync -a -- "$BIN_DIR/" "$BIN_TARGET/"
+	find "$BIN_TARGET" -type f -exec chmod +x {} +
+	ok "scripts installed"
 else
-	echo "Warning: '$BIN_DIR' does not exist or is empty. Skipping script copy."
+	warn "$BIN_DIR is missing or empty; skipping scripts"
 fi
-# Link rtrash so that it could be used from anywhere
-ln -s ~/.config/ranger/rtrash ~/.local/bin/rtrash
 
-# Make all .sh scripts executable in ~/.local/share/bin
-echo "Making scripts executable in ~/.local/share/bin..."
-chmod +x ~/.local/share/bin/*.sh || true # Use true to prevent script from exiting if no .sh files are found
-echo "Scripts made executable."
+# rtrash wrapper (idempotent: -f, and only if the source exists)
+if [[ -f $HOME/.config/ranger/rtrash ]]; then
+	mkdir -p -- "$HOME/.local/bin"
+	ln -sfn -- "$HOME/.config/ranger/rtrash" "$HOME/.local/bin/rtrash"
+	ok "linked rtrash into ~/.local/bin"
+else
+	warn "~/.config/ranger/rtrash not found; skipping rtrash link"
+fi
 
-# Enable and start bluetooth service
-echo "Enabling and starting bluetooth service..."
-sudo systemctl enable bluetooth || true
-sudo systemctl start bluetooth || true
-echo "Bluetooth service enabled and started."
+# --- bluetooth ---------------------------------------------------------------
+if systemctl list-unit-files bluetooth.service >/dev/null 2>&1; then
+	sudo systemctl enable --now bluetooth.service ||
+		warn "could not enable bluetooth.service (no adapter?)"
+fi
 
-echo "--- Core Packages and Configuration Installation Complete ---"
+ok "core step complete"

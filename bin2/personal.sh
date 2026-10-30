@@ -2,6 +2,7 @@
 
 # Ask for warmth level
 warmth=$(rofi -dmenu -p "Select warmth level:" -lines 4 <<< $'neutral\nmild\nwarm\nvery warm')
+[ -z "$warmth" ] && exit 0
 
 # Ask for fade amount (optional)
 fade=$(rofi -dmenu -p "Set fade (0.0 - 1.0):" -lines 5 <<< $'1.0\n0.8\n0.6\n0.4\n0.2')

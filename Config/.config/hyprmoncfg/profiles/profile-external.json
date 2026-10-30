@@ -1,0 +1,118 @@
+{
+  "name": "profile-external",
+  "created_at": "2026-09-02T11:13:05.63396362Z",
+  "updated_at": "2026-09-02T18:45:39.194217186Z",
+  "outputs": [
+    {
+      "key": "acer technologies|ka242y g0|251707a323w01",
+      "match_key": "acer technologies|ka242y g0|251707a323w01",
+      "name": "HDMI-A-1",
+      "description": "Acer Technologies KA242Y G0 251707A323W01",
+      "make": "Acer Technologies",
+      "model": "KA242Y G0",
+      "serial": "251707A323W01",
+      "enabled": true,
+      "mode": "1920x1080@120.00Hz",
+      "width": 1920,
+      "height": 1080,
+      "refresh": 120,
+      "x": 0,
+      "y": 1079,
+      "scale": 1,
+      "transform": 0,
+      "bitdepth": 8,
+      "cm": "srgb",
+      "sdr_brightness": 1,
+      "sdr_saturation": 1,
+      "sdr_min_luminance": 0.2,
+      "sdr_max_luminance": 80,
+      "min_luminance": 0
+    },
+    {
+      "key": "au optronics|0x21ed",
+      "match_key": "au optronics|0x21ed",
+      "name": "eDP-1",
+      "description": "AU Optronics 0x21ED",
+      "make": "AU Optronics",
+      "model": "0x21ED",
+      "enabled": false,
+      "mode": "1920x1080@60.06Hz",
+      "width": 1920,
+      "height": 1080,
+      "refresh": 60.06,
+      "x": 300,
+      "y": 300,
+      "scale": 1,
+      "transform": 0,
+      "bitdepth": 8,
+      "cm": "srgb",
+      "sdr_brightness": 1,
+      "sdr_saturation": 1,
+      "sdr_min_luminance": 0.2,
+      "sdr_max_luminance": 80,
+      "min_luminance": 0
+    }
+  ],
+  "workspaces": {
+    "enabled": false,
+    "strategy": "sequential",
+    "max_workspaces": 9,
+    "group_size": 3,
+    "monitor_order": [
+      "au optronics|0x21ed",
+      "acer technologies|ka242y g0|251707a323w01"
+    ],
+    "rules": [
+      {
+        "workspace": "1",
+        "output_key": "au optronics|0x21ed",
+        "output_name": "eDP-1",
+        "default": true,
+        "persistent": true
+      },
+      {
+        "workspace": "2",
+        "output_key": "acer technologies|ka242y g0|251707a323w01",
+        "output_name": "HDMI-A-1",
+        "default": true,
+        "persistent": true
+      },
+      {
+        "workspace": "3",
+        "output_key": "au optronics|0x21ed",
+        "output_name": "eDP-1"
+      },
+      {
+        "workspace": "4",
+        "output_key": "acer technologies|ka242y g0|251707a323w01",
+        "output_name": "HDMI-A-1"
+      },
+      {
+        "workspace": "5",
+        "output_key": "au optronics|0x21ed",
+        "output_name": "eDP-1"
+      },
+      {
+        "workspace": "6",
+        "output_key": "acer technologies|ka242y g0|251707a323w01",
+        "output_name": "HDMI-A-1"
+      },
+      {
+        "workspace": "7",
+        "output_key": "au optronics|0x21ed",
+        "output_name": "eDP-1"
+      },
+      {
+        "workspace": "8",
+        "output_key": "acer technologies|ka242y g0|251707a323w01",
+        "output_name": "HDMI-A-1"
+      },
+      {
+        "workspace": "9",
+        "output_key": "au optronics|0x21ed",
+        "output_name": "eDP-1"
+      }
+    ]
+  },
+  "exec": ""
+}

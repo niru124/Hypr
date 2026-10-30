@@ -14,4 +14,4 @@ hl.gesture({ fingers = 4, direction = "right", action = function() hl.dispatch(h
 hl.gesture({ fingers = 4, direction = "left", action = function() hl.dispatch(hl.dsp.focus({ workspace = "r+1" })) end })
 
 -- 2-finger pinch: zoom
--- hl.gesture({ fingers = 2, direction = "pinch", action = "cursor_zoom", zoom_level = 2, mode = "live" })
+hl.gesture({ fingers = 2, direction = "pinch", action = "cursor_zoom", zoom_level = 2, mode = "live" })

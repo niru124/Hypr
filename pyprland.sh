@@ -1,25 +1,27 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#
+# pyprland step: install pyprland and refresh hyprpm when it is available.
+#
+set -Eeuo pipefail
+IFS=$'\n\t'
 
-# Check if yay is installed
-if ! command -v yay &>/dev/null; then
-    echo "Error: 'yay' is not installed. Please install yay (AUR helper) first."
-    exit 1
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+# shellcheck source=lib/common.sh
+source "$SCRIPT_DIR/lib/common.sh"
+
+require_not_root
+need_cmd yay
+
+log "pyprland: installing"
+
+aur_install pyprland
+
+# hyprpm only exists when Hyprland was built with it; skip silently otherwise.
+if command -v hyprpm >/dev/null 2>&1; then
+	log "updating hyprpm headers"
+	hyprpm update || warn "hyprpm update failed"
+else
+	warn "hyprpm not found; skipping header update (pyprland itself is installed)"
 fi
 
-echo "--- Starting Pyprland Installation ---"
-
-# Install pyprland from AUR
-echo "Installing pyprland from AUR..."
-yay -S --noconfirm pyprland
-
-# Update hyprpm
-hyprpm update
-
-# # Add hyprscroller plugin
-# hyprpm add https://github.com/cpiber/hyprscroller
-#
-# # Enable hyprscroller plugin
-# hyprpm enable hyprscroller
-
-echo "--- Pyprland Installation Complete ---"
-
+ok "pyprland step complete"

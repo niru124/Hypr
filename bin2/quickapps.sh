@@ -73,5 +73,7 @@ do
     echo -en "${qapp}\x00icon\x1f${Ico}\n"
 done | rofi -no-fixed-num-lines -dmenu -theme-str "${r_override}" -theme-str "${pos}" -config $roconf)
 
+[ -z "${RofiSel}" ] && exit 0
+
 $RofiSel &
 

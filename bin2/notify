@@ -4,7 +4,7 @@
 sound_dir="/usr/share/sounds/freedesktop/stereo"
 
 # Directory where icons are stored
-icon_dir="/home/nirantar/.config/dunst/icons"
+icon_dir="$HOME/.config/dunst/icons"
 random_icon_dir="$icon_dir/random"
 
 # Declare an associative array of sound options

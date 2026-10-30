@@ -38,12 +38,12 @@ inputbar {
     padding: 0em;
     children: [ "entry" ];
     background-color: @main-bg;
-    expand: true;
+    expand: false;
 }
 
 entry {
     enabled: true;
-    padding: 1.8em;
+    padding: 0.8em;
     text-color: @main-fg;
     background-color: transparent;
     font: "JetBrainsMono Nerd Font 14"; // Optional: better mono font

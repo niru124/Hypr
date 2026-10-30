@@ -11,9 +11,9 @@ return {
   -- Custom jdtls config removed to avoid conflicts
 
   "andweeb/presence.nvim",
-  {
-    "hrsh7th/nvim-cmp",
-  },
+  -- NOTE (AstroNvim v5): completion is provided by blink.cmp out of the box.
+  -- Do NOT add hrsh7th/nvim-cmp here; it would load a second, unconfigured
+  -- completion engine. Extend blink via `opts` on "Saghen/blink.cmp" instead.
   {
     "ray-x/lsp_signature.nvim",
     event = "BufRead",

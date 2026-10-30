@@ -4,3 +4,10 @@ assets/videos/LOCAL_APPDATA_FONTCONFIG_CACHE/
 *.db
 todo.md
 **/*LOCAL_APPDATA_FONTCONFIG_CACHE/
+
+# Large binaries that are fetched at runtime instead of being versioned.
+bin/ollama
+bin/spf
+
+# Extracted theme directories (install_themes.sh works in a temp dir).
+themes/*/

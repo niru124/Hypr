@@ -41,139 +41,66 @@ return {
       },
     },
     -- Mappings can be configured through AstroCore as well.
-    -- NOTE: keycodes follow the casing in the vimdocs. For example, `<Leader>` must be capitalized
+    -- NOTE: keycodes follow the casing in the vimdocs. For example, `<Leader>` must be capitalized.
+    -- Each entry is either a string command, a function, or false to disable.
     mappings = {
       -- first key is the mode
       n = {
         -- second key is the lefthand side of the map
 
         -- navigate buffer tabs
-        -- Change leader + Shift+h to go to the previous buffer
-        vim.api.nvim_set_keymap(
-          "n",
-          "<S-h>",
-          '<Cmd>lua require("astrocore.buffer").nav(-1)<CR>',
-          {
-            noremap = true,
-            silent = true,
-            desc = "Previous buffer",
-          }
-        ),
-
-        -- Change leader + Shift+l to go to the next buffer
-        vim.api.nvim_set_keymap(
-          "n",
-          "<S-l>",
-          '<Cmd>lua require("astrocore.buffer").nav(1)<CR>',
-          {
-            noremap = true,
-            silent = true,
-            desc = "Next buffer",
-          }
-        ),
+        ["<S-h>"] = {
+          function() require("astrocore.buffer").nav(-vim.v.count1) end,
+          desc = "Previous buffer",
+        },
+        ["<S-l>"] = {
+          function() require("astrocore.buffer").nav(vim.v.count1) end,
+          desc = "Next buffer",
+        },
 
         -- mappings seen under group name "Buffer"
         ["<Leader>bd"] = {
           function()
             require("astroui.status.heirline").buffer_picker(
-              function(bufnr)
-                require("astrocore.buffer").close(
-                  bufnr
-                )
-              end
+              function(bufnr) require("astrocore.buffer").close(bufnr) end
             )
           end,
           desc = "Close buffer from tabline",
         },
-        vim.api.nvim_set_keymap(
-          "n",
-          "<Leader><Leader>",
-          "<Cmd>Telescope find_files<CR>",
-          {
-            noremap = true,
-            silent = true,
-            desc = "Telescope Find Files",
-          }
-        ),
-        vim.api.nvim_set_keymap(
-          "n",
-          "<Leader><Leader>b",
-          "<Cmd>Telescope buffers<CR>",
-          {
-            noremap = true,
-            silent = true,
-            desc = "Telescope Buffers",
-          }
-        ),
 
-        -- Custom function to toggle floating terminal
-        -- Set up toggleterm with floating window option
-        require("toggleterm").setup {
-          size = 20, -- You can customize the size of the floating terminal if needed
-          direction = "float", -- Set terminal direction to 'float'
-          float_opts = {
-            border = "double", -- Set border style (e.g., 'rounded', 'single', 'double', etc.)
-          },
-          open_mapping = [[<c-\>]], -- Optional: Set the default toggle mapping (you can remove this line)
+        -- Telescope shortcuts
+        ["<Leader><Leader>"] = { "<Cmd>Telescope find_files<CR>", desc = "Telescope Find Files" },
+        ["<Leader><Leader>b"] = { "<Cmd>Telescope buffers<CR>", desc = "Telescope Buffers" },
+
+        -- quality-of-life motions
+        ["<S-e>"] = { "$", desc = "End of line" },
+        ["<S-b>"] = { "0", desc = "Start of line" },
+
+        -- floating terminal (setup/opts in plugins/toggleterm.lua)
+        ["<C-/>"] = { "<Cmd>ToggleTerm direction=float<CR>", desc = "Toggle Floating Terminal" },
+        ["<Leader>th"] = { "<Cmd>ToggleTerm direction=horizontal<CR>", desc = "ToggleTerm horizontal" },
+        ["<Leader>tv"] = { "<Cmd>ToggleTerm direction=vertical<CR>", desc = "ToggleTerm vertical" },
+
+        -- Open current file in new tab
+        ["<Leader>te"] = { "<Cmd>tabedit %<CR>", desc = "Open current file in new tab" },
+
+        -- Go to function implementation (v5 default moved to `gri`; keep `gi`).
+        -- NOTE: `cond` is NOT allowed in astrocore mappings (only astrolsp
+        -- mappings support it); it aborts the entire astrocore setup.
+        ["gi"] = {
+          function() vim.lsp.buf.implementation() end,
+          desc = "Go to implementation",
         },
-
-        vim.api.nvim_set_keymap('n', '<S-e>', '$', { noremap = true, silent = true }),
-        vim.api.nvim_set_keymap('n', '<S-b>', '0', { noremap = true, silent = true }),
-
-        vim.api.nvim_set_keymap(
-          "t",
-          "<C-n>",
-          [[<C-\><C-n>]],
-          {
-            noremap = true,
-            silent = true,
-            desc = "Go to Normal Mode in Terminal",
-          }
-        ),
-        -- Map Ctrl+/ to toggle the terminal as a floating window
-        vim.api.nvim_set_keymap(
-          "n",
-          "<C-/>",
-          "<Cmd>ToggleTerm direction=float<CR>",
-          {
-            noremap = true,
-            silent = true,
-            desc = "Toggle Floating Terminal",
-          }
-        ),
         -- tables with just a `desc` key will be registered with which-key if it's installed
         -- this is useful for naming menus
         -- ["<Leader>b"] = { desc = "Buffers" },
 
         -- setting a mapping to false will disable it
         -- ["<C-S>"] = false,
-        vim.api.nvim_set_keymap(
-          "n",
-          "<Leader>th",
-          ":ToggleTerm direction=horizontal<CR>",
-          { noremap = true, silent = true }
-        ),
-        vim.api.nvim_set_keymap(
-          "n",
-          "<Leader>tv",
-          ":ToggleTerm direction=vertical<CR>",
-          { noremap = true, silent = true }
-        ),
-
-        -- Open current file in new tab
-        ["<Leader>te"] = { "<Cmd>tabedit %<CR>", desc = "Open current file in new tab" },
-
-        -- Go to function implementation
-        vim.api.nvim_set_keymap(
-          "n",
-          "gi",
-          "<Cmd>lua vim.lsp.buf.implementation()<CR>",
-          {
-            noremap = true,
-            silent = true,
-            desc = "Go to implementation",
-          }
-        ),
+      },
+      t = {
+        -- Go to Normal Mode in floating terminal
+        ["<C-n>"] = { [[<C-\><C-n>]], desc = "Go to Normal Mode in Terminal" },
       },
     },
   },

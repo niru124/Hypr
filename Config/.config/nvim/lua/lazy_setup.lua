@@ -1,7 +1,7 @@
 require("lazy").setup({
   {
     "AstroNvim/AstroNvim",
-    version = "^4", -- Remove version tracking to elect for nightly AstroNvim
+    version = "^5", -- Remove version tracking to elect for nightly AstroNvim
     import = "astronvim.plugins",
     opts = { -- AstroNvim options must be set here with the `import` key
       mapleader = " ", -- This ensures the leader key must be configured before Lazy is set up
@@ -30,22 +30,6 @@ require("lazy").setup({
       },
     },
   },
-  {
-    "mikesmithgh/kitty-scrollback.nvim",
-    enabled = true,
-    lazy = true,
-    cmd = {
-      "KittyScrollbackGenerateKittens",
-      "KittyScrollbackCheckHealth",
-      "KittyScrollbackGenerateCommandLineEditing",
-    },
-    event = { "User KittyScrollbackLaunch" },
-    -- version = '*', -- latest stable version, may have breaking changes if major version changed
-    -- version = '^6.0.0', -- pin major version, include fixes and features that do not have breaking changes
-    config = function()
-      require("kitty-scrollback").setup()
-    end,
-  },
 } --[[@as LazyConfig]])
 
 -- Load LSP configuration first
@@ -59,5 +43,5 @@ require("lazy").setup({
 --   end,
 -- })
 require("luasnip.loaders.from_lua").load {
-  paths = "~/.config/nvim/lua/snippets",
+  paths = vim.fn.stdpath "config" .. "/lua/snippets",
 }

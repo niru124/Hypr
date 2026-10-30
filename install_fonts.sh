@@ -1,79 +1,85 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#
+# Fonts step: Nerd Fonts, emoji font and two display fonts.
+#
+set -Eeuo pipefail
+IFS=$'\n\t'
 
-# Check if yay is installed (needed for potential AUR fonts)
-if ! command -v yay &>/dev/null; then
-    echo "Warning: 'yay' is not installed. If font installation fails, install yay first."
-fi
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+# shellcheck source=lib/common.sh
+source "$SCRIPT_DIR/lib/common.sh"
 
-echo "--- Starting Font Installation ---"
+FONT_ROOT="$HOME/.local/share/fonts"
+TMP_DIR=""
+
+cleanup() {
+	[[ -n $TMP_DIR && -d $TMP_DIR ]] && rm -rf -- "$TMP_DIR"
+}
+trap cleanup EXIT
+
+require_not_root
+pacman_install curl unzip
+need_cmd curl
+need_cmd unzip
+
+log "fonts: installing Nerd Fonts"
+
+TMP_DIR="$(mktemp -d)"
+
+# download_zip <url> <dest-dir>
+download_zip() {
+	local url=$1 dest=$2 zip
+	zip="$(mktemp -p "$TMP_DIR" --suffix=.zip)"
+	curl -fL --retry 3 --connect-timeout 15 -o "$zip" "$url" || return 1
+	unzip -tq "$zip" >/dev/null 2>&1 || {
+		warn "download is not a valid zip archive: $url"
+		return 1
+	}
+	unzip -qo "$zip" -d "$dest"
+}
 
 install_nerd_font() {
-    local FONT_NAME="$1"
-    local DOWNLOAD_URL="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/${FONT_NAME}.zip"
-    local FONT_DIR="$HOME/.local/share/fonts/$FONT_NAME"
-
-    echo "Installing ${FONT_NAME} Nerd Font..."
-
-    # Create font directory
-    mkdir -p "$FONT_DIR"
-
-    # Download and unzip the font
-    echo "Downloading ${FONT_NAME}..."
-    curl -L -o "${FONT_NAME}.zip" "$DOWNLOAD_URL"
-
-    echo "Extracting ${FONT_NAME}..."
-    unzip -o "${FONT_NAME}.zip" -d "$FONT_DIR"
-
-    # Clean up the zip file
-    rm "${FONT_NAME}.zip"
-
-    echo "${FONT_NAME} installed in ${FONT_DIR}"
+	local name=$1
+	local dest="$FONT_ROOT/$name"
+	log "installing $name Nerd Font"
+	mkdir -p -- "$dest"
+	download_zip \
+		"https://github.com/ryanoasis/nerd-fonts/releases/latest/download/${name}.zip" \
+		"$dest" || {
+		warn "could not install the $name Nerd Font"
+		return 1
+	}
 }
 
 install_custom_font() {
-    local FONT_NAME="$1"
-    local DOWNLOAD_URL="$2"
-    local FONT_DIR="$HOME/.local/share/fonts/$FONT_NAME"
-
-    echo "Installing ${FONT_NAME} font..."
-
-    # Create font directory
-    mkdir -p "$FONT_DIR"
-
-    # Download and unzip the font
-    echo "Downloading ${FONT_NAME}..."
-    curl -L -o "${FONT_NAME}.zip" "$DOWNLOAD_URL"
-
-    echo "Extracting ${FONT_NAME}..."
-    unzip -o "${FONT_NAME}.zip" -d "$FONT_DIR"
-
-    # Clean up the zip file
-    rm "${FONT_NAME}.zip"
-
-    echo "${FONT_NAME} installed in ${FONT_DIR}"
+	local name=$1 url=$2
+	local dest="$FONT_ROOT/$name"
+	log "installing $name"
+	mkdir -p -- "$dest"
+	download_zip "$url" "$dest" || {
+		warn "could not install $name (the upstream URL is unreliable; install it manually)"
+		return 1
+	}
 }
 
-# Install Nerd Fonts
-install_nerd_font "CaskaydiaCove"
-install_nerd_font "0xProto"
-install_nerd_font "JetBrainsMono"
-install_nerd_font "GeistMono"
+fails=0
+install_nerd_font CaskaydiaCove || fails=$((fails + 1))
+install_nerd_font 0xProto || fails=$((fails + 1))
+install_nerd_font JetBrainsMono || fails=$((fails + 1))
+install_nerd_font GeistMono || fails=$((fails + 1))
 
-# Install Noto Color Emoji for emoji support
-echo "Installing Noto Color Emoji..."
-sudo pacman -S --needed --noconfirm noto-fonts-emoji
+pacman_install noto-fonts-emoji
 
-# Install custom fonts
-install_custom_font "Abocat" "https://font.download/dl/font/abocat.zip"
-install_custom_font "Steelfish" "https://dl.dafont.com/dl/?f=steelfish"
-install_custom_font "Mexcellent" "https://dl.dafont.com/dl/?f=mexcellent"
+# These two come from font-sharing sites that are not guaranteed to stay up.
+install_custom_font Abocat "https://font.download/dl/font/abocat.zip" || fails=$((fails + 1))
+install_custom_font Steelfish "https://dl.dafont.com/dl/?f=steelfish" || fails=$((fails + 1))
+install_custom_font Mexcellent "https://dl.dafont.com/dl/?f=mexcellent" || fails=$((fails + 1))
 
-# Update font cache once after all installations
-echo "Updating font cache..."
-fc-cache -fv
+log "updating font cache"
+fc-cache -f "$FONT_ROOT" >/dev/null
 
-# Set zsh as default shell
-echo "Setting zsh as default shell..."
-chsh -s $(which zsh) || true
+if ((fails)); then
+	warn "$fails font(s) could not be installed; see the messages above"
+fi
 
-echo "--- Font Installation Complete ---"
+ok "fonts step complete"

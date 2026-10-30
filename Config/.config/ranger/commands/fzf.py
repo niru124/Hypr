@@ -173,8 +173,10 @@ class fzf_open_with(Command):
             elif ext in pdf_extensions:
                 preconfigured_commands = {
                     "evince": "evince {}",
+                    "okular": "okular {}",
                     "zathura": "zathura {}",
                     "papers": "papers {}",
+                    "xournalpp": "xournalpp {}",
                 }
             elif ext in audio_extensions:
                 preconfigured_commands = {

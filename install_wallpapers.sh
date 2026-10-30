@@ -1,26 +1,39 @@
-#!/bin/bash
-set -e
-THEMES_REPO="https://github.com/niru124/themes"
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-HYDE_WALLPAPER_DIR="$HOME/.config/hyde/themes"
-TEMP_DIR=$(mktemp -d)
-echo "--- Installing Wallpaper Repository ---"
-echo "Cloning themes repository..."
-if ! git clone "$THEMES_REPO" "$TEMP_DIR"; then
-	echo "Error: Failed to clone repository"
-	rm -rf "$TEMP_DIR"
-	exit 1
+#!/usr/bin/env bash
+#
+# Wallpapers step: clone the themes repository into ~/.config/hyde/themes.
+#
+set -Eeuo pipefail
+IFS=$'\n\t'
+
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+# shellcheck source=lib/common.sh
+source "$SCRIPT_DIR/lib/common.sh"
+
+THEMES_REPO="${THEMES_REPO:-https://github.com/niru124/themes}"
+WALLPAPER_DIR="$HOME/.config/hyde/themes"
+TMP_DIR=""
+
+cleanup() {
+	[[ -n $TMP_DIR && -d $TMP_DIR ]] && rm -rf -- "$TMP_DIR"
+}
+trap cleanup EXIT
+
+require_not_root
+need_cmd git
+
+log "wallpapers: cloning $THEMES_REPO"
+
+TMP_DIR="$(mktemp -d)"
+if ! git clone --depth 1 "$THEMES_REPO" "$TMP_DIR/repo"; then
+	die "could not clone $THEMES_REPO (is the repository public?)"
 fi
-echo "Setting up wallpapers..."
-mkdir -p "$HYDE_WALLPAPER_DIR"
-if [ -d "$TEMP_DIR/themes" ]; then
-	cp -r "$TEMP_DIR/themes/"* "$HYDE_WALLPAPER_DIR/"
-	echo "Wallpapers copied to $HYDE_WALLPAPER_DIR"
-elif [ -d "$TEMP_DIR" ]; then
-	cp -r "$TEMP_DIR/"* "$HYDE_WALLPAPER_DIR/" 2>/dev/null || true
-	echo "Contents copied to $HYDE_WALLPAPER_DIR"
+
+mkdir -p -- "$WALLPAPER_DIR"
+
+if [[ -d $TMP_DIR/repo/themes ]]; then
+	rsync -a -- "$TMP_DIR/repo/themes/" "$WALLPAPER_DIR/"
 else
-	echo "Warning: No wallpapers found in repository"
+	rsync -a --exclude='/.git/' -- "$TMP_DIR/repo/" "$WALLPAPER_DIR/"
 fi
-rm -rf "$TEMP_DIR"
-echo "--- Wallpaper Installation Complete ---"
+
+ok "wallpapers installed into $WALLPAPER_DIR"

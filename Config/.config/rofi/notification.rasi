@@ -22,7 +22,7 @@ window {
     border:                      0em;
     border-radius:               0em;
     border-color:                transparent;
-    background-color:            transparent;
+    background-color:            @main-tint;
     background-image:            url("~/.config/rofi/assets/notification.png", width);
 }
 mainbox {

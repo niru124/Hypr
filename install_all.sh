@@ -1,179 +1,137 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#
+# Hypr dotfiles installer - single entry point.
+#
+# Usage:
+#   ./install_all.sh                 # interactive, asks before each component
+#   ./install_all.sh --yes           # non-interactive, accept all prompts
+#   ./install_all.sh --dry-run       # only print what would run
+#   ./install_all.sh --only core,zsh # run only the listed components
+#
+set -Eeuo pipefail
+IFS=$'\n\t'
 
-# Exit immediately if a command exits with a non-zero status.
-set -e
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+# shellcheck source=lib/common.sh
+source "$SCRIPT_DIR/lib/common.sh"
 
-# Correct way to get current directory of the script
-CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ASSUME_YES=0
+DRY_RUN=0
+ONLY=""
 
-# --- Helper function for user confirmation ---
-confirm_action() {
-	read -p "Do you want to install/run: $1? (y/N): " -n 1 -r
-	echo
-	if [[ $REPLY =~ ^[Yy]$ ]]; then
-		return 0 # User confirmed yes
-	else
-		return 1 # User confirmed no
-	fi
+usage() {
+	cat <<'EOF'
+Hypr dotfiles installer
+
+Options:
+  -y, --yes          accept every prompt (non-interactive)
+  -n, --dry-run      print the steps that would run, change nothing
+      --only LIST    comma-separated components to run, e.g. core,zsh,fonts
+  -h, --help         show this help and exit
+
+Components:
+  core        pacman/AUR packages, dotfiles, helper scripts
+  zsh         Oh My Zsh, Powerlevel10k, plugins, .zshrc
+  wallpapers  wallpaper collection
+  gpu         GPU drivers
+  fonts       Nerd Fonts
+  pyprland    pyprland (Hyprland plugin manager layer)
+  greetd      greetd/tuigreet configuration (needs sudo)
+  astronvim   AstroNvim configuration
+  vim         ~/.vimrc
+  tmux_keyd   tmux config + keyd remapping (needs sudo)
+  themes      GTK theme and cursor theme
+  optional    optional packages (fzf picker)
+
+Examples:
+  ./install_all.sh --only core,zsh
+  ./install_all.sh --yes --only core
+EOF
 }
 
-# --- Main Script Logic ---
-echo "Welcome to the HyDE Installation Script!"
-echo "This script will guide you through installing various components for your Hyprland setup."
-echo
+while (($#)); do
+	case $1 in
+	-y | --yes) ASSUME_YES=1 ;;
+	-n | --dry-run) DRY_RUN=1 ;;
+	--only)
+		[[ -n ${2:-} ]] || die "--only needs a value, e.g. --only core,zsh"
+		ONLY=$2
+		shift
+		;;
+	-h | --help)
+		usage
+		exit 0
+		;;
+	*) die "unknown option: $1 (try --help)" ;;
+	esac
+	shift
+done
 
-# Core Packages
-if confirm_action "Core Packages (pacman/yay packages, config files, scripts)"; then
-	if [ -f "./install_core.sh" ]; then
-		chmod +x ./install_core.sh
-		./install_core.sh
-	else
-		echo "install_core.sh not found."
+export HYPR_ASSUME_YES=$ASSUME_YES
+
+confirm() {
+	((ASSUME_YES)) && return 0
+	local reply=''
+	printf '%s [y/N] ' "Run: $1"
+	read -r -n 1 reply || true
+	printf '\n'
+	[[ $reply =~ ^[Yy]$ ]]
+}
+
+want() {
+	[[ -z $ONLY ]] && return 0
+	[[ ",$ONLY," == *",$1,"* ]]
+}
+
+run_step() {
+	local name=$1 script=$2 use_sudo=${3:-}
+
+	want "$name" || return 0
+	[[ -f $SCRIPT_DIR/$script ]] || {
+		warn "$script not found, skipping"
+		return 0
+	}
+
+	if ((DRY_RUN)); then
+		log "[dry-run] would run $script${use_sudo:+ (with sudo)}"
+		return 0
 	fi
-	echo
-fi
 
-# Oh My Zsh
-if confirm_action "Oh My Zsh (theme, plugins, .zshrc)"; then
-	if [ -f "./install_zsh.sh" ]; then
-		chmod +x ./install_zsh.sh
-		./install_zsh.sh
+	confirm "$name" || return 0
+
+	chmod +x -- "$SCRIPT_DIR/$script"
+	log "running $script"
+	if [[ $use_sudo == sudo ]]; then
+		sudo "$SCRIPT_DIR/$script"
 	else
-		echo "install_zsh.sh not found."
+		"$SCRIPT_DIR/$script"
 	fi
-	echo
-fi
+	ok "$name finished"
+}
 
-# Wallpapers
-if confirm_action "Wallpapers (themes repository)"; then
-	if [ -f "./install_wallpapers.sh" ]; then
-		chmod +x ./install_wallpapers.sh
-		./install_wallpapers.sh
-	else
-		echo "install_wallpapers.sh not found."
-	fi
-	echo
-fi
+printf '\n%s\n\n' "Hypr dotfiles installation"
+printf 'Repo: %s\n\n' "$SCRIPT_DIR"
 
-# GPU Drivers
-if confirm_action "GPU Drivers (NVIDIA/AMD/Intel)"; then
-	if [ -f "./install_gpu_drivers.sh" ]; then
-		chmod +x ./install_gpu_drivers.sh
-		./install_gpu_drivers.sh
-	else
-		echo "install_gpu_drivers.sh not found."
-	fi
-	echo
-fi
+require_not_root
+require_arch
 
-# Non-Essential Packages
-if confirm_action "Non-Essential Packages (from non-essential.txt)"; then
-	if [ -f "./install_non_essential.sh" ]; then
-		chmod +x ./install_non_essential.sh
-		./install_non_essential.sh
-	else
-		echo "install_non_essential.sh not found."
-	fi
-	echo
-fi
+run_step core install_core.sh
+run_step zsh install_zsh.sh
+run_step wallpapers install_wallpapers.sh
+run_step gpu install_gpu_drivers.sh
+run_step fonts install_fonts.sh
+run_step pyprland pyprland.sh
+run_step greetd tui_greet.sh sudo
+run_step astronvim install_astronvim.sh
+run_step vim vim.sh
+run_step tmux_keyd tmux_and_keyd.sh
+run_step themes install_themes.sh
+run_step optional install_non_essential.sh
 
-# Fonts
-if confirm_action "Nerd Fonts (CaskaydiaCove, 0xProto, JetBrainsMono) and Custom Fonts (Abocat, Steelfish Outline, Mexcellent)"; then
-	if [ -f "./install_fonts.sh" ]; then
-		chmod +x ./install_fonts.sh
-		./install_fonts.sh
-	else
-		echo "install_fonts.sh not found."
-	fi
-	echo
-fi
+# install_hyprpm_plugins.sh is intentionally not part of the default flow:
+# Hyprland >= 0.56 ships a native `scrolling` layout that supersedes the
+# hyprscroller plugin. Run it manually only if you know you need it.
 
-# Pyprland
-if confirm_action "Pyprland (in a Python virtual environment)"; then
-	if [ -f "./pyprland.sh" ]; then
-		chmod +x ./pyprland.sh
-		./pyprland.sh
-	else
-		echo "pyprland.sh not found."
-	fi
-	echo
-fi
-
-# TUI Greet Configuration
-if confirm_action "TUI Greet Display Manager Configuration (requires sudo)"; then
-	if [ -f "./tui_greet.sh" ]; then
-		chmod +x ./tui_greet.sh
-		sudo ./tui_greet.sh
-	else
-		echo "tui_greet.sh not found."
-	fi
-	echo
-fi
-
-# AstroNvim
-if confirm_action "AstroNvim (Neovim configuration)"; then
-	if [ -f "./install_astronvim.sh" ]; then
-		chmod +x ./install_astronvim.sh
-		./install_astronvim.sh
-	else
-		echo "install_astronvim.sh not found."
-	fi
-	echo
-fi
-
-# Vim
-if confirm_action "Vim Configuration"; then
-	if [ -f "./vim.sh" ]; then
-		chmod +x ./vim.sh
-		./vim.sh
-	else
-		echo "vim.sh not found."
-	fi
-	echo
-fi
-
-# Tmux and Keyd
-if confirm_action "Tmux and Keyd Configuration"; then
-	if [ -f "./tmux_and_keyd.sh" ]; then
-		chmod +x ./tmux_and_keyd.sh
-		./tmux_and_keyd.sh
-	else
-		echo "tmux_and_keyd.sh not found."
-	fi
-	echo
-fi
-
-# Themes
-if confirm_action "Themes (Catppuccin, Bibata)"; then
-	if [ -f "./install_themes.sh" ]; then
-		chmod +x ./install_themes.sh
-		./install_themes.sh
-	else
-		echo "install_themes.sh not found."
-	fi
-	echo
-fi
-
-# Additional Installations
-if confirm_action "Run Non-Essential Packages Installation (install_non_essential.sh)"; then
-	if [ -f "./install_non_essential.sh" ]; then
-		chmod +x ./install_non_essential.sh
-		./install_non_essential.sh
-	else
-		echo "install_non_essential.sh not found."
-	fi
-	echo
-fi
-
-# if confirm_action "Run Hyprpm Plugins Installation (install_hyprpm_plugins.sh)"; then
-# 	if [ -f "./install_hyprpm_plugins.sh" ]; then
-# 		chmod +x ./install_hyprpm_plugins.sh
-# 		./install_hyprpm_plugins.sh
-# 	else
-# 		echo "install_hyprpm_plugins.sh not found."
-# 	fi
-# 	echo
-# fi
-
-echo "Installation script finished. Please review the output for any errors."
-echo "You may need to log out and back in for some changes to take effect."
+printf '\n'
+ok "all requested components processed"
+printf 'Log out and back in (or reboot) to pick up shell and service changes.\n'

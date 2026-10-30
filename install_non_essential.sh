@@ -1,37 +1,41 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#
+# Optional packages step: pick extras with fzf (or install all when
+# non-interactive) from non-essential.txt.
+#
+set -Eeuo pipefail
+IFS=$'\n\t'
 
-# Check if yay is installed
-if ! command -v yay &>/dev/null; then
-    echo "Error: 'yay' is not installed. Please install yay (AUR helper) first."
-    exit 1
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+# shellcheck source=lib/common.sh
+source "$SCRIPT_DIR/lib/common.sh"
+
+PACKAGE_FILE="$SCRIPT_DIR/non-essential.txt"
+
+require_not_root
+need_cmd yay
+
+log "optional packages from $(basename -- "$PACKAGE_FILE")"
+
+mapfile -t PACKAGES < <(read_list "$PACKAGE_FILE")
+((${#PACKAGES[@]})) || die "no packages listed in $PACKAGE_FILE"
+
+if [[ -t 0 && ${HYPR_ASSUME_YES:-0} -eq 0 ]]; then
+	need_cmd fzf
+	mapfile -t SELECTED < <(
+		printf '%s\n' "${PACKAGES[@]}" |
+			fzf -m --prompt="Select optional packages (Tab = select, Enter = confirm): " || true
+	)
+else
+	SELECTED=("${PACKAGES[@]}")
 fi
 
-# Correct way to get current directory
-CURRENT_DIR=$(pwd)
-
-PACKAGE_FILE="$CURRENT_DIR/non-essential.txt"
-
-# Check if package files exist
-if [ ! -f "$PACKAGE_FILE" ]; then
-    echo "Error: File '$PACKAGE_FILE' not found!"
-    exit 1
+if ((${#SELECTED[@]} == 0)); then
+	log "no packages selected"
+	exit 0
 fi
 
-# Select packages using fzf
-echo "Loading non-essential packages from $PACKAGE_FILE..."
-selected=$(cat "$PACKAGE_FILE" | fzf -m --prompt="Select non-essential packages to install (Tab to select, Enter to confirm): ")
+log "installing ${#SELECTED[@]} package(s)"
+aur_install "${SELECTED[@]}"
 
-if [ -z "$selected" ]; then
-    echo "No packages selected."
-    exit 0
-fi
-
-echo "Selected packages:"
-echo "$selected"
-echo
-
-# Install selected packages via yay
-echo "Installing selected packages..."
-echo "$selected" | xargs yay -S --noconfirm --needed
-
-echo "Installation complete."
+ok "optional packages step complete"

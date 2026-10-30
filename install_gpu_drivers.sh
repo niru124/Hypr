@@ -1,35 +1,48 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#
+# GPU drivers step: install the userspace driver stack matching the hardware.
+#
+set -Eeuo pipefail
+IFS=$'\n\t'
 
-echo "--- Starting GPU Driver Installation ---"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+# shellcheck source=lib/common.sh
+source "$SCRIPT_DIR/lib/common.sh"
 
-install_nvidia_drivers() {
-    echo "Installing NVIDIA drivers..."
-    sudo pacman -S --noconfirm --needed nvidia nvidia-utils
-    echo "NVIDIA drivers installed."
-}
+require_not_root
+need_cmd lspci
 
-install_amd_drivers() {
-    echo "Installing AMD drivers..."
-    sudo pacman -S --noconfirm --needed mesa xf86-video-amdgpu
-    echo "AMD drivers installed."
-}
+log "gpu: detecting hardware"
 
-install_intel_drivers() {
-    echo "Installing Intel drivers..."
-    sudo pacman -S --noconfirm --needed mesa xf86-video-intel
-    echo "Intel drivers installed."
-}
+# Only look at display controllers; matching "amd" anywhere also hits CPUs,
+# chipsets and USB controllers.
+controllers="$(lspci -nn | grep -Ei 'vga compatible controller|3d controller|display controller' || true)"
+[[ -n $controllers ]] || die "no display controller found"
 
-# Check for GPU and install appropriate drivers
-if lspci | grep -qi "nvidia"; then
-    install_nvidia_drivers
-elif lspci | grep -qi "amd"; then
-    install_amd_drivers
-elif lspci | grep -qi "intel"; then
-    install_intel_drivers
-else
-    echo "No dedicated GPU detected. Using Mesa defaults."
-    sudo pacman -S --noconfirm --needed mesa
+log "found:"
+printf '%s\n' "$controllers" | sed 's/^/    /'
+
+has() { grep -qi -- "$1" <<<"$controllers"; }
+
+pkgs=()
+if has nvidia; then
+	pkgs+=(nvidia nvidia-utils nvidia-settings libva-nvidia-driver)
+fi
+if has 'amd\|ati'; then
+	pkgs+=(mesa vulkan-radeon libva-mesa-driver mesa-utils)
+fi
+if has intel; then
+	pkgs+=(mesa vulkan-intel intel-media-driver mesa-utils)
 fi
 
-echo "--- GPU Driver Installation Complete ---"
+if ((${#pkgs[@]} == 0)); then
+	warn "no known GPU vendor matched; installing the generic Mesa stack"
+	pkgs+=(mesa mesa-utils)
+fi
+
+# Deduplicate while preserving order.
+mapfile -t pkgs < <(printf '%s\n' "${pkgs[@]}" | awk '!seen[$0]++')
+
+pacman_install linux-firmware "${pkgs[@]}"
+
+ok "gpu step complete"

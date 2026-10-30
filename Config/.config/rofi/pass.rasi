@@ -1,7 +1,7 @@
 configuration {
   modi: "dmenu"; 
   // show-icons: true;
-  font: "CaskaydiaCove Nerd Font 18";
+  font: "GeistMono Nerd Font 14";
 }
 
 @theme "~/.config/rofi/theme.rasi"

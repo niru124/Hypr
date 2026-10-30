@@ -12,11 +12,11 @@ edit = [
 play = [
 	{ run = 'mpv "$@"', block = true, for = "linux" },
 ]
-open = [
-	{ run = 'nsxiv "$@"', block = true, for = "image/jpeg" },
-	{ run = 'nsxiv "$@"', block = true, for = "image/png" },
-	{ run = 'nsxiv "$@"', block = true, for = "image/gif" },
-	{ run = 'nsxiv "$@"', block = true, for = "image/webp" },
-	{ run = 'nsxiv "$@"', block = true, for = "image/bmp" },
-	{ run = 'nsxiv "$@"', block = true, for = "image/tiff" },
+nsxiv = [
+	{ run = 'nsxiv "$@"', block = true, for = "linux" },
+]
+
+[open]
+prepend_rules = [
+	{ mime = "image/*", use = "nsxiv" },
 ]

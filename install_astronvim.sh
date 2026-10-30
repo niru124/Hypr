@@ -1,40 +1,43 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#
+# AstroNvim step: replace ~/.config/nvim with the AstroNvim template plus the
+# repository's nvim configuration. The previous configuration is backed up.
+#
+set -Eeuo pipefail
+IFS=$'\n\t'
 
-set -e
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+# shellcheck source=lib/common.sh
+source "$SCRIPT_DIR/lib/common.sh"
 
-echo "--- Starting AstroNvim Installation ---"
+NVIM_CONFIG="$HOME/.config/nvim"
+LOCAL_CONFIG="$SCRIPT_DIR/Config/.config/nvim"
 
-CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+require_not_root
+need_cmd git
 
-# Remove existing nvim configuration
-if [ -d "$HOME/.config/nvim" ]; then
-    echo "Removing existing ~/.config/nvim..."
-    rm -rf ~/.config/nvim
+log "astronvim: installing configuration"
+
+if [[ -d $NVIM_CONFIG ]]; then
+	backup_path "$NVIM_CONFIG" "$HOME/.config-backup"
+	rm -rf -- "$NVIM_CONFIG"
 fi
 
-# Clone AstroNvim template
-echo "Cloning AstroNvim template..."
-git clone --depth 1 https://github.com/AstroNvim/template ~/.config/nvim
+git clone --depth 1 https://github.com/AstroNvim/template "$NVIM_CONFIG"
+rm -rf -- "$NVIM_CONFIG/.git"
 
-# Remove .git from cloned repo
-echo "Removing .git from cloned repository..."
-rm -rf ~/.config/nvim/.git
-
-# Copy local nvim config on top
-echo "Copying local nvim configuration..."
-if [ -d "$CURRENT_DIR/Config/.config/nvim" ]; then
-    cp -r "$CURRENT_DIR/Config/.config/nvim/"* ~/.config/nvim/
+if [[ -d $LOCAL_CONFIG ]]; then
+	log "overlaying the repository nvim configuration"
+	cp -a -- "$LOCAL_CONFIG/." "$NVIM_CONFIG/"
 else
-    echo "Warning: $CURRENT_DIR/Config/.config/nvim not found"
+	warn "$LOCAL_CONFIG not found; using the plain AstroNvim template"
 fi
 
-# Run nvim to trigger Lazy sync
-echo "Running nvim to sync plugins (this may take a while on first run)..."
-if command -v nvim &> /dev/null; then
-    nvim --headless -c 'quitall' 2>/dev/null || true
-    echo "Plugin sync complete."
+if command -v nvim >/dev/null 2>&1; then
+	log "syncing plugins with Lazy (this can take a while)"
+	nvim --headless "+Lazy! sync" +qa 2>/dev/null || warn "Lazy sync failed; run ':Lazy sync' inside nvim"
 else
-    echo "Warning: nvim not found. Skipping initial plugin sync."
+	warn "nvim is not installed; skipping the initial plugin sync"
 fi
 
-echo "--- AstroNvim Installation Complete ---"
+ok "astronvim step complete"

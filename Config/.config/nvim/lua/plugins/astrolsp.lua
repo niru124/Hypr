@@ -16,18 +16,8 @@ return {
       },
       timeout_ms = 1000,
     },
-    ---@type AstroLSPFormatterOpts
-    formatters = {
-      none_ls = false,
-    },
-    formatters_by_ft = {
-      lua = { "stylua" },
-      python = { "black" },
-      cpp = { "clang_format" },
-      c = { "clang_format" },
-      sql = { "sqlfmt" },
-      java = { "google_java_format" },
-    },
+    -- NOTE (AstroNvim v5): per-filetype formatter selection lives in
+    -- conform.nvim (see plugins/conform.lua), not here.
     config = {
       clangd = {
         capabilities = {

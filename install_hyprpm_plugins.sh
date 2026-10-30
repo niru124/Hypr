@@ -1,36 +1,33 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#
+# Optional, manual step: install the hyprscroller hyprpm plugin.
+#
+# Hyprland >= 0.56 ships a native `scrolling` layout which supersedes this
+# plugin. Only run this script if you explicitly want the plugin, and make sure
+# your hyprland.conf uses `general:layout = hyprscroller` afterwards.
+#
+set -Eeuo pipefail
+IFS=$'\n\t'
 
-# Check if hyprpm is installed
-if ! command -v hyprpm &>/dev/null; then
-	echo "hyprpm could not be found. Please ensure Hyprland (version 0.34.0 or later) or hyprland-git is installed."
-	echo "You might need to update your Hyprland installation or install a git version if hyprpm is not available."
-	exit 1
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+# shellcheck source=lib/common.sh
+source "$SCRIPT_DIR/lib/common.sh"
+
+require_not_root
+
+if ! command -v hyprpm >/dev/null 2>&1; then
+	die "hyprpm not found; install Hyprland (or hyprland-git) with hyprpm support first"
 fi
 
-echo "hyprpm found. Proceeding with plugin installation."
+warn "hyprscroller is deprecated on Hyprland >= 0.56 (native scrolling layout exists)"
+printf 'Press Enter to continue, Ctrl-C to abort... '
+read -r _ || true
 
-echo ""
-echo "--------------------------------------------------------------------------------"
-echo "IMPORTANT: For C++ plugins, you might need to install build dependencies."
-echo "If you encounter compilation errors, please ensure you have the following installed:"
-echo "  - git"
-echo "  - cmake"
-echo "  - a C++ compiler (e.g., g++)"
-echo "  - a build system (e.g., make or ninja)"
-echo "  - cpio"
-echo "  - meson"
-echo "Example for Debian/Ubuntu: sudo apt install git cmake g++ make cpio meson"
-echo "Example for Arch Linux: sudo pacman -S git cmake gcc make cpio meson"
-echo "--------------------------------------------------------------------------------"
-echo ""
-
-echo "Running hyprpm update..."
+log "updating hyprpm headers"
 hyprpm update
 
-echo "Adding hyprscroller plugin..."
-hyprpm -v add https://github.com/cpiber/hyprscroller
-
+log "adding hyprscroller"
+hyprpm add https://github.com/cpiber/hyprscroller
 hyprpm enable hyprscroller
 
-echo "Enabled hyprscroller..."
-echo "Script finished. You may need to enable the plugin with 'hyprpm enable hyprscroller' and then 'hyprpm reload' or restart Hyprland."
+ok "hyprscroller installed; run 'hyprpm reload' or restart Hyprland"

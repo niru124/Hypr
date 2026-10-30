@@ -76,53 +76,71 @@ git_commit_changes() {
 }
 
 generate_password() {
-    local length include_symbols password entry
+    local length password entry
 
     length=$(rofi -dmenu -p "Password length (default 16):" -theme "$ROFI_THEME")
     [[ -z "$length" ]] && length=16
+    # Validate length is numeric
+    if ! [[ "$length" =~ ^[0-9]+$ ]]; then
+        notify-send "pass" "Invalid length: $length. Using default 16."
+        length=16
+    fi
+    [[ "$length" -lt 1 ]] && length=16
 
     local include_digits include_special_characters custom_symbols chars
 
     include_digits=$(printf "Yes\nNo" | rofi -dmenu -p "Include digits?" -theme "$ROFI_THEME")
     include_special_characters=$(printf "Yes\nNo\nAdvanced" | rofi -dmenu -p "Include special characters?" -theme "$ROFI_THEME")
 
-    chars="a-zA-Z"
+    # Build character set using arrays to avoid tr range interpretation issues
+    local char_array=()
+    # Always include letters
+    for c in {a..z}; do char_array+=("$c"); done
+    for c in {A..Z}; do char_array+=("$c"); done
+
     if [[ "$include_digits" == "Yes" ]]; then
-        chars+="0-9"
+        for c in {0..9}; do char_array+=("$c"); done
     fi
 
     if [[ "$include_special_characters" == "Yes" ]]; then
-        chars+="!@#$%^&*()_+-=[]{}|;:,.<>?"
+        local special='!@#$%^&*()_+={}[]|;:,.<>?'
+        for (( i=0; i<${#special}; i++ )); do
+            char_array+=("${special:$i:1}")
+        done
     elif [[ "$include_special_characters" == "Advanced" ]]; then
         custom_symbols=$(rofi -dmenu -p "Enter custom special characters:" -theme "$ROFI_THEME")
         if [[ -n "$custom_symbols" ]]; then
-            chars+="$custom_symbols"
+            for (( i=0; i<${#custom_symbols}; i++ )); do
+                char_array+=("${custom_symbols:$i:1}")
+            done
         else
             notify-send "pass" "No custom symbols entered. Generating without special characters."
         fi
     fi
 
-    if command -v pwgen >/dev/null 2>&1; then
-        # pwgen doesn't offer fine-grained control over character sets like openssl
-        # For simplicity, if custom symbols are requested, we'll fall back to openssl
-        if [[ "$include_special_characters" == "Advanced" && -n "$custom_symbols" ]]; then
-            password=$(openssl rand -base64 $((length*3/4)) | tr -dc "$chars" | head -c "$length")
-        elif [[ "$include_special_characters" == "Yes" ]]; then
-            password=$(pwgen -s "$length" 1)
-        elif [[ "$include_digits" == "Yes" ]]; then
-            password=$(pwgen "$length" 1) # pwgen includes digits by default
-        else
-            password=$(pwgen -0 "$length" 1) # pwgen -0 excludes digits and symbols
-        fi
-    else
-        # fallback: openssl
-        password=$(openssl rand -base64 $((length*3/4)) | tr -dc "$chars" | head -c "$length")
+    # Generate password character by character
+    local num_chars=${#char_array[@]}
+    if [[ "$num_chars" -eq 0 ]]; then
+        notify-send "pass" "Error: no characters available for password generation."
+        return
     fi
+    password=""
+    for (( i=0; i<length; i++ )); do
+        password+="${char_array[$((RANDOM % num_chars))]}"
+    done
 
     entry=$(rofi -dmenu -p "Store as (e.g. mail/account):" -theme "$ROFI_THEME")
     [[ -z "$entry" ]] && return
 
-    echo "$password" | pass insert -m "$entry"
+    if [[ ! -f "$PASSWORD_STORE_DIR/.gpg-id" ]]; then
+        notify-send "pass" "Password store not initialized. Run: pass init <your-gpg-id>"
+        return
+    fi
+
+    if ! echo "$password" | pass insert -m -f "$entry" 2>/tmp/pass_insert_err; then
+        notify-send "pass" "Failed to store password: $(cat /tmp/pass_insert_err 2>/dev/null)"
+        return
+    fi
     printf '%s' "$password" | wl-copy
     notify-send "pass" "Generated password for $entry (copied to clipboard)"
     git_commit_changes "Generate password for $entry"
@@ -208,6 +226,151 @@ restore_old_password() {
     fi
 }
 
+# Helper: pick a file via GUI dialog
+pick_file() {
+    local title="${1:-Select a file}"
+    if command -v yad >/dev/null 2>&1; then
+        yad --file --title="$title" --filename="$HOME/" 2>/dev/null
+    elif command -v zenity >/dev/null 2>&1; then
+        zenity --file-selection --title="$title" --filename="$HOME/"
+    else
+        rofi -dmenu -p "File path:" -theme "$ROFI_THEME"
+    fi
+}
+
+# Helper: get default GPG recipient from pass config
+get_gpg_recipient() {
+    local id_file="${PASSWORD_STORE_DIR}/.gpg-id"
+    if [[ -f "$id_file" ]]; then
+        head -n1 "$id_file"
+    else
+        gpg --list-secret-keys --keyid-format LONG 2>/dev/null | grep '^sec' | head -n1 | awk '{print $2}' | cut -d'/' -f2
+    fi
+}
+
+file_operations() {
+    local action
+
+    action=$(printf "%s\n" \
+        "🔒 Encrypt file" \
+        "🔓 Decrypt file" \
+        "✍️ Sign file" \
+        "✅ Verify signature" \
+        | rofi -dmenu -p "File operation:" -i -theme "$ROFI_THEME")
+
+    [[ -z "$action" ]] && return
+
+    case "$action" in
+        "🔒 Encrypt file")
+            local infile outfile recipient
+            infile=$(pick_file "Select file to encrypt")
+            [[ -z "$infile" ]] && return
+            outfile="${infile}.gpg"
+            if [[ -f "$outfile" ]]; then
+                local overwrite
+                overwrite=$(printf "No\nYes" | rofi -dmenu -p "$outfile exists. Overwrite?" -theme "$ROFI_THEME")
+                [[ "$overwrite" != "Yes" ]] && return
+            fi
+            recipient=$(get_gpg_recipient)
+            if [[ -z "$recipient" ]]; then
+                notify-send "pass" "No GPG key found!"
+                return
+            fi
+            gpg -e -r "$recipient" -o "$outfile" "$infile" && \
+                notify-send "pass" "Encrypted: $(basename "$infile") → $(basename "$outfile")" || \
+                notify-send "pass" "Encryption failed!"
+            ;;
+        "🔓 Decrypt file")
+            local infile outfile
+            infile=$(pick_file "Select .gpg file to decrypt")
+            [[ -z "$infile" ]] && return
+            outfile="${infile%.gpg}"
+            if [[ -f "$outfile" ]]; then
+                local overwrite
+                overwrite=$(printf "No\nYes" | rofi -dmenu -p "$outfile exists. Overwrite?" -theme "$ROFI_THEME")
+                [[ "$overwrite" != "Yes" ]] && return
+            fi
+            gpg -d -o "$outfile" "$infile" && \
+                notify-send "pass" "Decrypted: $(basename "$infile") → $(basename "$outfile")" || \
+                notify-send "pass" "Decryption failed!"
+            ;;
+        "✍️ Sign file")
+            local infile outfile
+            infile=$(pick_file "Select file to sign")
+            [[ -z "$infile" ]] && return
+            outfile="${infile}.sig"
+            if [[ -f "$outfile" ]]; then
+                local overwrite
+                overwrite=$(printf "No\nYes" | rofi -dmenu -p "$outfile exists. Overwrite?" -theme "$ROFI_THEME")
+                [[ "$overwrite" != "Yes" ]] && return
+            fi
+            gpg --detach-sign -o "$outfile" "$infile" && \
+                notify-send "pass" "Signed: $(basename "$infile") → $(basename "$outfile")" || \
+                notify-send "pass" "Signing failed!"
+            ;;
+        "✅ Verify signature")
+            local sigfile infile result
+            sigfile=$(pick_file "Select .sig file")
+            [[ -z "$sigfile" ]] && return
+            infile=$(pick_file "Select original file")
+            [[ -z "$infile" ]] && return
+            result=$(gpg --verify "$sigfile" "$infile" 2>&1)
+            if command -v yad >/dev/null 2>&1; then
+                yad --text-info --title="Verify result" --button=OK --geometry=400x200 <<<"$result"
+            else
+                notify-send "pass" "Verify result" "$result"
+            fi
+            ;;
+    esac
+}
+
+backup_restore_menu() {
+    local action
+
+    action=$(printf "%s\n" \
+        "💾 Backup GPG keys" \
+        "📂 Restore GPG keys" \
+        | rofi -dmenu -p "Backup & Restore:" -i -theme "$ROFI_THEME")
+
+    [[ -z "$action" ]] && return
+
+    case "$action" in
+        "💾 Backup GPG keys")
+            local outdir recipient
+            recipient=$(get_gpg_recipient)
+            if [[ -z "$recipient" ]]; then
+                notify-send "pass" "No GPG key found!"
+                return
+            fi
+
+            outdir=$(pick_file "Select backup directory")
+            [[ -z "$outdir" ]] && return
+            if [[ ! -d "$outdir" ]]; then
+                mkdir -p "$outdir"
+            fi
+
+            gpg --export-secret-keys --armor "$recipient" > "$outdir/gpg-private.asc" && \
+            gpg --export --armor "$recipient" > "$outdir/gpg-public.asc" && \
+            gpg --export-ownertrust > "$outdir/gpg-ownertrust.txt" && \
+            notify-send "pass" "GPG keys backed up to $outdir" || \
+            notify-send "pass" "Backup failed!"
+            ;;
+        "📂 Restore GPG keys")
+            local dir
+            dir=$(pick_file "Select backup directory containing gpg-*.asc files")
+            [[ -z "$dir" ]] && return
+            if [[ -f "$dir/gpg-public.asc" && -f "$dir/gpg-private.asc" ]]; then
+                gpg --import "$dir/gpg-public.asc" "$dir/gpg-private.asc" && \
+                [[ -f "$dir/gpg-ownertrust.txt" ]] && gpg --import-ownertrust < "$dir/gpg-ownertrust.txt" && \
+                notify-send "pass" "GPG keys restored from $dir" || \
+                notify-send "pass" "Restore failed!"
+            else
+                notify-send "pass" "Missing gpg-public.asc or gpg-private.asc in $dir"
+            fi
+            ;;
+    esac
+}
+
 # Main menu
 action=$(printf "%s\n" \
   "📋 Copy to clipboard" \
@@ -223,6 +386,9 @@ action=$(printf "%s\n" \
   "↩️ Restore old password version" \
   "🔳 Show QR for entry" \
   "🧰 Use in script (copy snippet)" \
+  "📝 Insert multiline secret" \
+  "📁 File operations (encrypt/sign)" \
+  "🔄 Backup & Restore" \
   "🫸🏽 Push updated passwords to github" \
   "🫸🏽 Synchronize from github" \
   | rofi -dmenu -p "Pass action:" -i -theme "$ROFI_THEME")
@@ -257,7 +423,7 @@ case "$action" in
     ;;
 
   "🧾 List all entries")
-    pass | rofi -dmenu -p "Entries - press Esc to close" -no-custom -i -theme "$ROFI_THEME"
+    (cd "$PASSWORD_STORE_DIR" && find . -type f -name "*.gpg" | sed 's|^\./||; s|\.gpg$||' | sort) | rofi -dmenu -p "Entries - press Esc to close" -no-custom -i -theme "$ROFI_THEME"
     ;;
 
   "🔍 Search entries")
@@ -331,6 +497,24 @@ case "$action" in
     snippet="MAIL_PASS=\"\$(pass $entry | head -n1)\""
     printf '%s' "$snippet" | wl-copy
     notify-send "pass" "Script snippet copied to clipboard"
+    ;;
+
+  "📝 Insert multiline secret")
+    entry=$(rofi -dmenu -p "Entry name (e.g. notes/mysecret):" -theme "$ROFI_THEME")
+    [[ -z "$entry" ]] && exit 0
+    longsecret=$(rofi -dmenu -p "Paste or type your multiline secret:" -theme "$ROFI_THEME")
+    [[ -z "$longsecret" ]] && exit 0
+    echo "$longsecret" | pass insert --multiline "$entry"
+    notify-send "pass" "Inserted multiline secret for $entry"
+    git_commit_changes "Add multiline secret $entry"
+    ;;
+
+  "📁 File operations (encrypt/sign)")
+    file_operations
+    ;;
+
+  "🔄 Backup & Restore")
+    backup_restore_menu
     ;;
 
   "🫸🏽 Push updated passwords to github")

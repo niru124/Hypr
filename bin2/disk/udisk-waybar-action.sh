@@ -24,7 +24,7 @@ options=$(lsblk -nrpo NAME,TYPE,LABEL,MOUNTPOINT | while read -r name type label
 done)
 
 # Select device from rofi
-selected=$(echo "$options" | rofi -dmenu -p "Select disk for action")
+selected=$(echo "$options" | rofi -dmenu -theme "~/.config/rofi/drive.rasi" -p "Select disk for action")
 
 [[ -z "$selected" ]] && exit
 
@@ -36,13 +36,13 @@ mountpoint=$(lsblk -no MOUNTPOINT "$device")
 
 if [[ -z "$mountpoint" ]]; then
   # Not mounted: ask to mount
-  action=$(echo -e "Mount\nCancel" | rofi -dmenu -p "Mount $device?")
+  action=$(echo -e "Mount\nCancel" | rofi -dmenu -theme "~/.config/rofi/drive.rasi" -p "Mount $device?")
   if [[ "$action" == "Mount" ]]; then
     udisksctl mount -b "$device" && notify-send "Mounted $device"
   fi
 else
   # Mounted: ask to unmount
-  action=$(echo -e "Unmount\nCancel" | rofi -dmenu -p "Unmount $device?")
+  action=$(echo -e "Unmount\nCancel" | rofi -dmenu -theme "~/.config/rofi/drive.rasi" -p "Unmount $device?")
   if [[ "$action" == "Unmount" ]]; then
     udisksctl unmount -b "$device" && notify-send "Unmounted $device"
   fi

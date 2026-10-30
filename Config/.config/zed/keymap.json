@@ -1,11 +1,17 @@
 [
   {
-    "context": "Editor",
+    "context": "VimControl && !menu",
+    "bindings": {
+      "ctrl-u": ["action::Sequence", ["vim::ScrollUp", "editor::ScrollCursorCenter"]],
+      "ctrl-d": ["action::Sequence", ["vim::ScrollDown", "editor::ScrollCursorCenter"]],
+      "ctrl-shift-u": ["task::Spawn", { "task_name": "ranger", "reveal_target": "center" }],
+    },
+  },
+  {
+    "context": "Editor && vim_mode == insert",
     "bindings": {
       "jj": "editor::Cancel",
       "ctrl-[": "editor::Cancel",
-      "ctrl-d": "editor::HalfPageDown",
-      "ctrl-u": "editor::HalfPageUp",
     },
   },
   {
@@ -13,6 +19,7 @@
     "bindings": {
       "shift-\\": "pane::SplitRight",
       "ctrl-shift--": "pane::SplitDown",
+      "ctrl-shift-u": ["task::Spawn", { "task_name": "ranger", "reveal_target": "center" }],
     },
   },
   {
@@ -29,16 +36,17 @@
   {
     "context": "Editor && (vim_mode == normal || vim_mode == visual)",
     "bindings": {
+      "ctrl-shift--": "pane::SplitDown",
       "space": "file_finder::Toggle",
-    },
-  },
-  {
-    "context": "Workspace && (vim_mode == normal || vim_mode == visual)",
-    "bindings": {
       "space e": "project_panel::ToggleFocus",
-      "ctrl-shift-\\": "terminal_panel::Toggle",
+      "space c a": "editor::ToggleCodeActions",
+      "n": "search::SelectNextMatch",
+      "shift-n": "search::SelectPreviousMatch",
+      "shift-h": "pane::ActivatePreviousItem",
+      "shift-l": "pane::ActivateNextItem",
     },
   },
+
   {
     "context": "ProjectPanel",
     "bindings": {
@@ -68,7 +76,7 @@
   {
     "context": "VimControl && !menu",
     "bindings": {
-      "space f w": "project_symbols::Toggle",
+      "space f w": "workspace::NewSearch",
     },
   },
   {

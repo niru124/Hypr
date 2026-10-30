@@ -1,22 +1,26 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#
+# vim step: install ~/.vimrc.
+#
+set -Eeuo pipefail
+IFS=$'\n\t'
 
-# Get the absolute path of the current directory
-current_directory="$(pwd)"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+# shellcheck source=lib/common.sh
+source "$SCRIPT_DIR/lib/common.sh"
 
-# Path to vim source and destination
-vim_source="$current_directory/.vimrc"
-vim_dest="$HOME/.vimrc"
+VIM_SOURCE="$SCRIPT_DIR/.vimrc"
+VIM_DEST="$HOME/.vimrc"
 
-# Copy the vim config to $HOME/.vimrc 
-if [ -f "$vim_source" ]; then
-    # Check if vim is installed
-    if ! command -v vim &>/dev/null; then
-        echo "Error: 'vim' is not installed. Please install vim first."
-    else
-        sudo cp "$vim_source" "$vim_dest"
-        echo "Copied vim config to $vim_dest"
-    fi
-else
-    echo "vim config not found at $vim_source"
+require_not_root
+
+[[ -f $VIM_SOURCE ]] || die "vim config not found at $VIM_SOURCE"
+
+if ! command -v vim >/dev/null 2>&1; then
+	warn "vim is not installed (pacman -S vim); installing the config anyway"
 fi
 
+backup_path "$VIM_DEST"
+install -m 644 -- "$VIM_SOURCE" "$VIM_DEST"
+
+ok "installed $VIM_DEST"

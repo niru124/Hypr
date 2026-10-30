@@ -149,11 +149,11 @@
 
  gradient = 1
  gradient_count = 8
- gradient_color_1 = '#293452'
- gradient_color_2 = '#3A476B'
- gradient_color_3 = '#4B5A7D'
- gradient_color_4 = '#57688F'
- gradient_color_5 = '#6590A3'
- gradient_color_6 = '#7AACC2'
- gradient_color_7 = '#9AE6E6'
- gradient_color_8 = '#AAF0F0'
+ gradient_color_1 = '#3B3345'
+ gradient_color_2 = '#4E445C'
+ gradient_color_3 = '#5F5866'
+ gradient_color_4 = '#332C3A'
+ gradient_color_5 = '#AA7983'
+ gradient_color_6 = '#BF8B95'
+ gradient_color_7 = '#BE575B'
+ gradient_color_8 = '#E4A4A3'

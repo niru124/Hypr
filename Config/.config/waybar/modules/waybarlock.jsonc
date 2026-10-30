@@ -1,0 +1,8 @@
+    "custom/waybarlock": {
+        "format": "{}",
+        "return-type": "json",
+        "exec": "~/.local/share/bin/waybar-themelock.sh status",
+        "interval": 5,
+        "on-click": "~/.local/share/bin/waybar-themelock.sh toggle",
+        "tooltip": true
+    },

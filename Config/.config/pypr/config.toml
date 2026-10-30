@@ -20,14 +20,14 @@ max_size = "1920px 100%"
 
 [scratchpads.nvim]
 animation = "fromTop"
-command = "kitty --class main-nvim -e nvim 1.md"
+command = "kitty --class main-nvim -e vim 1.md"
 class = "main-nvim"
 size = "95% 60%"
 max_size = "1920px 100%"
 
 [scratchpads.ranger]
 animation = "fromTop"
-command = "kitty --class main-ranger -e lf"
+command = "kitty --class main-ranger -e ranger"
 class = "main-ranger"
 size = "90% 80%"
 max_size = "1920px 100%"

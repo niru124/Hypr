@@ -30,20 +30,20 @@ fi
 
 x_mon=$(hyprctl -j monitors | jq '.[] | select(.focused==true) | .width')
 y_mon=$(hyprctl -j monitors | jq '.[] | select(.focused==true) | .height')
-hypr_scale=$(hyprctl -j monitors | jq '.[] | select (.focused == true) | .scale' | sed 's/\.//')
+mon_scale=$(hyprctl -j monitors | jq '.[] | select (.focused == true) | .scale')
 
 
 #// scale config layout and style
 
 case "${wlogoutStyle}" in
     1)  wlColms=6
-        export mgn=$(( y_mon * 28 / hypr_scale ))
-        export hvr=$(( y_mon * 23 / hypr_scale )) ;;
+        export mgn="$(awk -v y="${y_mon}" -v s="${mon_scale}" 'BEGIN{printf "%d", y*28/100/s}')"
+        export hvr="$(awk -v y="${y_mon}" -v s="${mon_scale}" 'BEGIN{printf "%d", y*23/100/s}')" ;;
     2)  wlColms=2
-        export x_mgn=$(( x_mon * 35 / hypr_scale ))
-        export y_mgn=$(( y_mon * 25 / hypr_scale ))
-        export x_hvr=$(( x_mon * 32 / hypr_scale ))
-        export y_hvr=$(( y_mon * 20 / hypr_scale )) ;;
+        export x_mgn="$(awk -v x="${x_mon}" -v s="${mon_scale}" 'BEGIN{printf "%d", x*35/100/s}')"
+        export y_mgn="$(awk -v y="${y_mon}" -v s="${mon_scale}" 'BEGIN{printf "%d", y*25/100/s}')"
+        export x_hvr="$(awk -v x="${x_mon}" -v s="${mon_scale}" 'BEGIN{printf "%d", x*32/100/s}')"
+        export y_hvr="$(awk -v y="${y_mon}" -v s="${mon_scale}" 'BEGIN{printf "%d", y*20/100/s}')" ;;
 esac
 
 

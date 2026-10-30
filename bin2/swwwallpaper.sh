@@ -16,7 +16,8 @@ Wall_Cache()
     ln -fs "${wallList[setIndex]}" "${wallSet}"
     ln -fs "${wallList[setIndex]}" "${wallCur}"
     "${scrDir}/swwwallcache.sh" -w "${wallList[setIndex]}" &> /dev/null
-    "${scrDir}/swwwallbash.sh" "${wallList[setIndex]}" &
+    # matugen handles all theming now (replaces swwwallbash.sh / wallbash)
+    matugen image "${wallList[setIndex]}" -m dark &> /dev/null &
     ln -fs "${thmbDir}/${wallHash[setIndex]}.sqre" "${wallSqr}"
     ln -fs "${thmbDir}/${wallHash[setIndex]}.thmb" "${wallTmb}"
     ln -fs "${thmbDir}/${wallHash[setIndex]}.blur" "${wallBlr}"
@@ -45,6 +46,14 @@ Wall_Change()
 
 scrDir="$(dirname "$(realpath "$0")")"
 source "${scrDir}/globalcontrol.sh"
+
+# // swww was renamed to awww upstream; prefer whichever is installed
+SWWW_BIN="$(command -v swww || command -v awww || true)"
+SWWWD_BIN="$(command -v swww-daemon || command -v awww-daemon || true)"
+if [[ -z ${SWWW_BIN} || -z ${SWWWD_BIN} ]]; then
+    echo ":: neither swww nor awww is installed" >&2
+    exit 1
+fi
 wallSet="${hydeThemeDir}/wall.set"
 wallCur="${cacheDir}/wall.set"
 wallSqr="${cacheDir}/wall.sqre"
@@ -95,10 +104,10 @@ done
 
 #// check swww daemon
 
-swww query &> /dev/null
+"${SWWW_BIN}" query &> /dev/null
 if [ $? -ne 0 ] ; then
-    swww-daemon --format xrgb &
-    swww query && swww restore
+    "${SWWWD_BIN}" --format xrgb &
+    "${SWWW_BIN}" query && "${SWWW_BIN}" restore
 fi
 
 
@@ -113,75 +122,14 @@ fi
 #// apply wallpaper
 
 echo ":: applying wall :: \"$(readlink -f "${wallSet}")\""
-swww img "$(readlink "${wallSet}")" --transition-bezier .43,1.19,1,.4 --transition-type "${xtrans}" --transition-duration "${wallTransDuration}" --transition-fps "${wallFramerate}" --invert-y --transition-pos "$(hyprctl cursorpos | grep -E '^[0-9]' || echo "0,0")" &
+"${SWWW_BIN}" img "$(readlink "${wallSet}")" --transition-bezier .43,1.19,1,.4 --transition-type "${xtrans}" --transition-duration "${wallTransDuration}" --transition-fps "${wallFramerate}" --invert-y --transition-pos "$(hyprctl cursorpos | grep -E '^[0-9]' || echo "0,0")" &
 
 notify -normal --app-name "ThemeSwitch" "" -message-new-instant
 sleep 0.5
 
-# Update border colors directly from .dcol file
-if [ -f "${wallDcl}" ]; then
-    . "${wallDcl}"
-
-    dcol_1xa6_rgba_fix="${dcol_1xa6_rgba//\\1/1}"
-    dcol_1xa7_rgba_fix="${dcol_1xa7_rgba//\\1/1}"
-    dcol_pry2_rgba_fix="${dcol_pry2_rgba//\\1/1}"
-    dcol_2xa8_rgba_fix="${dcol_2xa8_rgba//\\1/1}"
-    dcol_pry1_rgba_fix="${dcol_pry1_rgba//\\1/1}"
-    dcol_1xa3_rgba_fix="${dcol_1xa3_rgba//\\1/1}"
-    dcol_1xa4_rgba_fix="${dcol_1xa4_rgba//\\1/1}"
-
-    mkdir -p "$HOME/.config/hypr/themes"
-    cat > "$HOME/.config/hypr/themes/colors.lua" <<EOF
-hl.config({
-  general = {
-    ["col.active_border"] = {
-      colors = {
-        "${dcol_1xa6_rgba_fix}",
-        "${dcol_1xa7_rgba_fix}",
-        "${dcol_pry2_rgba_fix}",
-        "${dcol_2xa8_rgba_fix}",
-        "${dcol_1xa6_rgba_fix}",
-        "${dcol_1xa7_rgba_fix}",
-        "${dcol_pry2_rgba_fix}",
-        "${dcol_2xa8_rgba_fix}",
-      },
-    },
-    ["col.inactive_border"] = {
-      colors = {
-        "${dcol_pry1_rgba_fix}",
-        "${dcol_pry2_rgba_fix}",
-        "${dcol_1xa3_rgba_fix}",
-        "${dcol_1xa4_rgba_fix}",
-      },
-      angle = 45,
-    },
-  },
-  group = {
-    ["col.border_active"] = {
-      colors = {
-        "${dcol_1xa6_rgba_fix}",
-        "${dcol_1xa7_rgba_fix}",
-        "${dcol_pry2_rgba_fix}",
-        "${dcol_2xa8_rgba_fix}",
-        "${dcol_1xa6_rgba_fix}",
-        "${dcol_1xa7_rgba_fix}",
-        "${dcol_pry2_rgba_fix}",
-        "${dcol_2xa8_rgba_fix}",
-      },
-    },
-    ["col.border_inactive"] = {
-      colors = {
-        "${dcol_pry1_rgba_fix}",
-        "${dcol_pry2_rgba_fix}",
-        "${dcol_1xa3_rgba_fix}",
-        "${dcol_1xa4_rgba_fix}",
-      },
-      angle = 45,
-    },
-  },
-})
-EOF
-
-    hyprctl -q reload
-    echo "✅ Border colors updated from wallpaper"
-fi
+# matugen generates all colors (hypr, hyprlock, waybar, kitty, foot, dunst, rofi, alacritty, gtk)
+# Wall_Cache already fired it async; ensure current wallpaper is themed even
+# when invoked without option flags (e.g. plain startup call).
+matugen image "$(readlink -f "${wallSet}")" -m dark &> /dev/null || true
+hyprctl -q reload || true
+echo "✅ matugen colors applied from wallpaper"

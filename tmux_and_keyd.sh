@@ -1,48 +1,57 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#
+# tmux + keyd step: install .tmux.conf, TPM and the keyd remapping.
+#
+set -Eeuo pipefail
+IFS=$'\n\t'
 
-# Get the absolute path of the current directory
-current_directory="$(pwd)"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+# shellcheck source=lib/common.sh
+source "$SCRIPT_DIR/lib/common.sh"
 
-# Path to .tmux.conf source and destination
-tmux_source="$current_directory/Config/.config/tmux/.tmux.conf"
-tmux_dest="$HOME/.tmux.conf"
+TMUX_SOURCE="$SCRIPT_DIR/Config/.config/tmux/.tmux.conf"
+TMUX_DEST="$HOME/.tmux.conf"
+KEYD_SOURCE="$SCRIPT_DIR/keyd/default.conf"
+KEYD_DEST="/etc/keyd/default.conf"
 
-# Path to keyd source and destination
-keyd_source="$current_directory/keyd"
-keyd_dest="/etc/keyd/default.conf"
+require_not_root
+need_cmd git
 
-# Copy the .tmux.conf file to the user's home directory
-if [ -f "$tmux_source" ]; then
-    cp "$tmux_source" "$tmux_dest"
-    echo "Copied .tmux.conf to $tmux_dest"
+log "tmux + keyd"
+
+if [[ -f $TMUX_SOURCE ]]; then
+	backup_path "$TMUX_DEST"
+	install -m 644 -- "$TMUX_SOURCE" "$TMUX_DEST"
+	ok "installed $TMUX_DEST"
 else
-    echo ".tmux.conf not found at $tmux_source"
+	warn ".tmux.conf not found at $TMUX_SOURCE"
 fi
 
-# Install TPM (tmux plugin manager) if not already installed
-if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
-    git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
-    echo "Installed TPM"
+if [[ ! -d $HOME/.tmux/plugins/tpm ]]; then
+	log "installing TPM"
+	git clone --depth 1 https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+	ok "installed TPM"
 else
-    echo "TPM already installed"
+	ok "TPM already installed"
 fi
 
-# Copy the keyd config to /etc/keyd (requires sudo)
-if [ -f "$keyd_source" ]; then
-    # Check if keyd is installed
-    if ! command -v keyd &>/dev/null; then
-        echo "Error: 'keyd' is not installed. Please install keyd first."
-    else
-        sudo cp "$keyd_source" "$keyd_dest"
-        echo "Copied keyd config to $keyd_dest"
-
-        # Enable and start keyd service
-        sudo systemctl enable keyd
-        echo "Enabled keyd service."
-        sudo systemctl start keyd
-        echo "Started keyd service."
-    fi
-else
-    echo "keyd config not found at $keyd_source"
+if [[ ! -f $KEYD_SOURCE ]]; then
+	warn "keyd config not found at $KEYD_SOURCE"
+	exit 0
 fi
 
+command -v keyd >/dev/null 2>&1 || pacman_install keyd
+
+sudo mkdir -p -- "$(dirname -- "$KEYD_DEST")"
+if [[ -f $KEYD_DEST ]]; then
+	backup="/etc/keyd/default.conf.bak.$(date +%Y%m%d-%H%M%S)"
+	sudo cp -a -- "$KEYD_DEST" "$backup"
+	ok "backed up $KEYD_DEST -> $backup"
+fi
+sudo install -m 644 -- "$KEYD_SOURCE" "$KEYD_DEST"
+ok "installed $KEYD_DEST"
+
+sudo systemctl enable --now keyd.service
+ok "keyd enabled and running"
+
+ok "tmux + keyd step complete"

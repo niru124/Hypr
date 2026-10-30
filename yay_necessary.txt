@@ -1,11 +1,17 @@
-python-pywal16
+# AUR packages installed with yay.
+# One package per line; comments and blank lines are ignored.
+#
+# oh-my-zsh is installed by install_zsh.sh from git, not as a package, to avoid
+# two competing Oh My Zsh installations.
+#
+# matugen is listed in pacman_necessary.txt; on plain Arch install_core.sh falls
+# back to the AUR package matugen-bin.
+
 power-profiles-daemon
 wttrbar
 wlogout
-wl-clipboard
 carapace-bin
-grimblast
+grimblast-git
 nwg-look
 trashy
-oh-my-zsh-git
 nwg-displays

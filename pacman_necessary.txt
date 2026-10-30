@@ -1,38 +1,73 @@
-neovim
+# Packages installed with pacman (official repositories).
+# One package per line; comments and blank lines are ignored.
+
+# Hyprland and session
+hyprland
+hypridle
+hyprlock
 hyprsunset
+hyprshot
+xdg-desktop-portal
+xdg-desktop-portal-hyprland
+xdg-desktop-portal-gtk
+xdg-utils
+polkit
+polkit-gnome
+networkmanager
+network-manager-applet
+blueman
+bluez
+bluez-utils
+brightnessctl
+playerctl
+cliphist
+wl-clipboard
+
+# Bar, launcher, notifications, wallpaper
+waybar
+rofi
+rofi-calc
 dunst
-kitty
-rofi-wayland
+libnotify
+awww
+matugen
 satty
+grim
+slurp
+swappy
+
+# Terminals, editors, media
+kitty
+neovim
+mpv
 cava
 yazi
-mpv
-swww
-waybar
-hyprlock
-greetd-tuigreet
-rofi-calc
-picom
-xdg-desktop-portal 
-xdg-desktop-portal-hyprland
+zathura
+zathura-pdf-poppler
+
+# Audio
 pipewire
-wireplumber 
+wireplumber
+pavucontrol
 sound-theme-freedesktop
-network-manager-applet
-polkit-gnome
+
+# Shell and build tooling
 zsh
+git
 rsync
 unzip
+jq
+zoxide
+python
+cmake
 meson
 cpio
-cmake
-pavucontrol
-bluez-utils 
-bluez
 parallel
-hyprlock
-libnotify
-zoxide
-hyprshot
-blueman
-brightnessctl
+
+# Greeter
+greetd
+greetd-tuigreet
+
+# Qt/GTK theming
+qt5ct
+qt6ct
