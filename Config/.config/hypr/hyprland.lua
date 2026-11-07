@@ -9,6 +9,16 @@
 local scrPath = os.getenv("HOME") .. "/.local/share/bin"
 local mainMod = "SUPER"
 
+-- ScrollOverview configuration and keybinds (plugins/scrolloverview.lua).
+-- Loaded at config-parse time so `hyprctl reload` also (re)registers the binds,
+-- not only a full Hyprland start.
+local scrollOverviewConfig = os.getenv("HOME") .. "/.config/hypr/plugins/scrolloverview.lua"
+local scrollOverviewFile = io.open(scrollOverviewConfig, "r")
+if scrollOverviewFile then
+  scrollOverviewFile:close()
+  dofile(scrollOverviewConfig)
+end
+
 -- Autostart applications
 hl.on("hyprland.start", function()
   hl.exec_cmd(scrPath .. "/resetxdgportal.sh")
@@ -27,10 +37,6 @@ hl.on("hyprland.start", function()
   hl.exec_cmd(scrPath .. "/batterynotify.sh")
   hl.exec_cmd("hyprsunset -t 2500K")
   hl.exec_cmd("pypr")
-
-  local so = os.getenv("HOME") .. "/.config/hypr/plugins/scrolloverview.lua"
-  local f = io.open(so, "r")
-  if f then f:close(); dofile(so) end
   hl.exec_cmd("hyprshade on")
   hl.exec_cmd("youtube-local")
   hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")

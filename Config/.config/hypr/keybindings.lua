@@ -62,7 +62,8 @@ hl.bind(mainMod .. " + 4", hl.dsp.layout("colresize 1.0"))
 
 hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exec_cmd("pkill -x rofi || " .. scrPath .. "/rofilaunch.sh f"))
 hl.bind(mainMod .. " + O", hl.dsp.exec_cmd("pkill -x rofi || " .. scrPath .. "/emoji.sh"))
-hl.bind(mainMod .. " + U", hl.dsp.exec_cmd("pkill -x rofi || " .. scrPath .. "/quickapps.sh"))
+-- SUPER + U is the Scroll-Overview toggle (plugins/scrolloverview.lua)
+hl.bind(mainMod .. " + SHIFT + U", hl.dsp.exec_cmd("pkill -x rofi || " .. scrPath .. "/quickapps.sh"))
 hl.bind(mainMod .. " + ALT + Y", hl.dsp.exec_cmd("pkill -x rofi || " .. scrPath .. "/rofi_todo.sh"))
 hl.bind("ALT + S", hl.dsp.exec_cmd("pkill -x rofi || " .. scrPath .. "/shaders.sh"))
 hl.bind(mainMod .. " + SHIFT + J", hl.dsp.exec_cmd(os.getenv("HOME") .. "/.config/hypr/bin/toggle_layout.sh"))
@@ -279,10 +280,8 @@ hl.bind(mainMod .. " + RIGHT", hl.dsp.exec_cmd("pypr layout_center next"))
 hl.bind(mainMod .. " + UP", hl.dsp.exec_cmd("pypr layout_center prev2"))
 hl.bind(mainMod .. " + DOWN", hl.dsp.exec_cmd("pypr layout_center next2"))
 
--- Overview plugin
-hl.bind(mainMod .. " + U", hl.dsp.exec_cmd("plugin:overview:toggle"))
-
 -- Scroll-Overview plugin binds/submap live in plugins/scrolloverview.lua
+-- (toggle: SUPER + H). SUPER + U above is quickapps.sh.
 
 -- Cursor zoom (like 2-finger pinch)
 hl.bind(mainMod .. " + equal", hl.dsp.exec_cmd("hyprctl -q eval \"hl.config({cursor = {zoom_factor = $(hyprctl getoption cursor:zoom_factor -j | jq '.float * 1.1')}})\""), { repeating = true })

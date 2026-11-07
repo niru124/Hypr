@@ -7,7 +7,7 @@
   <property name="zoomGesturesEnabled" value="true"/>
   <property name="selectedToolbar" value="Portrait"/>
   <property name="lastSavePath" value="/home/pencil/Downloads"/>
-  <property name="lastOpenPath" value="/home/pencil/Downloads/localsend-cli"/>
+  <property name="lastOpenPath" value="/home/pencil/Downloads"/>
   <property name="lastImagePath" value="/home/pencil/Downloads/localsend-cli"/>
   <property name="edgePanSpeed" value="20"/>
   <property name="edgePanMaxMult" value="5"/>
@@ -126,10 +126,10 @@
   <property name="useSpacesForTab" value="false"/>
   <property name="numberOfSpacesForTab" value="4"/>
   <property name="laserPointerFadeOutTime" value="500"/>
-  <property name="stabilizerAveragingMethod" value="1"/>
+  <property name="stabilizerAveragingMethod" value="2"/>
   <property name="stabilizerPreprocessor" value="0"/>
   <property name="stabilizerBuffersize" value="15"/>
-  <property name="stabilizerSigma" value="0.5"/>
+  <property name="stabilizerSigma" value="0.6"/>
   <property name="stabilizerDeadzoneRadius" value="1.3"/>
   <property name="stabilizerDrag" value="0.4"/>
   <property name="stabilizerMass" value="5"/>
@@ -209,6 +209,10 @@
       <attribute name="deviceClass" type="int" value="0"/>
       <attribute name="deviceSource" type="int" value="2"/>
     </data>
+    <data name="UScreen Pen">
+      <attribute name="deviceClass" type="int" value="2"/>
+      <attribute name="deviceSource" type="int" value="1"/>
+    </data>
     <data name="Wayland Continuous Scrolling">
       <attribute name="deviceClass" type="int" value="1"/>
       <attribute name="deviceSource" type="int" value="7"/>
@@ -220,6 +224,10 @@
     <data name="Wayland Pointer">
       <attribute name="deviceClass" type="int" value="2"/>
       <attribute name="deviceSource" type="int" value="0"/>
+    </data>
+    <data name="Wayland Touch">
+      <attribute name="deviceClass" type="int" value="4"/>
+      <attribute name="deviceSource" type="int" value="5"/>
     </data>
     <data name="Wayland Wheel Scrolling">
       <attribute name="deviceClass" type="int" value="1"/>
@@ -268,7 +276,7 @@
       <attribute name="size" type="string" value="MEDIUM"/>
     </data>
     <data name="pen">
-      <attribute name="color" type="hex" value="ffa6da95"/>
+      <attribute name="color" type="hex" value="ffe78284"/>
       <attribute name="drawingType" type="string" value="default"/>
       <attribute name="fill" type="int" value="0"/>
       <attribute name="fillAlpha" type="int" value="128"/>
